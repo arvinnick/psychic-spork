@@ -1,7 +1,31 @@
-from fastapi import FastAPI
+from typing import List, Annotated, Any
+
+from fastapi import FastAPI, HTTPException, Query
+
+from crud import read
+from schemas import Inventory
 
 app = FastAPI()
 
-@app.get("/")
-async def home() -> dict:
-    return {"message":"test"}
+
+
+@app.get("/inventory", response_model=List[Inventory])
+async def inventory(code:Annotated[List[str] | None, Query()] = None,
+                    name:Annotated[List[str] | None, Query()] = None) -> Any:
+    if code and name:
+        raise HTTPException(status_code=400, detail="only one of the query parametes should be used")
+    elif code or name:
+        if code:
+            data = read(key='code',
+                        values=code) #going to filter out the resutls based on the
+                                                                       # code or name provided
+        elif name:
+            data = read(key='name',
+                        values=name)
+        return data
+    else:
+        data = read()
+        return data
+
+
+
