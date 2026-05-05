@@ -1,6 +1,7 @@
 from typing import List, Annotated, Any
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.params import Depends
 
 from crud import read
 from schemas import Inventory
@@ -27,5 +28,12 @@ async def inventory(code:Annotated[List[str] | None, Query()] = None,
         data = read()
         return data
 
+class test_depended():
+    def __init__(self, p=10, a='a', b='b'):
+        self.p = p
+        self.a = a
+        self.b = b
 
-
+@app.get("/dependency-test")
+async def test_endpoint(common: Annotated[test_depended, Depends(test_depended)]):
+    return common
