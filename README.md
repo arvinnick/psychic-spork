@@ -29,3 +29,7 @@ The primary objective of the algorithm is a Minimal Residual Average. Over a thr
     Refining: The system checks the "Waste Log." If items were discarded, the ordering logic is penalized to prevent over-ordering in the future.
 
     Execution: When the "Safety Threshold" is breached (considering delivery latency), the system autonomously generates a replenishment request to the supply center.
+
+
+Install:
+for the db initialization, run models.py after activating the virtual env (later to be dockerized).

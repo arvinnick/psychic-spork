@@ -4,7 +4,7 @@ from typing import Any, List
 
 
 
-def read(path:Path=Path('mock_inventory.json'), key:str=None, values:List=None) -> List[dict]:
+def read(path:Path=Path('../mock_inventory.json'), key:str=None, values:List=None) -> List[dict]:
     """
     Reads and optionally filters inventory data from a JSON file.
 

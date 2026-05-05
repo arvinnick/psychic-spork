@@ -3,8 +3,8 @@ from typing import List, Annotated, Any
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.params import Depends
 
-from crud import read
-from schemas import Inventory
+from db.crud import read
+from db.schemas import Inventory
 
 app = FastAPI()
 
