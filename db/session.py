@@ -1,13 +1,10 @@
 from sqlalchemy import create_engine
+from config import Settings
 
-##TODO: add this into a config file
-PROD = False
-PROD_ENGINE_URI = ''
-TEST_SQLITE_FILE_NAME = ":memory:" #"restaurant.sqlite"
-TEST_ENGINE_URI = f"sqlite+pysqlite:///{TEST_SQLITE_FILE_NAME}"
-
+config = Settings()
+PROD = config.PROD
 
 if PROD:
-    engine = create_engine(PROD_ENGINE_URI, echo=True)
+    engine = create_engine(config.PROD_ENGINE_URI, echo=True)
 else:
-    engine = create_engine(TEST_ENGINE_URI, echo=True)
+    engine = create_engine(config.TEST_ENGINE_URI, echo=True)

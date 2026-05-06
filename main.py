@@ -1,14 +1,12 @@
 from typing import List, Annotated, Any
-
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.params import Depends
-
 from db.crud import read
 from db.schemas import Inventory
 
+
+
 app = FastAPI()
-
-
 
 @app.get("/inventory", response_model=List[Inventory])
 async def inventory(code:Annotated[List[str] | None, Query()] = None,
