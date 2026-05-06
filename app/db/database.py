@@ -15,4 +15,10 @@ else:
 
 
 Session = sessionmaker(bind=engine)
-session = Session()
+
+
+def get_db():
+    with Session(bind=engine) as session:
+        yield session
+
+
