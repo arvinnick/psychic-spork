@@ -1,0 +1,16 @@
+from sqlalchemy import Float, ForeignKey, DateTime
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from datetime import datetime
+
+from .base import Base
+from .inventory import Inventory
+
+
+
+class Losses(Base):
+    __tablename__ = "losses"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    date_time: Mapped[datetime] = mapped_column(DateTime)
+    ingredient_id: Mapped[int] = mapped_column(ForeignKey("inventory.id"))
+    ingredient: Mapped[Inventory] = relationship("Inventory")
+    quantity: Mapped[float] = mapped_column(Float)
