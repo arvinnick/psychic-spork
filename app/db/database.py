@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, Engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session
 from db.models import Base
 
 ##TODO: add this into a config file
@@ -21,10 +21,6 @@ async def get_db():
     finally:
         db.close()
 
-
-def get_db():
-    with Session(bind=engine) as session:
-        yield session
 
 
 if __name__ == "__main__":
