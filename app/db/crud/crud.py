@@ -1,26 +1,13 @@
 from fastapi import APIRouter
-from sqlalchemy.orm import Session
-from db.base import Base
 
-crudRouter = APIRouter()
+from crud.inventory import inventory_crud_router
+
+crud_router = APIRouter(
+    prefix="/crud",
+)
+crud_router.include_router(inventory_crud_router)
 
 
 
-
-def create(model:Base,
-           db:Session, ) -> Base:
-    """
-    create inventory entity and commits it to the database
-    :return: created inventory object
-    """
-    for key, value in kwargs.items():
-        if hasattr(model, key):
-            setattr(model, key, value)
-        else:
-            raise AttributeError(f"{key} is not a valid attribute for {model.__tablename__}")
-    db.add(model)
-    db.commit()
-    db.refresh(model)
-    return model
 
 
