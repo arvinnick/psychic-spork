@@ -1,5 +1,5 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, Engine
+from sqlalchemy.orm import sessionmaker, Session
 from db.models import Base
 
 ##TODO: add this into a config file
@@ -14,8 +14,12 @@ if PROD:
 else:
     engine = create_engine(TEST_ENGINE_URI, echo=True)
 
-
-Session = sessionmaker(bind=engine)
+async def get_db():
+    db = Session(engine)
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 def get_db():
