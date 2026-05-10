@@ -1,10 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from db.models import Base
 
 ##TODO: add this into a config file
 PROD = False
 PROD_ENGINE_URI = ''
-TEST_SQLITE_FILE_NAME = ":memory:" #"restaurant.sqlite"
+TEST_SQLITE_FILE_NAME = "./test_db.sqlite" #"restaurant.sqlite"
 TEST_ENGINE_URI = f"sqlite+pysqlite:///{TEST_SQLITE_FILE_NAME}"
 
 
@@ -22,3 +23,5 @@ def get_db():
         yield session
 
 
+if __name__ == "__main__":
+    Base.metadata.create_all(engine)

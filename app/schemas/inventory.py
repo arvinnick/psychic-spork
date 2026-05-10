@@ -1,10 +1,12 @@
 from pydantic import BaseModel
 
-from .base import SupplierInventoryAssociation
+from .supplier import SupplierBase
 
 
 class Inventory(BaseModel):
-    id: int
     name: str
-    quantity: float
-    supplier: SupplierInventoryAssociation
+    quantity: int = 0
+    supplier: SupplierBase
+
+class InventoryCreate(Inventory):
+    pass

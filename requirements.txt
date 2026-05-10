@@ -189,7 +189,6 @@ shellingham==1.5.4
 six==1.16.0
 sortedcontainers==2.4.0
 soupsieve==2.5
-SQLAlchemy
 sqlparse==0.4.4
 stack-data==0.6.3
 sympy==1.12
@@ -377,3 +376,5 @@ xkit==0.0.0
 yarl==1.8.2
 yoyo-migrations==8.2.0
 zipp==1.0.0
+pydantic
+sqlalchemy

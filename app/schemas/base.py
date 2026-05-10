@@ -4,5 +4,5 @@ from pydantic import BaseModel
 
 class SupplierInventoryAssociation(BaseModel):
     id: int
-    supplier: int
+    suppliers: int
     inventory: int

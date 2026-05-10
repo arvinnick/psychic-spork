@@ -3,7 +3,6 @@ from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 from datetime import datetime
 from typing import List
 
-from db.database import engine
 
 
 class Base(DeclarativeBase):
@@ -57,5 +56,4 @@ class Orders(Base):
 
 
 
-if __name__ == "__main__":
-    Base.metadata.create_all(engine)
+
