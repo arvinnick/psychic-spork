@@ -1,7 +1,6 @@
-from typing import Any
-
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, model_validator
-
+from typing_extensions import Self
 
 class SupplierBase(BaseModel):
     id: int
@@ -9,14 +8,14 @@ class SupplierBase(BaseModel):
     address: str = None
     number: str = None
     email: str = None
-    # @model_validator(mode='after') #todo:make it work later based on pydantic 2.0
-    # @classmethod
-    # def at_least_one_contact(cls, address:str, number:str, email:str) -> Any:
-    #     assert (address or number or email)
 
 
 class SupplierCreate(SupplierBase):
-    pass
+    @model_validator(mode='after')
+    def at_least_one_contact(self) -> Self:
+        if not (self.address or self.number or self.email):
+            raise RequestValidationError('you should add at least one of the ways to contact the supplier')
+        return self
 
 
 
