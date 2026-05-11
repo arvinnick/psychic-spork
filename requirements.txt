@@ -378,3 +378,5 @@ yoyo-migrations==8.2.0
 zipp==1.0.0
 pydantic
 sqlalchemy
+httpx
+fastapi

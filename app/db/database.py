@@ -1,6 +1,6 @@
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from db.models import Base
+from .models import Base
 
 ##TODO: add this into a config file
 PROD = False

@@ -3,15 +3,15 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from models import Inventory
-from database import get_db
-from schemas.inventory import InventoryCreate, InventoryBase
+from ..models import Inventory
+from ..database import get_db
+from ...schemas.inventory import InventoryCreate, Inventory
 
 inventory_crud_router = APIRouter(
     prefix="/inventory"
 )
 
-@inventory_crud_router.post("/", response_model=InventoryBase)
+@inventory_crud_router.post("/", response_model=Inventory)
 async def create_inventory_item(inventory_item: InventoryCreate,
         db: Annotated[Session, Depends(get_db)],
                                 ):

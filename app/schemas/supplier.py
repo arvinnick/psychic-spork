@@ -9,10 +9,10 @@ class SupplierBase(BaseModel):
     address: str = None
     number: str = None
     email: str = None
-    @model_validator(mode='after')
-    @classmethod
-    def at_least_one_contact(cls, address:str, number:str, email:str) -> Any:
-        assert (address or number or email)
+    # @model_validator(mode='after')
+    # @classmethod
+    # def at_least_one_contact(cls, address:str, number:str, email:str) -> Any:
+    #     assert (address or number or email)
 
 
 class SupplierCreate(SupplierBase):
