@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .inventory import inventory_crud_router
+from db.crud.inventory import inventory_crud_router
 
 crud_router = APIRouter(
     prefix="/crud",

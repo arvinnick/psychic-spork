@@ -9,7 +9,7 @@ class SupplierBase(BaseModel):
     address: str = None
     number: str = None
     email: str = None
-    # @model_validator(mode='after')
+    # @model_validator(mode='after') #todo:make it work later based on pydantic 2.0
     # @classmethod
     # def at_least_one_contact(cls, address:str, number:str, email:str) -> Any:
     #     assert (address or number or email)

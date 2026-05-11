@@ -1,18 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from .models import Base
+from config import settings
 
-##TODO: add this into a config file
-PROD = False
-PROD_ENGINE_URI = ''
-TEST_SQLITE_FILE_NAME = "./test_db.sqlite" #"restaurant.sqlite"
-TEST_ENGINE_URI = f"sqlite+pysqlite:///{TEST_SQLITE_FILE_NAME}"
-
-
-if PROD:
-    engine = create_engine(PROD_ENGINE_URI, echo=True)
+if settings.PROD:
+    engine = create_engine(settings.PROD_ENGINE_URI, echo=True)
 else:
-    engine = create_engine(TEST_ENGINE_URI, echo=True)
+    engine = create_engine(settings.TEST_ENGINE_URI, echo=True)
 
 async def get_db():
     db = Session(engine)
@@ -20,8 +13,3 @@ async def get_db():
         yield db
     finally:
         db.close()
-
-
-
-if __name__ == "__main__":
-    Base.metadata.create_all(engine)

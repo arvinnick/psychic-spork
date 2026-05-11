@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
-from .db.crud.crud import crud_router
+from db.crud.crud import crud_router
 
 DEBUG = True
 app = FastAPI()
