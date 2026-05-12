@@ -1,18 +1,20 @@
-from sqlalchemy import Float, ForeignKey, DateTime
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from datetime import datetime
-
-from .base import Base
-from .inventory import Inventory
-from .supplier import Supplier
+from pydantic import BaseModel, model_validator
+from pydantic.types import datetime
+from datetime import datetime as vanilla_datetime
+from schemas.inventory import Inventory
+from schemas.supplier import SupplierBase
 
 
-class Orders(Base):
-    __tablename__ = "orders"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    date_time: Mapped[datetime] = mapped_column(DateTime)
-    quantity: Mapped[float] = mapped_column(Float)
-    ingredient_id: Mapped[int] = mapped_column(ForeignKey("inventory.id"))
-    ingredient: Mapped[Inventory] = relationship("Inventory")
-    supplier_id: Mapped[int] = mapped_column(ForeignKey("supplier.id"))
-    supplier: Mapped[Supplier] = relationship("Supplier")
+class Order(BaseModel):
+    quantity: float
+    ingredient: Inventory
+    supplier: SupplierBase
+
+class OrderCreate(Order):
+    quantity: float
+    ingredient: str
+    supplier: str
+    @model_validator(mode='after')
+    def check_quantity(self):
+        assert self.quantity > 0, "Quantity must be positive"
+        return self
