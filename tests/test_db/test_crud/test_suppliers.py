@@ -8,5 +8,18 @@ class Test:
     client = TestClient(app)
     def test_create(self):
         app.dependency_overrides[get_db] = MockDatabase.override_db_dependency
-        self.client.post("/suppliers/crud", json={"supplier": "test"})
+        res = self.client.post("/crud/suppliers", json={
+                'name': 'mamal',
+                'address': 'alllll',
+                'number': '0930',
+                'email': 'a@gmail.com'
+        }) #simple post req
+        assert res.status_code == 200
+        assert res.json() == {
+                'name': 'mamal',
+                'address': 'alllll',
+                'number': '0930',
+                'email': 'a@gmail.com'
+        }
+        # failed_res = self.client.post("/suppliers/crud",data={'name': ''})
         app.dependency_overrides = {}

@@ -1,13 +1,12 @@
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, EmailStr
 from typing_extensions import Self
 
 class SupplierBase(BaseModel):
-    id: int
     name: str = ''
     address: str = None
     number: str = None
-    email: str = None
+    email: EmailStr = None
 
 
 class SupplierCreate(SupplierBase):

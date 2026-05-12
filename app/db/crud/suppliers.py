@@ -13,7 +13,7 @@ suppliers_crud_router = APIRouter(
 
 
 @suppliers_crud_router.post('/', response_model=SupplierSchema)
-async def create(supplier: SupplierCreate, db: Annotated[Session, Depends(get_db)]):#use the dependency for db, make the pydantic schemas first
+async def create_supplier(supplier: SupplierCreate, db: Annotated[Session, Depends(get_db)]):#use the dependency for db, make the pydantic schemas first
     """
     endpoint to create a new supplier
     :param db: dependency of the database

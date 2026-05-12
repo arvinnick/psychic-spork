@@ -18,14 +18,14 @@ async def create_inventory_item(inventory_item: InventoryCreate,
                                 ):
     try:
         supplier_names = inventory_item.suppliers
-        supplier_ids = db.execute(select(Supplier).where(Supplier.name.in_(supplier_names))).all()
-        if not supplier_ids:
+        suppliers = db.execute(select(Supplier).where(Supplier.name.in_(supplier_names))).scalars().all()
+        if not suppliers:
             raise HTTPException(status_code=400, detail="Supplier ids are not in the database. You need to add them"
                                                         "first or use the correct id.")
         db_item = Inventory(
             name=inventory_item.name,
             quantity=inventory_item.quantity,
-            suppliers=supplier_ids
+            suppliers=suppliers
         )
         db.add(db_item)
         db.commit()

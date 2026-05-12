@@ -7,7 +7,24 @@ class Test:
     client = TestClient(app)
     def test_create_inventory_item(self):
         app.dependency_overrides[get_db] = MockDatabase.override_db_dependency
-        self.client.post("/suppliers/crud", json={"supplier": "test"})
+        res = self.client.post("/suppliers/crud",
+                               json={
+                                        "name": "string",
+                                        "quantity": 0,
+                                        "suppliers": [
+                                            1
+                                        ]
+
+                                    })
+        assert res.status_code == 200
+        assert res.json() == {
+                                "name": "string",
+                                "quantity": 0,
+                                "suppliers": [
+                                    1
+                                ]
+
+                            }
         app.dependency_overrides = {}
 
 
