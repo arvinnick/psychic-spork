@@ -6,7 +6,7 @@ from app.schemas.supplier import SupplierBase
 
 class Inventory(BaseModel):
     name: str
-    quantity: int = 0
+    quantity: float = 0
     suppliers: List[SupplierBase]
 
 class InventoryCreate(Inventory):
