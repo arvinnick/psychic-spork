@@ -8,7 +8,7 @@ class Test:
     client = TestClient(app)
     def test_create(self):
         app.dependency_overrides[get_db] = MockDatabase.override_db_dependency
-        res = self.client.post("/crud/suppliers", json={
+        res = self.client.post("/crud/suppliers/", json={
                 'name': 'mamal',
                 'address': 'alllll',
                 'number': '0930',
