@@ -19,6 +19,8 @@ async def create_inventory_item(inventory_item: InventoryCreate,
                                 ):
     try:
         supplier_names = inventory_item.suppliers
+        if not supplier_names:
+            raise HTTPException(status_code=400, detail="You must define at least one supplier for an ingredient")
         suppliers = db.execute(select(Supplier).where(Supplier.name.in_(supplier_names))).scalars().all()
         if not suppliers:
             raise HTTPException(status_code=400, detail="Supplier names are not in the database. You need to add them"
