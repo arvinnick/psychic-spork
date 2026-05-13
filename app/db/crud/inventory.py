@@ -13,7 +13,7 @@ inventory_crud_router = APIRouter(
     tags=["inventory"],
 )
 
-@inventory_crud_router.post("/", response_model=SchemasInventory)
+@inventory_crud_router.post("/", response_model=SchemasInventory, status_code=201)
 async def create_inventory_item(inventory_item: InventoryCreate,
         db: Annotated[Session, Depends(get_db)],
                                 ):
