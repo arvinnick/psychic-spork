@@ -19,7 +19,7 @@ SupplierInventoryAssociation = Table(
 class Inventory(Base):
     __tablename__ = "inventory"
     id: Mapped[int] = mapped_column(primary_key=True)
-    name:Mapped[str] = mapped_column(String(50))
+    name:Mapped[str] = mapped_column(String(50), unique=True)
     quantity:Mapped[float] = mapped_column(Float)
     suppliers: Mapped[List["Supplier"]] = relationship(
         secondary=SupplierInventoryAssociation,

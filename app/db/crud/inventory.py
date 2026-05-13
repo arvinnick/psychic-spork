@@ -8,6 +8,8 @@ from app.db.database import get_db
 from schemas.inventory import InventoryCreate
 from schemas.inventory import Inventory as SchemasInventory
 
+from sqlalchemy.exc import IntegrityError
+
 inventory_crud_router = APIRouter(
     prefix="/inventory",
     tags=["inventory"],
@@ -34,6 +36,13 @@ async def create_inventory_item(inventory_item: InventoryCreate,
         db.commit()
         db.refresh(db_item)
         return db_item
+    except IntegrityError as ie:
+        db.rollback()
+        raise HTTPException(status_code=409,
+                            detail={
+                                "args": ie.args,
+                                "params": ie.params
+                            })
     except Exception as e:
         if isinstance(e, HTTPException):
             raise e
