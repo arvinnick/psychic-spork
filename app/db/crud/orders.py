@@ -14,6 +14,7 @@ from sqlalchemy import select
 
 orders_crud_router = APIRouter(
     prefix="/orders",
+    tags=["orders", "crud operations"]
 )
 
 @orders_crud_router.post("/", response_model=SchemasOrder)
