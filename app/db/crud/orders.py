@@ -17,8 +17,13 @@ orders_crud_router = APIRouter(
     tags=["orders"]
 )
 
-@orders_crud_router.post("/", response_model=SchemasOrder)
+@orders_crud_router.post("/", response_model=SchemasOrder,
+                         summary="creates an order entity in the database")
 def create_order(order: OrderCreate, db:Annotated[Session, Depends(get_db)]) -> Orders:
+    """
+    Path operation for creating an order entity in the database. Orders are somehow "messages" that will be sent to a
+    supplier to send an ingredient to the kitchen.
+    """
     try:
         ingredients = db.execute(select(Inventory).where(Inventory.name == order.ingredient)).scalars().all()
         if not ingredients:

@@ -13,13 +13,11 @@ suppliers_crud_router = APIRouter(
 )
 
 
-@suppliers_crud_router.post('/', response_model=SupplierSchema)
+@suppliers_crud_router.post('/', response_model=SupplierSchema, summary="Create a new supplier entity in the DB")
 async def create_supplier(supplier: SupplierCreate, db: Annotated[Session, Depends(get_db)]):
     """
-    endpoint to create a new supplier
-    :param db: dependency of the database
-    :param supplier: Supplier object
-    :return:
+    Endpoint to create a new supplier entity in the database. The supplier is the business which will fullfill
+    an order.
     """
     try:
         db_item = Supplier(
