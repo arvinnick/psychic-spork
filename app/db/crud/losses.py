@@ -11,7 +11,7 @@ from db.models import Losses, Inventory
 
 losses_crud_router = APIRouter(
     prefix="/losses",
-    tags=["losses", "crud operation"],
+    tags=["losses"],
 )
 
 @losses_crud_router.post('/', response_model=LossesSchema,

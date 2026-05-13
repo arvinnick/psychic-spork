@@ -7,6 +7,7 @@ from db.crud.suppliers import suppliers_crud_router
 
 crud_router = APIRouter(
     prefix="/crud",
+    tags=["crud operations"],
 )
 crud_router.include_router(inventory_crud_router)
 crud_router.include_router(suppliers_crud_router)

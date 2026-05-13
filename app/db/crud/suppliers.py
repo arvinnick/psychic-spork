@@ -9,7 +9,7 @@ from schemas.supplier import SupplierBase as SupplierSchema
 
 suppliers_crud_router = APIRouter(
     prefix="/suppliers",
-    tags=["suppliers", "crud operations"],
+    tags=["suppliers"],
 )
 
 
