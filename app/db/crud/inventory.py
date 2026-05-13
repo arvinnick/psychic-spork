@@ -9,7 +9,8 @@ from schemas.inventory import InventoryCreate
 from schemas.inventory import Inventory as SchemasInventory
 
 inventory_crud_router = APIRouter(
-    prefix="/inventory"
+    prefix="/inventory",
+    tags=["crud operations", "inventory"],
 )
 
 @inventory_crud_router.post("/", response_model=SchemasInventory)
