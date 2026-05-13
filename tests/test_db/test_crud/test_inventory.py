@@ -46,10 +46,6 @@ class Test:
                                   }
                               ]
                               })
-
-
-
-        app.dependency_overrides = {}
     def test_create_inventory_item_wrong_supplier_fail(self):
         # TODO: Test creation fails (400/404) when trying to link a supplier name/ID that does not exist.
         self.blueprint(req_url="/crud/inventory/",
@@ -177,7 +173,35 @@ class Test:
                            }
                        }
                        )
+    def test_multiple_suppliers_success(self):
+        self.blueprint(req_url="/crud/inventory/",
+                       req_json={
+                           "name": "string",
+                           "quantity": 1,
+                           "suppliers": [
+                               "Tehran Supply Co.",
+                               "South Trading"
+                           ]
+                       },
+                       res_status_code=201,
+                       res_json={'name': 'string',
+                                 'quantity': 1,
+                                 'suppliers': [
+                                     {
+                                         'name': 'Tehran Supply Co.',
+                                         'address': '1st Valiasr St, Tehran',
+                                         'number': '02112345678',
+                                         'email': 'info@tehransupply.com'
+                                     },
+                                     {
+                                         "name": "South Trading",
+                                         "address": "Coastal Blvd, Bandar Abbas",
+                                         "number": "07612345678",
+                                         "email": None
+                                     }
 
+                                 ]
+                                 })
     # TODO: Test successful creation linking multiple valid suppliers at once.
 
 

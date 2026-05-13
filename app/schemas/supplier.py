@@ -6,7 +6,7 @@ class SupplierBase(BaseModel):
     name: str = ''
     address: str = None
     number: str = None
-    email: EmailStr = None
+    email: EmailStr | None = None
 
 
 class SupplierCreate(SupplierBase):
