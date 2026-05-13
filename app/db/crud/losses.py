@@ -11,10 +11,15 @@ from db.models import Losses, Inventory
 
 losses_crud_router = APIRouter(
     prefix="/losses",
+    tags=["losses", "crud operation"],
 )
 
-@losses_crud_router.post('/', response_model=LossesSchema)
+@losses_crud_router.post('/', response_model=LossesSchema,
+                         summary="creating a loss of ingredients record in the database")
 def create_loss(loss: LossesCreate, db: Annotated[Session, Depends(get_db)]) -> Losses:
+    """
+    Creates a loss entity. When an ingredient is thrown away due to spoilage, we use this path operation to record it.
+    """
     try:
         ingredients = db.execute(select(Inventory).where(Inventory.name == loss.ingredient)).scalars().all()
         if not ingredients:

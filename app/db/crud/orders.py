@@ -30,7 +30,7 @@ def create_order(order: OrderCreate, db:Annotated[Session, Depends(get_db)]) -> 
         elif len(suppliers) > 1:
             raise HTTPException(status_code=400, detail=f"There are {len(suppliers)} suppliers in the database with this name")
         db_item = Orders(
-            date_time=datetime.now(),
+            date_time=order.date_time,
             quantity = order.quantity,
             ingredient = ingredients[0],
             supplier = suppliers[0]

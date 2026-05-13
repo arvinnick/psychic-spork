@@ -1,11 +1,11 @@
 from pydantic.types import datetime
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, Field
 
 from schemas.inventory import Inventory
 
 
 class Loss(BaseModel):
-    date_time: datetime
+    date_time: datetime = Field(default_factory=datetime.now)
     ingredient : Inventory
     quantity : float
     @model_validator(mode='after')
