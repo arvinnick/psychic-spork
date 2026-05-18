@@ -3,13 +3,14 @@ Hardcoded stuff for the tests
 """
 
 from datetime import datetime
-
+import pytest
 from sqlalchemy import create_engine, insert, StaticPool
 from sqlalchemy.orm import Session
-
+from fastapi.testclient import TestClient
 from app.db.models import Inventory, Supplier, SupplierInventoryAssociation, Orders, Losses
-
+from app.main import app
 import seed_db
+from app.db.database import get_db
 
 class MockDatabase:
     def __init__(self):
@@ -113,3 +114,28 @@ class MockDatabase:
             yield self.db
         finally:
             pass
+
+
+
+@pytest.fixture()
+def blueprint_fixture():
+    mock_db = MockDatabase()
+    app.dependency_overrides[get_db] = mock_db.override_db_dependency
+    test_client = TestClient(app)
+    def blueprint(param_dict,
+                  client = test_client):
+        """
+        this is a blueprint for the testcases, assuming that most of them are just going to send a request to the server,
+        then check the status code and response payload.
+        """
+        req_url = param_dict["req_url"]
+        req_json = param_dict["req_json"]
+        res_status_code = param_dict["res_status_code"]
+        res_json = param_dict["res_json"]
+        res = client.post(req_url, json=req_json)
+        assert res.status_code == res_status_code, str(res.json())
+        assert res.json() == res_json
+    yield blueprint
+    app.dependency_overrides = {}
+
+

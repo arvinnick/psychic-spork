@@ -39,10 +39,8 @@ async def create_inventory_item(inventory_item: InventoryCreate,
     except IntegrityError as ie:
         db.rollback()
         raise HTTPException(status_code=409,
-                            detail={
-                                "args": ie.args,
-                                "params": ie.params
-                            })
+                            detail=f"An inventory item with {inventory_item.name} already exists."
+                            )
     except Exception as e:
         if isinstance(e, HTTPException):
             raise e
