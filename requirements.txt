@@ -169,7 +169,6 @@ PySocks==1.7.1
 python-apt==2.7.7+ubuntu5.2
 python-dateutil==2.8.2
 python-debian==0.1.49+ubuntu2
-python-dotenv==1.0.1
 pytz==2024.1
 pyxdg==0.28
 PyYAML==6.0.1
@@ -189,7 +188,6 @@ shellingham==1.5.4
 six==1.16.0
 sortedcontainers==2.4.0
 soupsieve==2.5
-SQLAlchemy==1.4.50
 sqlparse==0.4.4
 stack-data==0.6.3
 sympy==1.12
@@ -377,3 +375,9 @@ xkit==0.0.0
 yarl==1.8.2
 yoyo-migrations==8.2.0
 zipp==1.0.0
+pydantic
+sqlalchemy
+httpx
+fastapi
+pydantic-settings
+pydantic[email]
