@@ -1,5 +1,5 @@
-from db import models
-from db import database
+from app.db import models
+from app.db import database
 from sqlalchemy import Engine
 
 
