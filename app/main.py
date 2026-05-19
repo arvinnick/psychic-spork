@@ -1,9 +1,11 @@
 import uvicorn
 from fastapi import FastAPI
+
+from config import settings
 from logger import logger
 from db.crud.crud import crud_router
 
-DEBUG = False
+
 app = FastAPI()
 logger.info("Starting the application...")
 
@@ -13,7 +15,7 @@ logger.info("Added the crud router.")
 
 
 
-if DEBUG:
+if settings.DEBUG:
     logger.info("The app is running in debug mode.")
     if __name__ == "__main__":
         uvicorn.run(app, host="0.0.0.0", port=8000)

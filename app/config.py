@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     PROD_ENGINE_URI : str = ''
     TEST_SQLITE_FILE_NAME : str = "testdb.sqlite"
     TEST_ENGINE_URI : str = f"sqlite+pysqlite:///{TEST_SQLITE_FILE_NAME}"
-
+    DEBUG : bool = True
 
 
 settings = Settings()

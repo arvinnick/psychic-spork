@@ -6,6 +6,7 @@ from sqlalchemy import select
 from db.models import Inventory, Supplier
 from app.db.database import get_db
 from logger import logger
+from config import settings
 from schemas.inventory import InventoryCreate
 from schemas.inventory import Inventory as SchemasInventory
 
@@ -44,8 +45,12 @@ async def create_inventory_item(inventory_item: InventoryCreate,
         raise HTTPException(status_code=409,
                             detail=f"An inventory item with {inventory_item.name} already exists."
                             )
+
     except Exception as e:
-        if isinstance(e, HTTPException):
-            raise e
+        if settings.DEBUG:
+            if isinstance(e, HTTPException):
+                raise e
+            else:
+                return HTTPException(status_code=500, detail=str(e))
         else:
-            return HTTPException(status_code=500, detail=str(e))
+            return HTTPException(status_code=500, detail="an internal error occurred. we know no more:(")

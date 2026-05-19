@@ -1,7 +1,0 @@
-fastapi[standard]
-pydantic
-pytest
-pytest-asyncio
-httpx
-uvicorn
-sqlalchemy
