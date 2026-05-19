@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from db.models import Inventory, Supplier
 from app.db.database import get_db
+from logger import logger
 from schemas.inventory import InventoryCreate
 from schemas.inventory import Inventory as SchemasInventory
 
@@ -14,11 +15,13 @@ inventory_crud_router = APIRouter(
     prefix="/inventory",
     tags=["inventory"],
 )
+logger.info(f"Defined the inventory router.")
 
 @inventory_crud_router.post("/", response_model=SchemasInventory, status_code=201)
 async def create_inventory_item(inventory_item: InventoryCreate,
         db: Annotated[Session, Depends(get_db)],
                                 ):
+    logger.info(f"Creating inventory item: {inventory_item.name}")
     try:
         supplier_names = inventory_item.suppliers
         if not supplier_names:

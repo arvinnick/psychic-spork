@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from db.database import get_db
 from db.models import Supplier
+from logger import logger
 from schemas.supplier import SupplierCreate
 from schemas.supplier import SupplierBase as SupplierSchema
 
@@ -11,6 +12,7 @@ suppliers_crud_router = APIRouter(
     prefix="/suppliers",
     tags=["suppliers"],
 )
+logger.info(f"Defined the suppliers router.")
 
 
 @suppliers_crud_router.post('/',
@@ -21,6 +23,7 @@ async def create_supplier(supplier: SupplierCreate, db: Annotated[Session, Depen
     Endpoint to create a new supplier entity in the database. The supplier is the business which will fullfill
     an order.
     """
+    logger.info(f"Creating a new supplier with name: {supplier.name}")
     try:
         db_item = Supplier(
             **supplier.model_dump()
