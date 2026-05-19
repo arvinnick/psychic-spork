@@ -3,13 +3,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import select
+
 
 from app.db.database import get_db
 from app.db.models import Inventory, Supplier
-from logger import logger
-from schemas.orders import Order as SchemasOrder, OrderCreate
+from app.logger import logger
+from app.schemas.orders import Order as SchemasOrder, OrderCreate
 from app.db.models import Orders
-from sqlalchemy import select
 
 
 

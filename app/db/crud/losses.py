@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
-from logger import logger
+from app.logger import logger
 from app.db.database import get_db
-from schemas.losses import Loss as LossesSchema
-from schemas.losses import LossesCreate
-from db.models import Losses, Inventory
+from app.schemas.losses import Loss as LossesSchema
+from app.schemas.losses import LossesCreate
+from app.db.models import Losses, Inventory
 
 losses_crud_router = APIRouter(
     prefix="/losses",

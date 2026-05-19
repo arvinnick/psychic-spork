@@ -3,12 +3,13 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from db.models import Inventory, Supplier
+
+from app.db.models import Inventory, Supplier
 from app.db.database import get_db
-from logger import logger
-from config import settings
-from schemas.inventory import InventoryCreate
-from schemas.inventory import Inventory as SchemasInventory
+from app.logger import logger
+from app.config import settings
+from app.schemas.inventory import InventoryCreate
+from app.schemas.inventory import Inventory as SchemasInventory
 
 from sqlalchemy.exc import IntegrityError
 

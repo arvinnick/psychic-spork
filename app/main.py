@@ -1,9 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
 
-from config import settings
-from logger import logger
-from db.crud.crud import crud_router
+from app.config import settings
+from app.logger import logger
+from app.db.crud.crud import crud_router
 
 
 app = FastAPI()

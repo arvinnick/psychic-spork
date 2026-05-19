@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
-from db.crud.inventory import inventory_crud_router
-from db.crud.losses import losses_crud_router
-from db.crud.orders import orders_crud_router
-from db.crud.suppliers import suppliers_crud_router
-from logger import logger
+from app.db.crud.inventory import inventory_crud_router
+from app.db.crud.losses import losses_crud_router
+from app.db.crud.orders import orders_crud_router
+from app.db.crud.suppliers import suppliers_crud_router
+from app.logger import logger
 
 crud_router = APIRouter(
     prefix="/crud",

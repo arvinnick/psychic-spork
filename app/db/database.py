@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from config import settings
-from logger import logger
+
+from app.config import settings
+from app.logger import logger
 
 if settings.PROD:
     engine = create_engine(settings.PROD_ENGINE_URI, echo=True)

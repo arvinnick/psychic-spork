@@ -1,7 +1,7 @@
 from pydantic.types import datetime
 from pydantic import BaseModel, model_validator, Field
 
-from schemas.inventory import Inventory
+from app.schemas.inventory import Inventory
 
 
 class Loss(BaseModel):

@@ -2,11 +2,11 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
 
-from db.database import get_db
-from db.models import Supplier
-from logger import logger
-from schemas.supplier import SupplierCreate
-from schemas.supplier import SupplierBase as SupplierSchema
+from app.db.database import get_db
+from app.db.models import Supplier
+from app.logger import logger
+from app.schemas.supplier import SupplierCreate
+from app.schemas.supplier import SupplierBase as SupplierSchema
 
 suppliers_crud_router = APIRouter(
     prefix="/suppliers",
