@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.db.models import Inventory, Supplier
+from logger import logger
 from schemas.orders import Order as SchemasOrder, OrderCreate
 from app.db.models import Orders
 from sqlalchemy import select
@@ -16,6 +17,8 @@ orders_crud_router = APIRouter(
     prefix="/orders",
     tags=["orders"]
 )
+logger.info(f"Defined the orders router.")
+
 
 @orders_crud_router.post("/", response_model=SchemasOrder,
                          summary="creates an order entity in the database")
@@ -24,6 +27,7 @@ def create_order(order: OrderCreate, db:Annotated[Session, Depends(get_db)]) -> 
     Path operation for creating an order entity in the database. Orders are somehow "messages" that will be sent to a
     supplier to send an ingredient to the kitchen.
     """
+    logger.info("Creating order for ingredient: {order.ingredient} from supplier: {order.supplier}")
     try:
         ingredients = db.execute(select(Inventory).where(Inventory.name == order.ingredient)).scalars().all()
         if not ingredients:

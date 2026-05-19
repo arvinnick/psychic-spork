@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
+from logger import logger
 from app.db.database import get_db
 from schemas.losses import Loss as LossesSchema
 from schemas.losses import LossesCreate
@@ -13,6 +14,7 @@ losses_crud_router = APIRouter(
     prefix="/losses",
     tags=["losses"],
 )
+logger.info(f"Defined the losses router.")
 
 @losses_crud_router.post('/', response_model=LossesSchema,
                          summary="creating a loss of ingredients record in the database")
@@ -20,6 +22,7 @@ def create_loss(loss: LossesCreate, db: Annotated[Session, Depends(get_db)]) -> 
     """
     Creates a loss entity. When an ingredient is thrown away due to spoilage, we use this path operation to record it.
     """
+    logger.info(f"Creating a loss of ingredient: {loss.ingredient}")
     try:
         ingredients = db.execute(select(Inventory).where(Inventory.name == loss.ingredient)).scalars().all()
         if not ingredients:
