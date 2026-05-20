@@ -2,6 +2,7 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
 
+import app.config as config
 from app.db.database import get_db
 from app.db.models import Supplier
 from app.logger import logger
@@ -34,5 +35,5 @@ async def create_supplier(supplier: SupplierCreate, db: Annotated[Session, Depen
         db.refresh(db_item)
         return db_item
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
+        raise HTTPException(status_code=500,
+                            detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")

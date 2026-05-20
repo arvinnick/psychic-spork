@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
-
+import app.config as config
 from app.db.database import get_db
 from app.db.models import Inventory, Supplier
 from app.logger import logger
@@ -56,5 +56,5 @@ def create_order(order: OrderCreate, db:Annotated[Session, Depends(get_db)]) -> 
         if e.__getattribute__("status_code") == 400:
             raise e
         else:
-            raise HTTPException(status_code=500, detail=str(e))
-
+            raise HTTPException(status_code=500,
+                                detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")

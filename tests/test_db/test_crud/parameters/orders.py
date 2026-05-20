@@ -1,9 +1,6 @@
 from tests.conftest import MockDatabase, test_now
 
-from datetime import datetime
-
 database = MockDatabase()
-date_time = datetime.now()
 
 #Test case: ingredient is not in the inventory (no entity)
 test_ingredient_not_in_database_fail = {"req_url": "/crud/orders/",

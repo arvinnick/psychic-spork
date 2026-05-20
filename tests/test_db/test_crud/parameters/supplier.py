@@ -1,5 +1,3 @@
-from pydantic_extra_types.phone_numbers import PhoneNumber
-
 from tests.conftest import MockDatabase
 database = MockDatabase()
 

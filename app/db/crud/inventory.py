@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
+import app.config as config
 from app.db.models import Inventory, Supplier
 from app.db.database import get_db
 from app.logger import logger
@@ -52,6 +53,8 @@ async def create_inventory_item(inventory_item: InventoryCreate,
             if isinstance(e, HTTPException):
                 raise e
             else:
-                return HTTPException(status_code=500, detail=str(e))
+                return HTTPException(status_code=500,
+                            detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
         else:
-            return HTTPException(status_code=500, detail="an internal error occurred. we know no more:(")
+            return HTTPException(status_code=500,
+                            detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
