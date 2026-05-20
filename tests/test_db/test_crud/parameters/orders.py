@@ -36,7 +36,7 @@ test_create_order_item_successful = {
         'address': '1st Valiasr St, Tehran',
         'email': 'info@tehransupply.com',
         'name': 'Tehran Supply Co.',
-        'number': '02112345678'
+        'number': 'tel:+98-21-1234-5678'
      }
               ]
 
@@ -46,7 +46,7 @@ test_create_order_item_successful = {
                      {
                          'name': 'Tehran Supply Co.',
                          'address': '1st Valiasr St, Tehran',
-                         'number': '02112345678',
+                         'number': 'tel:+98-21-1234-5678',
                          'email': 'info@tehransupply.com'
                      }
 

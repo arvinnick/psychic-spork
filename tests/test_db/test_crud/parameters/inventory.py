@@ -18,7 +18,7 @@ test_create_inventory_item_successful = {
                      {
                          'name': 'Tehran Supply Co.',
                          'address': '1st Valiasr St, Tehran',
-                         'number': '02112345678',
+                         'number': 'tel:+98-21-1234-5678',
                          'email': 'info@tehransupply.com'
                      }
                  ]
@@ -90,7 +90,7 @@ test_create_inventory_item_zero_quantity = {
                      {
                          'name': 'Tehran Supply Co.',
                          'address': '1st Valiasr St, Tehran',
-                         'number': '02112345678',
+                         'number': 'tel:+98-21-1234-5678',
                          'email': 'info@tehransupply.com'
                      }
                  ]
@@ -161,13 +161,13 @@ test_multiple_suppliers_success = {
                      {
                          'name': 'Tehran Supply Co.',
                          'address': '1st Valiasr St, Tehran',
-                         'number': '02112345678',
+                         'number': 'tel:+98-21-1234-5678',
                          'email': 'info@tehransupply.com'
                      },
                      {
                          "name": "South Trading",
                          "address": "Coastal Blvd, Bandar Abbas",
-                         "number": "07612345678",
+                         "number": "tel:+98-76-1234-5678",
                          "email": None
                      }
 

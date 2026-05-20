@@ -39,28 +39,28 @@ class MockDatabase:
                 "id": 1,
                 "name": "Tehran Supply Co.",
                 "address": "1st Valiasr St, Tehran",
-                "number": "02112345678",
+                "number": 'tel:+98-21-1234-5678',
                 "email": "info@tehransupply.com"
             },
             {
                 "id": 2,
                 "name": "South Trading",
                 "address": "Coastal Blvd, Bandar Abbas",
-                "number": "07612345678",
+                "number": 'tel:+98-76-1234-5678',
                 "email": None
             },
             {
                 "id": 3,
                 "name": "Sepehr Machinery",
                 "address": "1st Valiasr St, Mashahad",
-                "number": "05112345678",
+                "number": 'tel:+98-21-1234-5678',
                 "email": "info@tehransupply.com"
             },
             {
                 "id": 4,
                 "name": "Sepehr Machinery",
                 "address": "1st Valiasr St, Tehran",
-                "number": "02112345678",
+                "number": 'tel:+98-21-1234-5678',
                 "email": "info@tehransupply.com"
             }
         ],
