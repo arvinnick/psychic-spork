@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -43,9 +42,8 @@ def create_order(order: OrderCreate, db:Annotated[Session, Depends(get_db)]) -> 
             raise HTTPException(status_code = 400,
                                 detail = "non of the mentioned suppliers provide the requested ingredient.")
 
-        date_time = datetime.now()
         db_item = Orders(
-            date_time=date_time,
+            date_time=order.date_time,
             quantity = order.quantity,
             ingredient = ingredients[0],
             supplier = suppliers[0]

@@ -1,10 +1,12 @@
+from datetime import datetime as datetime_factory
 from pydantic import BaseModel, model_validator, Field
-
+from pydantic.types import datetime
 from app.schemas.inventory import Inventory
 from app.schemas.supplier import SupplierBase
 
 
 class Order(BaseModel):
+    date_time: datetime = Field(default_factory=lambda:datetime_factory.now())
     quantity: float| int
     ingredient: Inventory
     supplier: SupplierBase

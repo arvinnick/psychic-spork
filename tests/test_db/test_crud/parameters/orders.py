@@ -1,4 +1,5 @@
-from tests.conftest import MockDatabase
+from tests.conftest import MockDatabase, test_now
+
 from datetime import datetime
 
 database = MockDatabase()
@@ -28,6 +29,7 @@ test_create_order_item_successful = {
     },
     "res_status_code": 201,
     'res_json': {
+        "date_time": test_now,
         'ingredient': {
             "name": "White Sugar",
             "quantity": 200.0,

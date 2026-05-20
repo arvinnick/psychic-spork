@@ -4,6 +4,7 @@ Hardcoded stuff for the tests
 
 from datetime import datetime
 import pytest
+from freezegun import freeze_time
 from sqlalchemy import create_engine, insert, StaticPool
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
@@ -135,7 +136,7 @@ class MockDatabase:
         finally:
             pass
 
-
+test_now = "2026-05-20T15:40:22"
 
 @pytest.fixture()
 def blueprint_fixture():
