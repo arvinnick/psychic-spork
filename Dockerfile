@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 # ۴. کپی کردن کل سورس‌کد
 COPY ./app /code/app
-COPY ./seed_db.py /code/seed_db.py
+COPY seed_db.py /code/seed_db.py
 COPY ./tests /code/tests
 RUN pytest
 # ۵. اجرای برنامه (بدون --reload)

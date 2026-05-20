@@ -3,11 +3,11 @@ from pydantic.types import datetime
 
 from app.schemas.inventory import Inventory
 from app.schemas.supplier import SupplierBase
+from schemas import supplier
 
 
 class Order(BaseModel):
-    date_time: datetime = Field(default_factory=datetime.now)
-    quantity: float
+    quantity: float| int
     ingredient: Inventory
     supplier: SupplierBase
 
@@ -19,3 +19,4 @@ class OrderCreate(Order):
     def check_quantity(self):
         assert self.quantity > 0, "Quantity must be positive"
         return self
+

@@ -5,6 +5,7 @@ Hardcoded stuff for the tests
 from datetime import datetime
 import pytest
 from sqlalchemy import create_engine, insert, StaticPool
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 from app.db.models import Inventory, Supplier, SupplierInventoryAssociation, Orders, Losses
@@ -28,7 +29,9 @@ class MockDatabase:
         "Inventory": [
             {"id": 1, "name": "Wheat Flour", "quantity": 500.5},
             {"id": 2, "name": "White Sugar", "quantity": 200.0},
-            {"id": 3, "name": "Vegetable Oil", "quantity": 150.75}
+            {"id": 3, "name": "Vegetable Oil", "quantity": 150.75},
+            {"id": 4, "name": "Peanut", "quantity": 150.75}
+
         ],
 
         "Supplier": [
@@ -45,6 +48,20 @@ class MockDatabase:
                 "address": "Coastal Blvd, Bandar Abbas",
                 "number": "07612345678",
                 "email": None
+            },
+            {
+                "id": 3,
+                "name": "Sepehr Machinery",
+                "address": "1st Valiasr St, Mashahad",
+                "number": "05112345678",
+                "email": "info@tehransupply.com"
+            },
+            {
+                "id": 4,
+                "name": "Sepehr Machinery",
+                "address": "1st Valiasr St, Tehran",
+                "number": "02112345678",
+                "email": "info@tehransupply.com"
             }
         ],
 
@@ -86,7 +103,10 @@ class MockDatabase:
             }
         ]
     }
-        self.__seed_test_db()
+        try:
+            self.__seed_test_db()
+        except DBAPIError as e:
+            raise Exception("there is a problem in database seeding")
 
 
     def __seed_test_db(self):
