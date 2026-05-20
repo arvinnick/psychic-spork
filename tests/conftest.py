@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from fastapi.testclient import TestClient
 from app.db.models import Inventory, Supplier, SupplierInventoryAssociation, Orders, Losses
 from app.main import app
-import seed_db
+import app.seed_db as seed_db
 from app.db.database import get_db
 
 class MockDatabase:

@@ -1,9 +1,7 @@
 from pydantic import BaseModel, model_validator, Field
-from pydantic.types import datetime
 
 from app.schemas.inventory import Inventory
 from app.schemas.supplier import SupplierBase
-from schemas import supplier
 
 
 class Order(BaseModel):
