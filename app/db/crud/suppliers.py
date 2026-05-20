@@ -17,7 +17,8 @@ logger.info(f"Defined the suppliers router.")
 
 @suppliers_crud_router.post('/',
                             response_model=SupplierSchema,
-                            summary="Create a new supplier entity in the DB")
+                            summary="Create a new supplier entity in the DB",
+                            status_code=201)
 async def create_supplier(supplier: SupplierCreate, db: Annotated[Session, Depends(get_db)]):
     """
     Endpoint to create a new supplier entity in the database. The supplier is the business which will fullfill

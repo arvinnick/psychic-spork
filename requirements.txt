@@ -5,3 +5,5 @@ pytest-asyncio
 httpx
 uvicorn
 sqlalchemy
+pydantic-extra-types
+phonenumbers
