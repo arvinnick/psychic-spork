@@ -43,10 +43,13 @@ async def create_inventory_item(inventory_item: InventoryCreate,
         db.refresh(db_item)
         return db_item
     except IntegrityError as ie:
-        db.rollback()
-        raise HTTPException(status_code=409,
-                            detail=f"An inventory item with {inventory_item.name} already exists."
-                            )
+        if "unique constraint" in " ".join(ie.args).lower():
+            db.rollback()
+            raise HTTPException(status_code=409,
+                                detail=f"An inventory item with {inventory_item.name} already exists."
+                                )
+        else:
+            raise ie
 
     except Exception as e:
         if settings.DEBUG:
