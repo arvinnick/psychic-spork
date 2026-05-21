@@ -59,5 +59,5 @@ async def create_inventory_item(inventory_item: InventoryCreate,
                 return HTTPException(status_code=500,
                             detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
         else:
-            return HTTPException(status_code=500,
+            raise HTTPException(status_code=500,
                             detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")

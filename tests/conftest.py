@@ -4,9 +4,9 @@ Hardcoded stuff for the tests
 
 from datetime import datetime
 import pytest
-from sqlalchemy import create_engine, insert, StaticPool
+from sqlalchemy import insert, StaticPool
 from sqlalchemy.exc import DBAPIError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from fastapi.testclient import TestClient
 from app.db.models import Inventory, Supplier, SupplierInventoryAssociation, Orders, Losses
 from app.main import app
@@ -17,14 +17,14 @@ class MockDatabase:
     def __init__(self):
         self.__TEST_DB_PATH = ":memory:"  # "restaurant.sqlite"
         self.__TEST_DB_ENGINE = f"sqlite+pysqlite:///{self.__TEST_DB_PATH}"
-        self.__test_engine = create_engine(
+        self.__test_engine = create_async_engine(
             self.__TEST_DB_ENGINE,
             echo=True,
             connect_args={"check_same_thread": False},
             poolclass=StaticPool  # This keeps the in-memory DB alive!
         )
         seed_db.main(self.__test_engine)
-        self.db = Session(self.__test_engine)
+        self.db = AsyncSession(self.__test_engine)
         self.__mock_db_data = {
         "Inventory": [
             {"id": 1, "name": "Wheat Flour", "quantity": 500.5},

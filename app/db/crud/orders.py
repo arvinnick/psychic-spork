@@ -28,11 +28,11 @@ async def create_order(order: OrderCreate, db:Annotated[AsyncSession, Depends(ge
     """
     logger.info("Creating order for ingredient: {order.ingredient} from supplier: {order.supplier}.")
     try:
-        ingredients = db.execute(select(Inventory).where(Inventory.name == order.ingredient)).scalars().all()
+        ingredients = await db.execute(select(Inventory).where(Inventory.name == order.ingredient)).scalars().all()
         if not ingredients:
             raise HTTPException(status_code=400, detail="Ingredient not found in the database.")
         ingredient = ingredients[0]
-        suppliers = db.execute(select(Supplier).where(Supplier.name == order.supplier)).scalars().all()
+        suppliers = await db.execute(select(Supplier).where(Supplier.name == order.supplier)).scalars().all()
         if not suppliers:
             raise HTTPException(status_code=400, detail="Supplier not found in the database.")
 

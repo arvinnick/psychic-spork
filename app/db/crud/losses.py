@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 import app.config as config
@@ -35,8 +35,8 @@ def create_loss(loss: LossesCreate, db: Annotated[Session, Depends(get_db)]) -> 
             ingredient=ingredients[0]
         )
         db.add(db_item)
-        db.commit()
-        db.refresh(db_item)
+        await db.commit()
+        await db.refresh(db_item)
         return db_item
     except Exception as e:
         if isinstance(e, HTTPException):
