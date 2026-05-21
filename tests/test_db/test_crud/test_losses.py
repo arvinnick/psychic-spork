@@ -1,5 +1,5 @@
 import pytest
-from tests.conftest import blueprint_fixture, test_now
+from tests.conftest import test_now
 from tests.test_db.test_crud.parameters.loss import (
     test_quantity_zero_fail,
     test_quantity_negative_fail,

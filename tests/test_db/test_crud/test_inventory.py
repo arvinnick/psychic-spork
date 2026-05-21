@@ -1,6 +1,5 @@
 import pytest
 
-from tests.conftest import blueprint_fixture
 from tests.test_db.test_crud.parameters.inventory import (test_create_inventory_item_successful,
                                                           test_create_inventory_item_wrong_supplier_fail,
                                                           test_create_inventory_item_no_supplier_fail,

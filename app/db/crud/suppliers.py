@@ -13,7 +13,7 @@ suppliers_crud_router = APIRouter(
     prefix="/suppliers",
     tags=["suppliers"],
 )
-logger.info(f"Defined the suppliers router.")
+logger.info("Defined the suppliers router.")
 
 
 @suppliers_crud_router.post('/',

@@ -11,7 +11,7 @@ else:
 
 async def get_db():
     db = Session(engine)
-    logger.info(f"Getting db session")
+    logger.info("Getting db session")
     try:
         yield db
     finally:
