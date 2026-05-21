@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 import app.config as config
@@ -21,7 +21,7 @@ logger.info("Defined the orders router.")
 @orders_crud_router.post("/", response_model=SchemasOrder,
                          summary="creates an order entity in the database",
                          status_code=201)
-def create_order(order: OrderCreate, db:Annotated[Session, Depends(get_db)]) -> Orders:
+async def create_order(order: OrderCreate, db:Annotated[AsyncSession, Depends(get_db)]) -> Orders:
     """
     Path operation for creating an order entity in the database. Orders are somehow "messages" that will be sent to a
     supplier to send an ingredient to the kitchen.
@@ -49,8 +49,8 @@ def create_order(order: OrderCreate, db:Annotated[Session, Depends(get_db)]) -> 
             supplier = suppliers[0]
         )
         db.add(db_item)
-        db.commit()
-        db.refresh(db_item)
+        await db.commit()
+        await db.refresh(db_item)
         return db_item
     except Exception as e:
         if e.__getattribute__("status_code") == 400:

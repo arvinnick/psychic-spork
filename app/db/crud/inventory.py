@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 import app.config as config
@@ -22,7 +22,7 @@ logger.info("Defined the inventory router.")
 
 @inventory_crud_router.post("/", response_model=SchemasInventory, status_code=201)
 async def create_inventory_item(inventory_item: InventoryCreate,
-        db: Annotated[Session, Depends(get_db)],
+        db: Annotated[AsyncSession, Depends(get_db)],
                                 ):
     logger.info(f"Creating inventory item: {inventory_item.name}")
     try:
@@ -39,12 +39,12 @@ async def create_inventory_item(inventory_item: InventoryCreate,
             suppliers=suppliers
         )
         db.add(db_item)
-        db.commit()
-        db.refresh(db_item)
+        await db.commit()
+        await db.refresh(db_item)
         return db_item
     except IntegrityError as ie:
         if "unique constraint" in " ".join(ie.args).lower():
-            db.rollback()
+            await db.rollback()
             raise HTTPException(status_code=409,
                                 detail=f"An inventory item with {inventory_item.name} already exists."
                                 )
