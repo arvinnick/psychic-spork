@@ -4,7 +4,6 @@ Hardcoded stuff for the tests
 
 from datetime import datetime
 import pytest
-from freezegun import freeze_time
 from sqlalchemy import create_engine, insert, StaticPool
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
@@ -106,7 +105,7 @@ class MockDatabase:
     }
         try:
             self.__seed_test_db()
-        except DBAPIError as e:
+        except DBAPIError:
             raise Exception("there is a problem in database seeding")
 
 

@@ -15,7 +15,7 @@ orders_crud_router = APIRouter(
     prefix="/orders",
     tags=["orders"]
 )
-logger.info(f"Defined the orders router.")
+logger.info("Defined the orders router.")
 
 
 @orders_crud_router.post("/", response_model=SchemasOrder,

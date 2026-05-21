@@ -15,7 +15,7 @@ losses_crud_router = APIRouter(
     prefix="/losses",
     tags=["losses"],
 )
-logger.info(f"Defined the losses router.")
+logger.info("Defined the losses router.")
 
 @losses_crud_router.post('/', response_model=LossesSchema,
                          summary="creating a loss of ingredients record in the database",

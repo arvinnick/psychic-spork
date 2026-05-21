@@ -18,7 +18,7 @@ inventory_crud_router = APIRouter(
     prefix="/inventory",
     tags=["inventory"],
 )
-logger.info(f"Defined the inventory router.")
+logger.info("Defined the inventory router.")
 
 @inventory_crud_router.post("/", response_model=SchemasInventory, status_code=201)
 async def create_inventory_item(inventory_item: InventoryCreate,

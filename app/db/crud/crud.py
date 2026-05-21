@@ -10,16 +10,16 @@ crud_router = APIRouter(
     prefix="/crud",
     tags=["crud operations"],
 )
-logger.info(f"Defined the crud router.")
+logger.info("Defined the crud router.")
 crud_router.include_router(inventory_crud_router)
-logger.info(f"Added the inventory router.")
+logger.info("Added the inventory router.")
 
 crud_router.include_router(suppliers_crud_router)
-logger.info(f"Added the suppliers router.")
+logger.info("Added the suppliers router.")
 crud_router.include_router(losses_crud_router)
-logger.info(f"Added the losses router.")
+logger.info("Added the losses router.")
 crud_router.include_router(orders_crud_router)
-logger.info(f"Added the orders router.")
+logger.info("Added the orders router.")
 
 
 
