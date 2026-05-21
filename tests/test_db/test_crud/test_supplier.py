@@ -19,3 +19,8 @@ from tests.test_db.test_crud.parameters.supplier import (test_create_supplier_ph
 )
 def test_orders(blueprint_fixture, param_dict):
     blueprint_fixture(param_dict)
+
+
+def test_ground_truth_test():
+    #this is a test to make sure the CICD is working
+    assert False

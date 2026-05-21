@@ -40,13 +40,11 @@ jobs:
         run: |
           pip install ruff
           ruff check .
-        continue-on-error: true
 
       - name: Run tests
         run: |
           pip install pytest pytest-cov
           pytest tests/ --cov=. --cov-report=xml
-        continue-on-error: true
 
   deploy-to-render:
     needs: build-and-test
