@@ -6,7 +6,7 @@ from tests.test_db.test_crud.parameters.supplier import (test_create_supplier_ph
                                                          test_create_supplier_wrong_email_format_fail,
                                                          test_create_supplier_no_contact_fail
                                                        )
-
+@pytest.mark.anyio
 @pytest.mark.freeze_time(test_now)
 @pytest.mark.parametrize(
 "param_dict",
@@ -17,10 +17,10 @@ from tests.test_db.test_crud.parameters.supplier import (test_create_supplier_ph
         test_create_supplier_no_contact_fail
     ]
 )
-def test_orders(blueprint_fixture, param_dict):
-    blueprint_fixture(param_dict)
+async def test_orders(blueprint_fixture, param_dict):
+    await blueprint_fixture(param_dict)
 
-
-def test_ground_truth_test():
+@pytest.mark.anyio
+async def test_ground_truth_test():
     #this is a test to make sure the CICD is working
     assert True

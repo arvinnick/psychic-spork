@@ -9,7 +9,7 @@ from tests.test_db.test_crud.parameters.inventory import (test_create_inventory_
                                                           test_create_inventory_item_missing_name_fail,
                                                           test_create_inventory_item_negative_quantity_fail)
 
-
+@pytest.mark.anyio
 @pytest.mark.parametrize(
 "param_dict",
     [
@@ -23,7 +23,7 @@ from tests.test_db.test_crud.parameters.inventory import (test_create_inventory_
         test_multiple_suppliers_success
     ]
 )
-def test_inventory(blueprint_fixture, param_dict):
-    blueprint_fixture(param_dict)
+async def test_inventory(blueprint_fixture, param_dict):
+    await blueprint_fixture(param_dict)
 
 

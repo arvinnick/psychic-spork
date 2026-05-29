@@ -20,18 +20,22 @@ inventory_crud_router = APIRouter(
 )
 logger.info("Defined the inventory router.")
 
-@inventory_crud_router.post("/", response_model=SchemasInventory, status_code=201)
+@inventory_crud_router.post("/",
+                            response_model=SchemasInventory,
+                            status_code=201)
 async def create_inventory_item(inventory_item: InventoryCreate,
         db: Annotated[AsyncSession, Depends(get_db)],
-                                ):
+                                ) -> Inventory:
     logger.info(f"Creating inventory item: {inventory_item.name}")
     try:
         supplier_names = inventory_item.suppliers
         if not supplier_names:
             raise HTTPException(status_code=400, detail="You must define at least one supplier for an ingredient")
-        suppliers = db.execute(select(Supplier).where(Supplier.name.in_(supplier_names))).scalars().all()
+        smth = select(Supplier).where(Supplier.name.in_(supplier_names))
+        suppliers_db_object = await db.execute(smth)
+        suppliers = suppliers_db_object.scalars().all()
         if not suppliers:
-            raise HTTPException(status_code=400, detail="Supplier names are not in the database. You need to add them"
+            raise HTTPException(status_code=400, detail="Supplier names are not in the database. You need to add them "
                                                         "first or use the correct id.")
         db_item = Inventory(
             name=inventory_item.name,
@@ -40,13 +44,12 @@ async def create_inventory_item(inventory_item: InventoryCreate,
         )
         db.add(db_item)
         await db.commit()
-        await db.refresh(db_item)
         return db_item
     except IntegrityError as ie:
         if "unique constraint" in " ".join(ie.args).lower():
             await db.rollback()
             raise HTTPException(status_code=409,
-                                detail=f"An inventory item with {inventory_item.name} already exists."
+                                detail=f"An inventory item with the name {inventory_item.name} already exists."
                                 )
         else:
             raise ie
@@ -56,7 +59,7 @@ async def create_inventory_item(inventory_item: InventoryCreate,
             if isinstance(e, HTTPException):
                 raise e
             else:
-                return HTTPException(status_code=500,
+                raise HTTPException(status_code=500,
                             detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
         else:
             raise HTTPException(status_code=500,

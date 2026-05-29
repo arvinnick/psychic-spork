@@ -1,6 +1,7 @@
 from tests.conftest import MockDatabase
 
 database = MockDatabase()
+database.setup()
 
 test_create_inventory_item_successful = {
     "req_url": "/crud/inventory/",
@@ -23,7 +24,7 @@ test_create_inventory_item_successful = {
                      }
                  ]
                  },
-"get_db":database.override_db_dependency
+"get_db":database.override_get_db
 }
 test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                   "req_json": {
@@ -35,10 +36,10 @@ test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                   },
                                                   "res_status_code": 400,
                                                   "res_json": {
-                                                      'detail': 'Supplier names are not in the database. You need to add themfirst or use the correct id.'
+                                                      'detail': 'Supplier names are not in the database. You need to add them first or use the correct id.'
                                                   }
     ,
-                                                  "get_db": database.override_db_dependency}
+                                                  "get_db": database.override_get_db}
 test_create_inventory_item_no_supplier_fail = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -51,30 +52,27 @@ test_create_inventory_item_no_supplier_fail = {
         'detail': 'You must define at least one supplier for an ingredient'
     }
 ,
-                 "get_db":database.override_db_dependency}
+                 "get_db":database.override_get_db}
 test_create_inventory_item_negative_quantity_fail = {"req_url": "/crud/inventory/",
                                                      "res_json": {
-                                                         'detail': [
-                                                             {
-                                                                 'type': 'assertion_error',
-                                                                 'loc': ['body'],
-                                                                 'msg': 'Assertion failed, '
-                                                                        'Inventory quantity must be positive float number',
-                                                                 'input': {
-                                                                     'name': 'string',
-                                                                     'quantity': -1,
-                                                                     'suppliers': ['Tehran Supply Co.']},
-                                                                 'ctx': {'error': {}}}]},
-                                                     "res_status_code": 422,
+                                                         'detail': [{'ctx': {'ge': 0.0},
+             'input': -1,
+             'loc': ['body', 'quantity'],
+             'msg': 'Input should be greater than or equal to 0',
+             'type': 'greater_than_equal'}]
+                                                         ,
+
+
+    },
                                                      "req_json": {
                                                          "name": "string",
                                                          "quantity": -1,
                                                          "suppliers": [
                                                              "Tehran Supply Co."
                                                          ]
-                                                     }
-    ,
-                                                     "get_db": database.override_db_dependency}
+                                                     },
+                                                     "res_status_code": 422,
+                                                     "get_db": database.override_get_db}
 test_create_inventory_item_zero_quantity = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -97,7 +95,7 @@ test_create_inventory_item_zero_quantity = {
                  },
     "res_status_code": 201
 ,
-                 "get_db":database.override_db_dependency}
+                 "get_db":database.override_get_db}
 test_create_inventory_item_missing_name_fail = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -126,7 +124,7 @@ test_create_inventory_item_missing_name_fail = {
         ]
     }
 ,
-                 "get_db":database.override_db_dependency}
+                 "get_db":database.override_get_db}
 test_duplicate_inventory_name_fail = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -140,10 +138,10 @@ test_duplicate_inventory_name_fail = {
     },
     "res_status_code": 409,
     "res_json": {
-        'detail': 'An inventory item with White Sugar already exists.'
+        'detail': 'An inventory item with the name White Sugar already exists.'
     }
 ,
-                 "get_db":database.override_db_dependency}
+                 "get_db":database.override_get_db}
 test_multiple_suppliers_success = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -174,4 +172,4 @@ test_multiple_suppliers_success = {
                  ]
                  }
 ,
-                 "get_db":database.override_db_dependency}
+                 "get_db":database.override_get_db}
