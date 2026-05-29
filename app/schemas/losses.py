@@ -1,5 +1,5 @@
 from pydantic.types import datetime
-from pydantic import BaseModel, model_validator, Field
+from pydantic import BaseModel, Field
 
 from app.schemas.inventory import Inventory
 
