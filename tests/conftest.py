@@ -130,7 +130,7 @@ class MockDatabase:
         await seed_db(self.__test_engine)
         try:
             await self.__seed_test_db()
-        except DBAPIError as de:
+        except DBAPIError:
             raise Exception("there is a problem in test database seeding")
         except Exception as e:
             if settings.DEBUG:

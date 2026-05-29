@@ -1,4 +1,4 @@
-from pydantic import BaseModel, model_validator, Field
+from pydantic import BaseModel, Field
 from typing import List
 
 from app.schemas.supplier import SupplierBase
