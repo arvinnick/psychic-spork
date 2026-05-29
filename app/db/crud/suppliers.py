@@ -32,7 +32,6 @@ async def create_supplier(supplier: SupplierCreate, db: Annotated[AsyncSession, 
         )
         db.add(db_item)
         await db.commit()
-        await db.refresh(db_item)
         return db_item
     except Exception as e:
         raise HTTPException(status_code=500,
