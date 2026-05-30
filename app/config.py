@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     DEV_ENGINE_URI : str = f"sqlite+aiosqlite:///{DEV_SQLITE_FILE_NAME}"
     TEST_SQLITE_FILE_NAME: str = f"{BASE_DIR}/testdb.sqlite"
     TEST_ENGINE_URI: str = f"sqlite+aiosqlite:///{TEST_SQLITE_FILE_NAME}"
-    DEBUG : bool = True
+    DEBUG : bool = False
     echo_sql: bool = True
 
 
