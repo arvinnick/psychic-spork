@@ -1,11 +1,12 @@
 from sqlalchemy import ForeignKey, Column, Table, DateTime, String, Float, Text
-from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
 from datetime import datetime
 from typing import List
 
 
 
-class Base(DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 

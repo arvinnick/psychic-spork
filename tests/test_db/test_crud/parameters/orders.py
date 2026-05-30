@@ -1,6 +1,7 @@
 from tests.conftest import MockDatabase, test_now
 
 database = MockDatabase()
+database.setup()
 
 #Test case: ingredient is not in the inventory (no entity)
 test_ingredient_not_in_database_fail = {"req_url": "/crud/orders/",
@@ -14,7 +15,7 @@ test_ingredient_not_in_database_fail = {"req_url": "/crud/orders/",
                                                       'detail': 'Ingredient not found in the database.'
                                                   }
     ,
-                                                  "get_db": database.override_db_dependency}
+                                                  "get_db": database.override_get_db}
 
 #Test case: Order created successfully
 test_create_order_item_successful = {
@@ -50,7 +51,7 @@ test_create_order_item_successful = {
                      }
 
                  },
-"get_db":database.override_db_dependency
+"get_db":database.override_get_db
 }
 
 #Test case: wrong supplier
@@ -65,7 +66,7 @@ test_supplier_not_in_database_fail = {"req_url": "/crud/orders/",
                                                       'detail': 'Supplier not found in the database.'
                                                   }
     ,
-                                                  "get_db": database.override_db_dependency}
+                                                  "get_db": database.override_get_db}
 
 #Test case: supplier doesn't provide the ingredient
 test_create_order_supplier_mismatch_fail = {
@@ -79,7 +80,7 @@ test_create_order_supplier_mismatch_fail = {
     "res_json":{
         "detail":"non of the mentioned suppliers provide the requested ingredient."
     },
-"get_db":database.override_db_dependency
+"get_db":database.override_get_db
 }
 
 

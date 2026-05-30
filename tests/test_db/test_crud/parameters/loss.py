@@ -1,6 +1,7 @@
 from tests.conftest import MockDatabase, test_now
 
 database = MockDatabase()
+database.setup()
 
 
 #test case: ingredient name is wrong
@@ -14,7 +15,7 @@ test_ingredient_name_not_in_database_fail = {"req_url": "/crud/losses/",
                                                       'detail': 'ingredient name is not in the database.'
                                                   }
     ,
-                                                  "get_db": database.override_db_dependency}
+                                                  "get_db": database.override_get_db}
 
 
 #test case: quantity is zero
@@ -24,13 +25,13 @@ test_quantity_zero_fail = {"req_url": "/crud/losses/",
                                                                 "ingredient": "Wheat Flour"
                                                             },
                                                   "res_status_code": 422,
-                                                  "res_json": {'detail': [{'ctx': {'error': {}},
-                                                     'input': {'ingredient': 'Wheat Flour', 'quantity': 0.0},
-                                                     'loc': ['body'],
-                                                     'msg': 'Assertion failed, Quantity must be positive',
-                                                     'type': 'assertion_error'}]}
+                                                  "res_json": {'detail': [{'ctx': {'gt': 0.0},
+             'input': 0.0,
+             'loc': ['body', 'quantity'],
+             'msg': 'Input should be greater than 0',
+             'type': 'greater_than'}]}
     ,
-                                                  "get_db": database.override_db_dependency}
+                                                  "get_db": database.override_get_db}
 
 
 #test case: quantity is less than zero
@@ -40,13 +41,13 @@ test_quantity_negative_fail = {"req_url": "/crud/losses/",
                                                                 "ingredient": "Wheat Flour"
                                                             },
                                                   "res_status_code": 422,
-                                                  "res_json": {'detail': [{'ctx': {'error': {}},
-             'input': {'ingredient': 'Wheat Flour', 'quantity': -1.0},
-             'loc': ['body'],
-             'msg': 'Assertion failed, Quantity must be positive',
-             'type': 'assertion_error'}]}
+                                                  "res_json": {'detail': [{'ctx': {'gt': 0.0},
+             'input': -1.0,
+             'loc': ['body', 'quantity'],
+             'msg': 'Input should be greater than 0',
+             'type': 'greater_than'}]}
     ,
-                                                  "get_db": database.override_db_dependency}
+                                                  "get_db": database.override_get_db}
 
 
 #test case: successful creation
@@ -65,4 +66,4 @@ test_success_created = {"req_url": "/crud/losses/",
                                'number': 'tel:+98-21-1234-5678'}]},
  'quantity': 1.0}
     ,
-                                                  "get_db": database.override_db_dependency}
+                                                  "get_db": database.override_get_db}

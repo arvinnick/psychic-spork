@@ -1,18 +1,45 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from typing import AsyncGenerator, Any
+
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from app.config import settings
-from app.logger import logger
 
 if settings.PROD:
-    engine = create_engine(settings.PROD_ENGINE_URI, echo=True)
+    engine = create_async_engine(settings.PROD_ENGINE_URI, echo=True)
 else:
-    engine = create_engine(settings.TEST_ENGINE_URI, echo=True)
+    engine = create_async_engine(settings.DEV_ENGINE_URI, echo=True)
 
-async def get_db():
-    db = Session(engine)
-    logger.info(f"Getting db session")
-    try:
-        yield db
-    finally:
-        db.close()
+
+
+async_session_maker = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,  # Prevent lazy loading issues after commit
+)
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Dependency that provides an async database session.
+    Automatically handles commit/rollback and session cleanup.
+    """
+    async with async_session_maker() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
+
+
+
+# Alternative: Session with transaction control
+async def get_db() -> AsyncGenerator[AsyncSession, Any]:
+    """
+    Provides a session that automatically begins a transaction.
+    Useful when you need explicit transaction boundaries.
+    """
+    async with async_session_maker() as session:
+        async with session.begin():
+            yield session

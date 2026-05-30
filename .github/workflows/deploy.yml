@@ -1,11 +1,12 @@
 name: Build, Test, and Deploy to Render
 
 env:
-  PYTHON_VERSION: '3.11'
+  PYTHON_VERSION: '3.12'
 
 on:
   push:
     branches:
+      - dev
       - main
   pull_request:
     branches:
@@ -40,13 +41,13 @@ jobs:
         run: |
           pip install ruff
           ruff check .
-        continue-on-error: true
+        continue-on-error: false
 
       - name: Run tests
         run: |
           pip install pytest pytest-cov
           pytest tests/ --cov=. --cov-report=xml
-        continue-on-error: true
+        continue-on-error: false
 
   deploy-to-render:
     needs: build-and-test

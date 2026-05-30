@@ -1,5 +1,5 @@
 from typing import Annotated
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException
 
 import app.config as config
@@ -13,14 +13,14 @@ suppliers_crud_router = APIRouter(
     prefix="/suppliers",
     tags=["suppliers"],
 )
-logger.info(f"Defined the suppliers router.")
+logger.info("Defined the suppliers router.")
 
 
 @suppliers_crud_router.post('/',
                             response_model=SupplierSchema,
                             summary="Create a new supplier entity in the DB",
                             status_code=201)
-async def create_supplier(supplier: SupplierCreate, db: Annotated[Session, Depends(get_db)]):
+async def create_supplier(supplier: SupplierCreate, db: Annotated[AsyncSession, Depends(get_db)]):
     """
     Endpoint to create a new supplier entity in the database. The supplier is the business which will fullfill
     an order.
@@ -31,8 +31,7 @@ async def create_supplier(supplier: SupplierCreate, db: Annotated[Session, Depen
             **supplier.model_dump()
         )
         db.add(db_item)
-        db.commit()
-        db.refresh(db_item)
+        await db.commit()
         return db_item
     except Exception as e:
         raise HTTPException(status_code=500,
