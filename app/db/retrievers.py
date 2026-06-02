@@ -21,8 +21,7 @@ async def retrieve_suppliers(supplier_names:List[str],
     suppliers_db_object = await db.execute(smth)
     suppliers = suppliers_db_object.scalars().all()
     if not suppliers:
-        raise HTTPException(status_code=400, detail="Supplier names are not in the database. You need to add them "
-                                                    "first or use the correct id.")
+        raise HTTPException(status_code=400, detail="Supplier not found in the database.")
     return suppliers
 
 

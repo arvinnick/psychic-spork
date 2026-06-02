@@ -12,20 +12,16 @@ from app.schemas.orders import Order as SchemasOrder
 from app.schemas.orders import OrderCreate
 from app.db.models import Orders
 from app.services.supplier import supplier_provides_ingredient
+from app.db.injectors import db_item_injector
+from app.db.retrievers import retrieve_inventory, retrieve_suppliers
 
 
 async def db_layer_create_order(db:Annotated[AsyncSession, Depends(get_db)], order: OrderCreate) -> Orders:
     # this function is the database layer for creating an order. it is separated from the path operation function to make it testable without the need for the whole app and its dependencies
-    smth = select(Inventory).where(Inventory.name == order.ingredient)
-    ingredients = await db.execute(
-        smth
-    )
-    ingredients = ingredients.scalars()
-    ingredient = ingredients.first()
+    ingredient = await retrieve_inventory(order.ingredient, db)
     if not ingredient:
         raise HTTPException(status_code=400, detail="Ingredient not found in the database.")
-    supliers_db_object = await db.execute(select(Supplier).where(Supplier.name == order.supplier))
-    suppliers = supliers_db_object.scalars().all()
+    suppliers = await retrieve_suppliers([order.supplier], db)
     if not suppliers:
         raise HTTPException(status_code=400, detail="Supplier not found in the database.")
     if not await supplier_provides_ingredient(suppliers, ingredient):
@@ -38,8 +34,7 @@ async def db_layer_create_order(db:Annotated[AsyncSession, Depends(get_db)], ord
         ingredient=ingredient,
         supplier=order_supplier
     )
-    db.add(db_item)
-    await db.commit()
+    await db_item_injector(db_item, db)
     return db_item
 
 orders_crud_router = APIRouter(

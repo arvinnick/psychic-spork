@@ -36,7 +36,7 @@ test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                   },
                                                   "res_status_code": 400,
                                                   "res_json": {
-                                                      'detail': 'Supplier names are not in the database. You need to add them first or use the correct id.'
+                                                      'detail': 'Supplier not found in the database.'
                                                   }
     ,
                                                   "get_db": database.override_get_db}
