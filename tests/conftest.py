@@ -5,7 +5,7 @@ import os.path
 
 from httpx import ASGITransport, AsyncClient
 
-from app.config import settings
+from core.config import settings
 from datetime import datetime
 import pytest
 from sqlalchemy import StaticPool
@@ -179,6 +179,9 @@ class MockDatabase:
 
 test_now = "2026-05-20T15:40:22"
 
+
+
+
 @pytest.fixture()
 async def blueprint_fixture():
     mock_db = MockDatabase()
@@ -203,5 +206,3 @@ async def blueprint_fixture():
         yield blueprint
         await mock_db.teardown()
         app.dependency_overrides.clear()
-
-

@@ -3,14 +3,15 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
-import app.config as config
-from app.logger import logger
+import app.core.config as config
+from app.core.logger import logger
 from app.db.database import get_db
 from app.schemas.losses import Loss as LossesSchema, LossesRead
 from app.schemas.losses import LossesCreate
-from app.db.models import Losses, Inventory
+from app.db.models import Losses
+from app.db.injectors import db_item_injector
+from app.db.retrievers import retrieve_inventory
 
 losses_crud_router = APIRouter(
     prefix="/losses",
@@ -29,10 +30,7 @@ async def create_loss(loss: LossesCreate,
     """
     logger.info(f"Creating a loss of ingredient: {loss.ingredient}")
     try:
-        smth = select(Inventory).where(Inventory.name == loss.ingredient).options(
-            selectinload(Inventory.suppliers))
-        ingredients_db_object = await db.execute(smth)
-        ingredients = ingredients_db_object.scalars().first()
+        ingredients = await retrieve_inventory(loss.ingredient, db)
         if not ingredients:
             raise HTTPException(status_code=400, detail="ingredient name is not in the database.")
         db_item = Losses(
@@ -40,12 +38,14 @@ async def create_loss(loss: LossesCreate,
             date_time=loss.date_time,
             ingredient=ingredients
         )
-        db.add(db_item)
-        await db.commit()
+        await db_item_injector(db_item, db)
         return db_item
     except Exception as e:
         if isinstance(e, HTTPException):
-            raise e
+            if config.settings.DEBUG:
+                raise e
+            else:
+                raise HTTPException(status_code=500, detail="The server has encountered an error")
         raise HTTPException(status_code=500,
                             detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
 

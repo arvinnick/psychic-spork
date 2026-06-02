@@ -1,6 +1,6 @@
 import pytest
 from tests.conftest import test_now
-from tests.test_db.test_crud.parameters.loss import (
+from tests.test_routers.test_crud.parameters.loss import (
     test_quantity_zero_fail,
     test_quantity_negative_fail,
     test_success_created,
