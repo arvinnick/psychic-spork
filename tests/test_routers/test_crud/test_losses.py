@@ -1,13 +1,11 @@
 import pytest
-from tests.conftest import test_now
-from tests.test_routers.test_crud.parameters.loss import (
-    test_quantity_zero_fail,
-    test_quantity_negative_fail,
-    test_success_created,
-    test_ingredient_name_not_in_database_fail
-                                                     )
+from tests.conftest import frozen_test_time
+from tests.parameters.routers.crud.loss import test_quantity_zero_fail, test_quantity_negative_fail, \
+    test_success_created, test_ingredient_name_not_in_database_fail
+
+
 @pytest.mark.anyio
-@pytest.mark.freeze_time(test_now)
+@pytest.mark.freeze_time(frozen_test_time)
 @pytest.mark.parametrize(
 "param_dict",
     [

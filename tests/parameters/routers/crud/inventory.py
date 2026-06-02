@@ -34,7 +34,7 @@ test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                           "Tehran Supply Co.mn"
                                                       ]
                                                   },
-                                                  "res_status_code": 400,
+                                                  "res_status_code": 404,
                                                   "res_json": {
                                                       'detail': 'Supplier not found in the database.'
                                                   }

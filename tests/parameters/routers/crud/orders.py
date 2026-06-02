@@ -1,4 +1,4 @@
-from tests.conftest import MockDatabase, test_now
+from tests.conftest import MockDatabase, frozen_test_time
 
 database = MockDatabase()
 database.setup()
@@ -10,7 +10,7 @@ test_ingredient_not_in_database_fail = {"req_url": "/crud/orders/",
                                                                 "ingredient": "Wheat",
                                                                 "supplier": "Tehran Supply Co.",
                                                             },
-                                                  "res_status_code": 400,
+                                                  "res_status_code": 404,
                                                   "res_json": {
                                                       'detail': 'Ingredient not found in the database.'
                                                   }
@@ -27,7 +27,7 @@ test_create_order_item_successful = {
     },
     "res_status_code": 201,
     'res_json': {
-        "date_time": test_now,
+        "date_time": frozen_test_time,
         'ingredient': {
             "name": "White Sugar",
             "quantity": 200.0,
@@ -61,7 +61,7 @@ test_supplier_not_in_database_fail = {"req_url": "/crud/orders/",
                                                                 "ingredient": "White Sugar",
                                                                 "supplier": "Aramco",
                                                             },
-                                                  "res_status_code": 400,
+                                                  "res_status_code": 404,
                                                   "res_json": {
                                                       'detail': 'Supplier not found in the database.'
                                                   }

@@ -1,13 +1,13 @@
 import pytest
 
-from tests.conftest import test_now
-from tests.test_routers.test_crud.parameters.supplier import (test_create_supplier_phone_number_wrong_fail,
-                                                              test_create_supplier_success,
-                                                              test_create_supplier_wrong_email_format_fail,
-                                                              test_create_supplier_no_contact_fail
-                                                              )
+from tests.conftest import frozen_test_time
+from tests.parameters.routers.crud.supplier import (test_create_supplier_phone_number_wrong_fail,
+                                                    test_create_supplier_success,
+                                                    test_create_supplier_wrong_email_format_fail,
+                                                    test_create_supplier_no_contact_fail
+                                                    )
 @pytest.mark.anyio
-@pytest.mark.freeze_time(test_now)
+@pytest.mark.freeze_time(frozen_test_time)
 @pytest.mark.parametrize(
 "param_dict",
     [
