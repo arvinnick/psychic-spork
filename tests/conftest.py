@@ -2,6 +2,7 @@
 Hardcoded stuff for the tests
 """
 import pytest
+import pytest_asyncio
 
 from httpx import AsyncClient, ASGITransport
 
@@ -13,7 +14,7 @@ frozen_test_time = "2026-05-20T15:40:22"
 
 
 
-@pytest.fixture
+@pytest_asyncio.fixture()
 async def db_instance():
     db_instance = MockDatabase()
     await db_instance.setup()
@@ -23,7 +24,7 @@ async def db_instance():
 
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def blueprint_fixture():
     mock_db = MockDatabase()
     await mock_db.setup()
