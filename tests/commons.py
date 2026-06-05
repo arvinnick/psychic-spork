@@ -22,3 +22,5 @@ async def async_session_maker(engine):
         class_=AsyncSession,
         expire_on_commit=False,  # Prevent lazy loading issues after commit
     )
+
+

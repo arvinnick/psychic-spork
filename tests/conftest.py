@@ -1,13 +1,25 @@
 """
 Hardcoded stuff for the tests
 """
-
 import pytest
-from httpx import ASGITransport, AsyncClient
+
+from httpx import AsyncClient, ASGITransport
 
 from app.db.database import get_db
 from app.main import app
 from tests.mock_database import MockDatabase
+
+frozen_test_time = "2026-05-20T15:40:22"
+
+
+
+@pytest.fixture
+async def db_instance():
+    db_instance = MockDatabase()
+    await db_instance.setup()
+    db = await db_instance.override_get_db()
+    yield db
+    await db_instance.teardown()
 
 
 
@@ -35,13 +47,5 @@ async def blueprint_fixture():
         yield blueprint
         await mock_db.teardown()
         app.dependency_overrides.clear()
-
-
-
-
-frozen_test_time = "2026-05-20T15:40:22"
-
-
-
 
 

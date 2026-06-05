@@ -1,17 +1,7 @@
 import pytest
 
 from app.db.retrievers import retrieve_inventory, retrieve_suppliers
-from tests.mock_database import MockDatabase
 from fastapi.exceptions import HTTPException
-
-
-@pytest.fixture
-async def db_instance():
-    db_instance = MockDatabase()
-    await db_instance.setup()
-    db = await db_instance.override_get_db()
-    yield db
-    await db_instance.teardown()
 
 
 @pytest.mark.anyio
@@ -20,7 +10,7 @@ async def test_retrieve_inventory(db_instance):
     assert db_item.name == "White Sugar"
 
 @pytest.mark.anyio
-async def test_retrieve_inventory(db_instance):
+async def test_retrieve_inventory_not_found(db_instance):
     try:
         await retrieve_inventory("Whit Sugar", db_instance)
     except HTTPException as ex:
@@ -36,7 +26,7 @@ async def test_retrieve_suppliers(db_instance):
 
 
 @pytest.mark.anyio
-async def test_retrieve_suppliers(db_instance):
+async def test_retrieve_suppliers_not_found(db_instance):
     try:
         await retrieve_suppliers(["Tehran SupplyCo."], db_instance)
     except HTTPException as ex:
