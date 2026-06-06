@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Kitchen Inventory & Predictive Replenishment System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        h1, h2, h3 {
+            color: #222;
+        }
+
+        .notice {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        ul {
+            margin-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .install {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="notice">
+        <strong>Note:</strong> This project is under development and the MVP is not ready yet.
+        However, this README provides an overview of the concept and the core logic behind the system.
+    </div>
+
+    <h1>Smart Kitchen Inventory &amp; Predictive Replenishment System</h1>
+
+    <section class="section">
+        <h2>1. Overview</h2>
+        <p>
+            This system is designed to eliminate human error in kitchen management by automating
+            inventory tracking and ordering processes. By utilizing real-time weight data and
+            historical consumption patterns, the system ensures that a kitchen never runs out of
+            essential ingredients while simultaneously minimizing food waste.
+        </p>
+    </section>
+
+    <section class="section">
+        <h2>2. The Core Concept: "The Predictive Brain"</h2>
+
+        <p>
+            The system operates on a feedback loop. It doesn't just look at what is missing;
+            it learns from the past to predict the future. It treats the kitchen as a dynamic
+            environment where variables (such as customer volume or supplier speed) are constantly changing.
+        </p>
+
+        <h3>Key Components</h3>
+
+        <ul>
+            <li>
+                <strong>Mass-Based Tracking:</strong>
+                Ingredients are placed on specialized scales. The system receives a constant
+                stream of weight data, identifying exactly how much of a specific product
+                (e.g., Salmon, Rice, Avocado) remains in real time.
+            </li>
+
+            <li>
+                <strong>Dynamic Coefficient Logic:</strong>
+                Instead of relying on a static reorder point, the system uses a variable coefficient.
+                <ul>
+                    <li>If the kitchen ends the week with excessive leftover stock (waste), the coefficient decreases.</li>
+                    <li>If the kitchen runs out before the next delivery (shortage), the coefficient increases.</li>
+                </ul>
+            </li>
+
+            <li>
+                <strong>Latency Compensation:</strong>
+                The system factors in lead time—the delay between placing an order and receiving goods.
+                Orders are triggered early enough to cover expected consumption during that delivery window.
+            </li>
+        </ul>
+    </section>
+
+    <section class="section">
+        <h2>3. Optimization Goal</h2>
+
+        <p>
+            The primary objective of the algorithm is to achieve a
+            <strong>Minimal Residual Average</strong>.
+            Over a rolling three-month period, the system continuously adjusts ordering patterns
+            until the remaining stock at the moment of the next delivery is as close as possible
+            to the defined safety buffer without ever reaching zero.
+        </p>
+    </section>
+
+    <section class="section">
+        <h2>4. Operational Flow</h2>
+
+        <ol>
+            <li>
+                <strong>Sensing:</strong>
+                Scales transmit current ingredient weights in a simplified data format.
+            </li>
+
+            <li>
+                <strong>Processing:</strong>
+                The Predictive Brain compares current inventory levels against forecasted demand
+                for the upcoming delivery cycle.
+            </li>
+
+            <li>
+                <strong>Refining:</strong>
+                The system evaluates waste logs. If ingredients were discarded, the ordering
+                algorithm is penalized to reduce future over-ordering.
+            </li>
+
+            <li>
+                <strong>Execution:</strong>
+                When the safety threshold is breached (while accounting for delivery latency),
+                the system automatically generates a replenishment request to the supply center.
+            </li>
+        </ol>
+    </section>
+
+    <section class="section install">
+        <h2>Installation</h2>
+        <p>
+            For database initialization, run:
+        </p>
+
+        <pre><code>python seed_db.py</code></pre>
+
+        <p>
+            Make sure the virtual environment is activated before running the command.
+            Dockerization is planned for a future release.
+        </p>
+        <p>
+            The docs are standardized as localhost/redoc or localhost/docs.
+        </p>
+    </section>
+
+</body>
+</html>
