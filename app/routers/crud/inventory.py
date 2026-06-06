@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import app.core.config as config
 from app.db.models import Inventory
 from app.db.database import get_db
 from app.core.logger import logger
@@ -27,7 +26,7 @@ logger.info("Defined the inventory router.")
                             status_code=201)
 async def create_inventory_item(inventory_item: InventoryCreate,
         db: Annotated[AsyncSession, Depends(get_db)],
-                                ) -> Inventory:
+                                ) -> Inventory | None:
     logger.info(f"Creating inventory item: {inventory_item.name}")
     try:
         supplier_names = inventory_item.suppliers
@@ -49,14 +48,20 @@ async def create_inventory_item(inventory_item: InventoryCreate,
                                 )
         else:
             raise ie
-
+    except HTTPException as he:
+        logger.error(he.detail)
+        if he.status_code in [409, 400, 404]:
+            raise he
+        else:
+            if settings.DEBUG:
+                raise HTTPException(status_code=500, detail=str(he))
+            else:
+                raise HTTPException(
+                    status_code=500,
+                    detail="we got an error on the server. we know no more:(",
+                )
     except Exception as e:
         if settings.DEBUG:
-            if isinstance(e, HTTPException):
-                raise e
-            else:
-                raise HTTPException(status_code=500,
-                                    detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
-        else:
-            raise HTTPException(status_code=500,
-                                detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
+            raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500,
+                                detail="we got an error on the server. we know no more:(")
