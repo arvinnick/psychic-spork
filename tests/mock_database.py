@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.db.models import Supplier, Inventory, SupplierInventoryAssociation, Losses, Orders
 from tests.commons import seed_db, async_session_maker
 
+DEBUG = settings.DEBUG
 
 class MockDatabase:
     def __init__(self):
@@ -96,7 +97,7 @@ class MockDatabase:
     async def setup(self):
         self.__test_engine = create_async_engine(
             self.__TEST_DB_ENGINE,
-            echo=True,
+            echo=True if DEBUG else False,
             connect_args={"check_same_thread": False},
             poolclass=StaticPool  # This keeps the in-memory DB alive!
 
