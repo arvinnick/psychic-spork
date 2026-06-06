@@ -1,4 +1,7 @@
 from tests.conftest import frozen_test_time
+from app.core.config import settings
+
+DEBUG = settings.DEBUG
 
 
 
@@ -8,9 +11,9 @@ test_ingredient_name_not_in_database_fail = {"req_url": "/crud/losses/",
                                                                 "quantity": 1.0,
                                                                 "ingredient": "Wheat"
                                                             },
-                                                  "res_status_code": 404,
+                                                  "res_status_code": 404 if DEBUG else 500,
                                                   "res_json": {
-                                                      'detail': 'Ingredient not found in the database.'
+                                                      'detail': 'Ingredient not found in the database.' if DEBUG else "The server has encountered an error"
                                                   }
                                              }
 

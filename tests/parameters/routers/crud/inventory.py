@@ -1,3 +1,8 @@
+from IPython.core.magics import config
+
+from app.core import config
+
+DEBUG = config.settings.DEBUG
 
 test_create_inventory_item_successful = {
     "req_url": "/crud/inventory/",
@@ -29,11 +34,11 @@ test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                           "Tehran Supply Co.mn"
                                                       ]
                                                   },
-                                                  "res_status_code": 404,
+                                                  "res_status_code": 404 if DEBUG else 500,
                                                   "res_json": {
-                                                      'detail': 'Supplier not found in the database.'
+                                                      'detail': 'Supplier not found in the database.' if DEBUG else "we got an error on the server. we know no more:("}
                                                   }
-    }
+
 test_create_inventory_item_no_supplier_fail = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -41,9 +46,9 @@ test_create_inventory_item_no_supplier_fail = {
         "quantity": 0,
         "suppliers": []
     },
-    "res_status_code": 400,
+    "res_status_code": 400 if DEBUG else 500,
     "res_json": {
-        'detail': 'You must define at least one supplier for an ingredient'
+        'detail': 'You must define at least one supplier for an ingredient' if DEBUG else "we got an error on the server. we know no more:("
     }
 }
 test_create_inventory_item_negative_quantity_fail = {"req_url": "/crud/inventory/",
