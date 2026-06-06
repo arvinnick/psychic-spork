@@ -11,7 +11,7 @@ logger.info("Starting the application...")
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    with open("readme.html", "r") as f:
+    with open("app/readme.html", "r") as f:
         content = f.read()
         return content
 
