@@ -17,21 +17,6 @@ async_session_maker = async_sessionmaker(
     expire_on_commit=False,  # Prevent lazy loading issues after commit
 )
 
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    """
-    Dependency that provides an async database session.
-    Automatically handles commit/rollback and session cleanup.
-    """
-    async with async_session_maker() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
-
 
 
 # Alternative: Session with transaction control
