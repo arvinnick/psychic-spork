@@ -1,7 +1,3 @@
-from tests.conftest import MockDatabase
-
-database = MockDatabase()
-database.setup()
 
 test_create_inventory_item_successful = {
     "req_url": "/crud/inventory/",
@@ -23,8 +19,7 @@ test_create_inventory_item_successful = {
                          'email': 'info@tehransupply.com'
                      }
                  ]
-                 },
-"get_db":database.override_get_db
+                 }
 }
 test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                   "req_json": {
@@ -38,8 +33,7 @@ test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                   "res_json": {
                                                       'detail': 'Supplier not found in the database.'
                                                   }
-    ,
-                                                  "get_db": database.override_get_db}
+    }
 test_create_inventory_item_no_supplier_fail = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -51,8 +45,7 @@ test_create_inventory_item_no_supplier_fail = {
     "res_json": {
         'detail': 'You must define at least one supplier for an ingredient'
     }
-,
-                 "get_db":database.override_get_db}
+}
 test_create_inventory_item_negative_quantity_fail = {"req_url": "/crud/inventory/",
                                                      "res_json": {
                                                          'detail': [{'ctx': {'ge': 0.0},
@@ -71,8 +64,8 @@ test_create_inventory_item_negative_quantity_fail = {"req_url": "/crud/inventory
                                                              "Tehran Supply Co."
                                                          ]
                                                      },
-                                                     "res_status_code": 422,
-                                                     "get_db": database.override_get_db}
+                                                     "res_status_code": 422
+                                                     }
 test_create_inventory_item_zero_quantity = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -94,8 +87,8 @@ test_create_inventory_item_zero_quantity = {
                  ]
                  },
     "res_status_code": 201
-,
-                 "get_db":database.override_get_db}
+
+}
 test_create_inventory_item_missing_name_fail = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -123,8 +116,7 @@ test_create_inventory_item_missing_name_fail = {
             }
         ]
     }
-,
-                 "get_db":database.override_get_db}
+}
 test_duplicate_inventory_name_fail = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -140,8 +132,7 @@ test_duplicate_inventory_name_fail = {
     "res_json": {
         'detail': 'An inventory item with the name White Sugar already exists.'
     }
-,
-                 "get_db":database.override_get_db}
+}
 test_multiple_suppliers_success = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -171,5 +162,4 @@ test_multiple_suppliers_success = {
 
                  ]
                  }
-,
-                 "get_db":database.override_get_db}
+}

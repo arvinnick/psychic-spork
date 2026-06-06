@@ -1,7 +1,5 @@
-from tests.conftest import MockDatabase, frozen_test_time
+from tests.conftest import frozen_test_time
 
-database = MockDatabase()
-database.setup()
 
 
 #test case: ingredient name is wrong
@@ -14,8 +12,7 @@ test_ingredient_name_not_in_database_fail = {"req_url": "/crud/losses/",
                                                   "res_json": {
                                                       'detail': 'Ingredient not found in the database.'
                                                   }
-    ,
-                                                  "get_db": database.override_get_db}
+                                             }
 
 
 #test case: quantity is zero
@@ -30,8 +27,7 @@ test_quantity_zero_fail = {"req_url": "/crud/losses/",
              'loc': ['body', 'quantity'],
              'msg': 'Input should be greater than 0',
              'type': 'greater_than'}]}
-    ,
-                                                  "get_db": database.override_get_db}
+                           }
 
 
 #test case: quantity is less than zero
@@ -46,8 +42,7 @@ test_quantity_negative_fail = {"req_url": "/crud/losses/",
              'loc': ['body', 'quantity'],
              'msg': 'Input should be greater than 0',
              'type': 'greater_than'}]}
-    ,
-                                                  "get_db": database.override_get_db}
+                               }
 
 
 #test case: successful creation
@@ -65,5 +60,4 @@ test_success_created = {"req_url": "/crud/losses/",
                                'name': 'Tehran Supply Co.',
                                'number': 'tel:+98-21-1234-5678'}]},
  'quantity': 1.0}
-    ,
-                                                  "get_db": database.override_get_db}
+                        }

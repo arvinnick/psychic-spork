@@ -1,6 +1,5 @@
 import pytest
 from app.services.supplier import retrieve_suppliers_for_ingredient
-from tests.conftest import db_instance
 
 
 

@@ -5,7 +5,7 @@ from sqlalchemy import select
 from typing import Annotated
 
 from app.db.database import get_db
-from db.models import Supplier, Inventory, SupplierInventoryAssociation
+from app.db.models import Supplier, Inventory, SupplierInventoryAssociation
 
 
 async def retrieve_suppliers_for_ingredient(ingredient: str,
