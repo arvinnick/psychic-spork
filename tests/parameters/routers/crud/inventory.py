@@ -1,8 +1,6 @@
-from IPython.core.magics import config
+from app.core.config import settings
 
-from app.core import config
-
-DEBUG = config.settings.DEBUG
+DEBUG = settings.DEBUG
 
 test_create_inventory_item_successful = {
     "req_url": "/crud/inventory/",
