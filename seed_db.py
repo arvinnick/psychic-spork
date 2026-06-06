@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.db.models import Base
 from app.db import database
-from core.logger import logger
+from app.core.logger import logger
 
 
 async def main(engine: AsyncEngine = database.engine, model_base = Base):
