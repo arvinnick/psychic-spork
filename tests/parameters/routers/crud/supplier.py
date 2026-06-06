@@ -1,15 +1,10 @@
-from tests.conftest import MockDatabase
-database = MockDatabase()
-database.setup()
-
 
 #testcase: no contact is provided
 test_create_supplier_no_contact_fail = {
     "req_url": "/crud/suppliers/",
     "req_json": {"name": "Aramco"},
     "res_status_code": 422,
-    "res_json":{'detail': 'you should add at least one of the ways to contact the supplier.'},
-"get_db":database.override_get_db
+    "res_json":{'detail': 'you should add at least one of the ways to contact the supplier.'}
 }
 #test case: the email format is wrong
 test_create_supplier_wrong_email_format_fail = {
@@ -27,8 +22,7 @@ test_create_supplier_wrong_email_format_fail = {
                     'have an @-sign.',
              'type': 'value_error'}
         ]
-    },
-"get_db":database.override_get_db
+    }
 }
 #test case: the phone number format is wrong with numbers
 test_create_supplier_phone_number_wrong_fail = {
@@ -46,8 +40,7 @@ test_create_supplier_phone_number_wrong_fail = {
                          'msg': 'value is not a valid phone number',
                          'type': 'value_error'}
                     ]
-    },
-"get_db":database.override_get_db
+    }
 }
 #test case: successful creation
 test_create_supplier_success = {
@@ -64,7 +57,6 @@ test_create_supplier_success = {
         "email": "info@aram.co",
         "number": 'tel:+1-650-253-0000',
         "address":"1, Aram road, Riad, Saudi Arabia"
-    },
-"get_db":database.override_get_db
+    }
 }
 

@@ -1,4 +1,8 @@
+Note: this project is under development and the MVP is not ready yet. But this readme will give you an idea of the concept and the core logic behind the system.
+
+
 Smart Kitchen Inventory & Predictive Replenishment System
+
 1. Overview
 
 This system is designed to eliminate human error in kitchen management by automating the inventory tracking and ordering process. By utilizing real-time weight data and historical consumption patterns, the system ensures that a kitchen never runs out of essential ingredients while simultaneously minimizing food waste.

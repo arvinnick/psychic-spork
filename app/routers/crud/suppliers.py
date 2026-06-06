@@ -2,12 +2,13 @@ from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException
 
-import app.config as config
+import app.core.config as config
 from app.db.database import get_db
 from app.db.models import Supplier
-from app.logger import logger
+from app.core.logger import logger
 from app.schemas.supplier import SupplierCreate
 from app.schemas.supplier import SupplierBase as SupplierSchema
+from app.db.injectors import db_item_injector
 
 suppliers_crud_router = APIRouter(
     prefix="/suppliers",
@@ -30,8 +31,7 @@ async def create_supplier(supplier: SupplierCreate, db: Annotated[AsyncSession, 
         db_item = Supplier(
             **supplier.model_dump()
         )
-        db.add(db_item)
-        await db.commit()
+        await db_item_injector(db_item, db)
         return db_item
     except Exception as e:
         raise HTTPException(status_code=500,

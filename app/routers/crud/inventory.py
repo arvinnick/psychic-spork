@@ -2,17 +2,19 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
-import app.config as config
-from app.db.models import Inventory, Supplier
+import app.core.config as config
+from app.db.models import Inventory
 from app.db.database import get_db
-from app.logger import logger
-from app.config import settings
+from app.core.logger import logger
+from app.core.config import settings
 from app.schemas.inventory import InventoryCreate
 from app.schemas.inventory import Inventory as SchemasInventory
 
 from sqlalchemy.exc import IntegrityError
+
+from app.db.injectors import db_item_injector
+from app.db.retrievers import retrieve_suppliers
 
 inventory_crud_router = APIRouter(
     prefix="/inventory",
@@ -31,19 +33,13 @@ async def create_inventory_item(inventory_item: InventoryCreate,
         supplier_names = inventory_item.suppliers
         if not supplier_names:
             raise HTTPException(status_code=400, detail="You must define at least one supplier for an ingredient")
-        smth = select(Supplier).where(Supplier.name.in_(supplier_names))
-        suppliers_db_object = await db.execute(smth)
-        suppliers = suppliers_db_object.scalars().all()
-        if not suppliers:
-            raise HTTPException(status_code=400, detail="Supplier names are not in the database. You need to add them "
-                                                        "first or use the correct id.")
+        suppliers = await retrieve_suppliers(supplier_names, db)
         db_item = Inventory(
             name=inventory_item.name,
             quantity=inventory_item.quantity,
             suppliers=suppliers
         )
-        db.add(db_item)
-        await db.commit()
+        await db_item_injector(db_item, db)
         return db_item
     except IntegrityError as ie:
         if "unique constraint" in " ".join(ie.args).lower():
@@ -60,7 +56,7 @@ async def create_inventory_item(inventory_item: InventoryCreate,
                 raise e
             else:
                 raise HTTPException(status_code=500,
-                            detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
+                                    detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
         else:
             raise HTTPException(status_code=500,
-                            detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
+                                detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
