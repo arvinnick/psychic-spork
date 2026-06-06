@@ -26,7 +26,7 @@ async def db_layer_create_order(db:Annotated[AsyncSession, Depends(get_db)], ord
         sup_of_ingred = await retrieve_suppliers_for_ingredient(ingredient, db)
     except Exception as e:
         raise e
-    if not supplier in [supp.name for supp in sup_of_ingred]: #todo:
+    if supplier not in [supp.name for supp in sup_of_ingred]:
         try:
             await retrieve_suppliers([supplier], db)
         except HTTPException as e:
@@ -65,7 +65,8 @@ async def create_order(order: OrderCreate, db:Annotated[AsyncSession, Depends(ge
         db_item = await db_layer_create_order(db, order)
         return db_item
     except Exception as e:
-        if isinstance(e, HTTPException) and e.status_code in [400,404]: raise e
+        if isinstance(e, HTTPException) and e.status_code in [400,404]:
+            raise e
         else:
             raise HTTPException(status_code=500,
                                 detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")

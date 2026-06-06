@@ -1,7 +1,6 @@
-from tests.conftest import MockDatabase, frozen_test_time
+from tests.conftest import frozen_test_time
 
-# database = MockDatabase()
-# database.setup()
+
 
 #Test case: ingredient is not in the inventory (no entity)
 test_ingredient_not_in_database_fail = {"req_url": "/crud/orders/",
