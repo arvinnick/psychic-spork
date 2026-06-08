@@ -1,39 +1,244 @@
-Note: this project is under development and the MVP is not ready yet. But this readme will give you an idea of the concept and the core logic behind the system.
+# Smart Kitchen Inventory & Predictive Replenishment System
 
+**Live Demo:** [https://psychic-spork.onrender.com](https://psychic-spork.onrender.com)
 
-Smart Kitchen Inventory & Predictive Replenishment System
+> An intelligent inventory management system designed to eliminate human error in kitchen operations through real-time tracking and predictive ordering.
 
-1. Overview
+---
 
-This system is designed to eliminate human error in kitchen management by automating the inventory tracking and ordering process. By utilizing real-time weight data and historical consumption patterns, the system ensures that a kitchen never runs out of essential ingredients while simultaneously minimizing food waste.
-2. The Core Concept: "The Predictive Brain"
+## What's Working Now
 
-The system operates on a feedback loop. It doesn't just look at what is missing; it learns from the past to predict the future. It treats the kitchen as a dynamic environment where variables (like customer volume or supplier speed) are constantly changing.
-Key Components:
+✅ **Core API** – FastAPI-based REST endpoints for CRUD operations  
+✅ **Database Layer** – SQLAlchemy ORM with async support (SQLite for dev, PostgreSQL for prod)  
+✅ **Data Models** – Inventory, Suppliers, Orders, and Loss tracking  
+✅ **Async Operations** – Non-blocking database access with `asyncpg` and `aiosqlite`  
 
-    Mass-Based Tracking: Ingredients are placed on specialized scales. The system receives a constant stream of weight data, identifying exactly how much of a specific product (e.g., Salmon, Rice, Avocado) is left in real-time.
+---
 
-    Dynamic Coefficient Logic: Instead of a static "reorder point," the system uses a variable coefficient.
+## Architecture
 
-        If the kitchen ends the week with too much leftover (Waste), the coefficient decreases.
+### System Design
 
-        If the kitchen runs out before the next delivery (Shortage), the coefficient increases.
+The system operates on a **feedback loop** that learns from past behavior to predict future needs:
 
-    Latency Compensation: The system factors in "Lead Time"—the delay between placing an order and the physical arrival of the goods. It triggers orders early enough to cover the consumption expected during that delivery window.
+1. **Sensing** – Weight scales transmit real-time ingredient quantities
+2. **Processing** – The system compares current stock against predicted consumption for the next delivery cycle
+3. **Refining** – Loss logs are analyzed; over-ordering penalties are applied to prevent waste
+4. **Execution** – Autonomous replenishment orders are triggered when inventory approaches safety thresholds (accounting for delivery latency)
 
-3. Optimization Goal
+### Core Concept: "The Predictive Brain"
 
-The primary objective of the algorithm is a Minimal Residual Average. Over a three-month rolling window, the system adjusts its ordering patterns until the amount of remaining stock (at the moment of the next delivery) is as close to the safety buffer as possible, without ever hitting zero.
-4. Operational Flow
+Instead of static reorder points, the system uses **dynamic coefficients** that adapt based on outcomes:
 
-    Sensing: Scales transmit current ingredient weights in a simplified data format.
+- **Waste detected** → Coefficient decreases (reduce future orders)
+- **Shortages occur** → Coefficient increases (order more)
+- **Lead time factored in** → Orders trigger early enough to account for delivery delays
 
-    Processing: The "Brain" compares current weight against predicted needs for the next delivery cycle.
+**Primary Optimization Goal:** Minimize residual average inventory over a 3-month rolling window while preventing stockouts.
 
-    Refining: The system checks the "Waste Log." If items were discarded, the ordering logic is penalized to prevent over-ordering in the future.
+---
 
-    Execution: When the "Safety Threshold" is breached (considering delivery latency), the system autonomously generates a replenishment request to the supply center.
+## Tech Stack
 
+| Component | Technology |
+|-----------|-----------|
+| **Backend** | FastAPI (Python 3.11+) |
+| **Async Runtime** | Uvicorn, asyncio |
+| **ORM** | SQLAlchemy 2.x (async) |
+| **Dev Database** | SQLite |
+| **Prod Database** | PostgreSQL |
+| **Async Drivers** | `asyncpg`, `aiosqlite` |
+| **Data Validation** | Pydantic 2.x |
+| **Testing** | pytest, pytest-asyncio |
+| **Phone Numbers** | phonenumbers library |
 
-Install:
-for the db initialization, run models.py after activating the virtual env (later to be dockerized).
+### Dependencies
+
+```
+fastapi[standard]
+pydantic
+pytest
+pytest-asyncio
+httpx
+uvicorn
+sqlalchemy
+pydantic-extra-types
+phonenumbers
+setuptools
+pytest-freezegun
+aiosqlite
+asyncpg
+sqlalchemy[asyncio]
+pydantic-settings
+```
+
+---
+
+## Data Model
+
+```
+Inventory
+├── id (PK)
+├── name (unique)
+├── quantity
+└── suppliers (M:M relationship)
+
+Supplier
+├── id (PK)
+├── name
+├── address
+├── number
+├── email
+└── inventories (M:M relationship)
+
+Orders
+├── id (PK)
+├── date_time
+├── quantity
+├── ingredient_id (FK → Inventory)
+├── supplier_id (FK → Supplier)
+└── [pending: confirmed_at, delivery_date]
+
+Losses
+├── id (PK)
+├── date_time
+├── ingredient_id (FK → Inventory)
+├── quantity
+└── ingredient (relationship)
+```
+
+---
+
+## Planned Features
+
+**Key Initiatives:**
+- **Authentication & Authorization** – Role-based access control, privilege assignment
+- **Order Management** – Delivery tracking, order confirmation, post-delivery inventory updates
+- **Loss Processing** – Automated deduction of losses from inventory
+- **Scale Integration** – Mock scale for development, real-time weight streaming
+- **Warning System** – Low-stock and shortage alerts
+- **Predictive Engine** – Dynamic coefficient calculations and autonomous ordering
+- **Documentation** – API docs and setup guides for all endpoints
+- **Testing** – Unit tests for all CRUD operations
+- **DevOps** – Dockerization, production database configuration
+
+See the [Issues tab](https://github.com/arvinnick/psychic-spork/issues) for the full roadmap.
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.11+
+- Virtual environment (`venv` or `poetry`)
+- PostgreSQL (optional, for production)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/arvinnick/psychic-spork.git
+   cd psychic-spork
+   ```
+
+2. **Set up virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Initialize database** (SQLite for development)
+   ```bash
+   python app/db/models.py
+   ```
+
+5. **Run the application**
+   ```bash
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+   Visit: `http://localhost:8000`
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+DEBUG=True
+DATABASE_URL=sqlite:///./test.db
+```
+
+For production (PostgreSQL):
+```env
+DEBUG=False
+DATABASE_URL=postgresql+asyncpg://user:password@localhost/psychic_spork
+```
+
+---
+
+## API Endpoints
+
+### Inventory
+- `GET /inventory` – List all ingredients
+- `POST /inventory` – Create new ingredient
+- `PUT /inventory/{id}` – Update ingredient quantity
+- `DELETE /inventory/{id}` – Remove ingredient
+
+### Suppliers
+- `GET /suppliers` – List all suppliers
+- `POST /suppliers` – Add new supplier
+- `PUT /suppliers/{id}` – Update supplier info
+- `DELETE /suppliers/{id}` – Remove supplier
+
+### Orders
+- `GET /orders` – List all orders
+- `POST /orders` – Create new order
+- `PUT /orders/{id}` – Update order
+- `DELETE /orders/{id}` – Cancel order
+
+### Losses
+- `GET /losses` – View recorded waste/losses
+- `POST /losses` – Log ingredient loss
+- `DELETE /losses/{id}` – Remove loss record
+
+---
+
+## Current Status
+
+**Phase:** MVP Development (Core infrastructure in place)
+
+**Known Issues:**
+- GET `/losses` endpoint has bugs (see [#59](https://github.com/arvinnick/psychic-spork/issues/59))
+- Dependency injection needs fixes (see [#55](https://github.com/arvinnick/psychic-spork/issues/55))
+
+**Next Priorities:**
+1. Fix critical bugs in losses endpoint
+2. Implement authentication system
+3. Add order delivery tracking
+4. Deploy scale integration
+
+---
+
+## Contributing
+
+This project is under active development. Check the [Issues](https://github.com/arvinnick/psychic-spork/issues) tab for tasks or features you'd like to work on.
+
+---
+
+## License
+
+Apache License 2.0 – See [LICENSE](LICENSE) file for details
+
+---
+
+## Related Resources
+
+- **Project Board:** [See planned work](https://github.com/arvinnick/psychic-spork/issues)
+- **Live Instance:** [https://psychic-spork.onrender.com](https://psychic-spork.onrender.com)
+- **Concept:** Smart, adaptive inventory management inspired by machine learning feedback loops
