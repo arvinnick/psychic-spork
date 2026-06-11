@@ -38,7 +38,11 @@ async def retrieve_inventory(ingredient_name:str, db:Annotated[AsyncSession, Dep
     """
     smth = select(model).where(model.name == ingredient_name).options(
         selectinload(model.suppliers))
-    ingredients_db_object = await db.execute(smth)
+    try:
+        ingredients_db_object = await db.execute(smth)
+    except Exception as e:
+        logger.error("An error occurred while retrieving inventory: " + str(e))
+        raise e
     ingredients = ingredients_db_object.scalars().first()
     if ingredients is None:
         raise HTTPException(status_code=404, detail="Ingredient not found in the database.")

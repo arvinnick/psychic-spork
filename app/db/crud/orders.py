@@ -23,6 +23,7 @@ async def db_layer_create_order(db:Annotated[AsyncSession, Depends(get_db)], ord
     try:
         sup_of_ingred = await retrieve_suppliers_for_ingredient(ingredient, db)
     except Exception as e:
+        logger.error("An error occurred while retrieving suppliers for ingredient: " + str(e))
         raise e
     if supplier not in [supp.name for supp in sup_of_ingred]:
         try:

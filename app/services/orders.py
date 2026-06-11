@@ -32,6 +32,7 @@ async def get_orders(db:Annotated[AsyncSession, Depends(get_db)],
                                                 )
         return db_item
     except Exception as e:
+        logger.error(f"service layer, getting orders, has encountered an error: {e}")
         if isinstance(e, HTTPException) and e.status_code in [400,404, 422]:
             raise e
         else:

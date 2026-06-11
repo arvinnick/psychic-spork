@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from app.main import app
 from app.core.config import settings
 from app.db.models import Supplier, Inventory, SupplierInventoryAssociation, Losses, Orders
+from app.core.logger import logger
 from tests.commons import seed_db, async_session_maker
 
 DEBUG = settings.DEBUG
@@ -105,9 +106,11 @@ class MockDatabase:
         await seed_db(self.__test_engine)
         try:
             await self.__seed_test_db()
-        except DBAPIError:
+        except DBAPIError as de:
+            logger.error(f"Database error during test seeding: {de}")
             raise Exception("there is a problem in test database seeding")
         except Exception as e:
+            logger.error(f"Unexpected error during test seeding: {e}")
             if settings.DEBUG:
                 raise e
             else:

@@ -3,6 +3,7 @@ import os
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.db.models import Base
+from app.core.logger import logger
 
 
 async def seed_db(engine, model_base = Base):
@@ -12,6 +13,7 @@ async def seed_db(engine, model_base = Base):
         async with engine.begin() as conn:
             await conn.run_sync(model_base.metadata.create_all)
     except Exception as e:
+        logger.error(f"seeding has encountered an error: {e}")
         raise e
 
 

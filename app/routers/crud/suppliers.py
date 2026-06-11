@@ -34,5 +34,6 @@ async def create_supplier(supplier: SupplierCreate, db: Annotated[AsyncSession, 
         await db_item_injector(db_item, db)
         return db_item
     except Exception as e:
+        logger.error(f"error in creating suppliers endpoint: {e}")
         raise HTTPException(status_code=500,
                             detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")

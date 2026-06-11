@@ -35,6 +35,7 @@ async def create_order(order: OrderCreate, db:Annotated[AsyncSession, Depends(ge
         db_item = await db_layer_create_order(db, order)
         return db_item
     except Exception as e:
+        logger.error(f"exception is risen in the order post router: {e}")
         if isinstance(e, HTTPException) and e.status_code in [400,404]:
             raise e
         else:

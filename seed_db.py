@@ -14,6 +14,7 @@ async def main(engine: AsyncEngine = database.engine, model_base = Base):
             await conn.run_sync(model_base.metadata.create_all)
         logger.info("database seeded successfully")
     except Exception as e:
+        logger.error(f"seeding db error: {e}")
         raise e
 
 if __name__ == "__main__":
