@@ -58,8 +58,6 @@ async def retrieve_orders(
             )  -> List[Orders]:
     logger.info("retrieving orders by the specified constraints")
     query = select(Orders)
-    # query = query
-    # query = query
     try:
         if order_id:
             if isinstance(order_id, list):
@@ -87,6 +85,7 @@ async def retrieve_orders(
     except ValueError as ve:
         raise HTTPException(status_code=422, detail=str(ve))
     except Exception as e:
+        logger.error(f"An error occurred while retrieving orders: {str(e)}")
         raise e
     orders = orders_cor.scalars().all()
     if not any([
