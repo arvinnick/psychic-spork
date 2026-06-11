@@ -38,10 +38,22 @@ async def blueprint_fixture():
             then check the status code and response payload.
             """
             req_url = param_dict["req_url"]
-            req_json = param_dict["req_json"]
+            req_json = param_dict.get("req_json")
             res_status_code = param_dict["res_status_code"]
             res_json = param_dict["res_json"]
-            response = await client.post(req_url, json=req_json)
+            method = param_dict.get("method", "post")
+            if method == "post":
+                response = await client.post(req_url, json=req_json)
+            elif method == "put":
+                response = await client.put(req_url, json=req_json)
+            elif method == "delete":
+                response = await client.delete(req_url)
+            elif method == "patch":
+                response = await client.patch(req_url, json=req_json)
+            elif method == "get":
+                response = await client.get(req_url)
+            else:
+                raise ValueError("Invalid HTTP method specified in the test case.")
             assert response.status_code == res_status_code, str(response.json())
             assert response.json() == res_json
         yield blueprint
