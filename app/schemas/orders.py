@@ -1,5 +1,7 @@
 from datetime import datetime as datetime_factory
-from pydantic import BaseModel, Field
+from typing import List
+
+from pydantic import BaseModel, Field, RootModel
 from pydantic.types import datetime
 from app.schemas.inventory import Inventory
 from app.schemas.supplier import SupplierBase
@@ -18,7 +20,10 @@ class OrderCreate(Order):
     ingredient: str
     supplier: str
 
-class OrderGet(OrderBase):
+class OrderGetItem(OrderBase):
     supplier_id: int
     ingredient_id: int
+
+class OrderGet(RootModel[List[OrderGetItem]]):
+    pass
 

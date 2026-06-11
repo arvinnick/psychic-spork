@@ -98,7 +98,7 @@ test_case_all_orders_successful                             = {
                 "supplier_id": 1
             },
         {
-            "date_time": "2023-11-01T10:00:00",
+            "date_time": "2023-11-05T11:45:00",
             "quantity": 50.0,
             "ingredient_id": 3,
             "supplier_id": 2
@@ -110,12 +110,14 @@ test_case_singular_order_successful                             = {
     "req_url": "/crud/orders/1",
     "method": "get",
     "res_status_code": 200,
-    "res_json":{
+    "res_json":[
+        {
                     "date_time": "2023-11-01T10:00:00", #note that the datetime format might be wrong. So don't get stressed if the test didn't pass for the first time. Just fix the hardcodes
                     "quantity": 100.0,
                     "ingredient_id": 1,
                     "supplier_id": 1
                 }
+    ]
 }
 
 test_case_multiple_orders_successful                            = {
@@ -124,15 +126,13 @@ test_case_multiple_orders_successful                            = {
     "res_status_code": 200,
     "res_json":[
         {
-                "id": 1,
                 "date_time": "2023-11-01T10:00:00", #note that the datetime format might be wrong. So don't get stressed if the test didn't pass for the first time. Just fix the hardcodes
                 "quantity": 100.0,
                 "ingredient_id": 1,
                 "supplier_id": 1
             },
         {
-            "id": 2,
-            "date_time": "2023-11-01T10:00:00",
+            "date_time": "2023-11-05T11:45:00",
             "quantity": 50.0,
             "ingredient_id": 3,
             "supplier_id": 2
@@ -144,13 +144,12 @@ test_case_singular_ingredient_successful                        = {
     "req_url": "/crud/orders?ingredient_id=1",
 "method": "get",
     "res_status_code": 200,
-    "res_json":{
-                    "id": 1,
+    "res_json":[{
                     "date_time": "2023-11-01T10:00:00", #note that the datetime format might be wrong. So don't get stressed if the test didn't pass for the first time. Just fix the hardcodes
                     "quantity": 100.0,
                     "ingredient_id": 1,
                     "supplier_id": 1
-                }
+                }]
 }
 
 test_case_multiple_ingredient_successful                        = {
@@ -159,15 +158,13 @@ test_case_multiple_ingredient_successful                        = {
     "res_status_code": 200,
     "res_json":[
         {
-                "id": 1,
                 "date_time": "2023-11-01T10:00:00", #note that the datetime format might be wrong. So don't get stressed if the test didn't pass for the first time. Just fix the hardcodes
                 "quantity": 100.0,
                 "ingredient_id": 1,
                 "supplier_id": 1
             },
         {
-            "id": 2,
-            "date_time": "2023-11-01T10:00:00",
+            "date_time": "2023-11-05T11:45:00",
             "quantity": 50.0,
             "ingredient_id": 3,
             "supplier_id": 2
@@ -179,13 +176,12 @@ test_case_singular_supplier_successful                          = {
     "req_url": "/crud/orders?supplier_id=1",
 "method": "get",
     "res_status_code": 200,
-    "res_json":{
-                    "id": 1,
+    "res_json":[{
                     "date_time": "2023-11-01T10:00:00", #note that the datetime format might be wrong. So don't get stressed if the test didn't pass for the first time. Just fix the hardcodes
                     "quantity": 100.0,
                     "ingredient_id": 1,
                     "supplier_id": 1
-                }
+                }]
 }
 
 test_case_multiple_supplier_successful                          = {
@@ -194,15 +190,13 @@ test_case_multiple_supplier_successful                          = {
     "res_status_code": 200,
     "res_json":[
         {
-                "id": 1,
                 "date_time": "2023-11-01T10:00:00", #note that the datetime format might be wrong. So don't get stressed if the test didn't pass for the first time. Just fix the hardcodes
                 "quantity": 100.0,
                 "ingredient_id": 1,
                 "supplier_id": 1
             },
         {
-            "id": 2,
-            "date_time": "2023-11-01T10:00:00",
+            "date_time": "2023-11-05T11:45:00",
             "quantity": 50.0,
             "ingredient_id": 3,
             "supplier_id": 2
@@ -211,30 +205,33 @@ test_case_multiple_supplier_successful                          = {
 }
 
 test_case_ingredient_supplier_combination_successful            = {
-    "req_url": "/crud/orders?supplier_id=1&supplier_id=3",
+    "req_url": "/crud/orders?supplier_id=2&ingredient_id=3",
 "method": "get",
     "res_status_code": 200,
-    "res_json":{
-                    "id": 1,
-                    "date_time": "2023-11-01T10:00:00", #note that the datetime format might be wrong. So don't get stressed if the test didn't pass for the first time. Just fix the hardcodes
-                    "quantity": 100.0,
-                    "ingredient_id": 1,
-                    "supplier_id": 1
-                }
+    "res_json":[{
+                    "date_time": '2023-11-05T11:45:00',
+                    "quantity": 50.0,
+                    "ingredient_id": 3,
+                    "supplier_id": 2
+                }]
 }
 
 test_case_ingredient_supplier_combination_successful_not_found  = {
-    "req_url": "/crud/orders?supplier_id=1&supplier_id=1",
+    "req_url": "/crud/orders?ingredient_id=2&supplier_id=1",
 "method": "get",
     "res_status_code": 200,
-    "res_json":{}
+    "res_json":[]
 }
 
 test_case_wrong_format_fail                                     = {
     "req_url": "/crud/orders?supplier_id=a",
 "method": "get",
     "res_status_code": 422,
-    "res_json":{}
+    "res_json":{'detail': [{'input': 'a',
+             'loc': ['query', 'supplier_id', 0],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]}
 }
 
 test_case_between_two_dates_successful                          = {
@@ -243,15 +240,13 @@ test_case_between_two_dates_successful                          = {
     "res_status_code": 200,
     "res_json":[
         {
-                "id": 1,
                 "date_time": "2023-11-01T10:00:00", #note that the datetime format might be wrong. So don't get stressed if the test didn't pass for the first time. Just fix the hardcodes
                 "quantity": 100.0,
                 "ingredient_id": 1,
                 "supplier_id": 1
             },
         {
-            "id": 2,
-            "date_time": "2023-11-01T10:00:00",
+            "date_time": "2023-11-05T11:45:00",
             "quantity": 50.0,
             "ingredient_id": 3,
             "supplier_id": 2
@@ -264,42 +259,45 @@ test_case_between_two_dates_successful_not_found                = {
 "req_url": "/crud/orders?date_time_from=2023-08-01T00:00:00&date_time_to=2023-09-01T00:00:00",
 "method": "get",
     "res_status_code": 200,
-    "res_json":{}
+    "res_json":[]
 }
 
 test_case_datetime_not_correctly_formatted_failure              = {
 "req_url": "/crud/orders?date_time_from=ds&date_time_to=2023-09-01T00:00:00",
 "method": "get",
     "res_status_code": 422,
-    "res_json":{}
+    "res_json":{'detail': "Invalid isoformat string: 'ds'"}
 }
 
 test_case_between_two_quantities_successful                     = {
 "req_url": "/crud/orders?quantity_gt=80&quantity_lt=120",
 "method": "get",
     "res_status_code": 200,
-    "res_json":{
-                "id": 1,
+    "res_json":[{
                 "date_time": "2023-11-01T10:00:00", #note that the datetime format might be wrong. So don't get stressed if the test didn't pass for the first time. Just fix the hardcodes
                 "quantity": 100.0,
                 "ingredient_id": 1,
                 "supplier_id": 1
-            }
+            }]
 }
 
 
 test_case_string_as_id_failure                                  = {
 "req_url": "/crud/orders/as",
 "method": "get",
-    "res_status_code": 400  ,
-    "res_json":{}
+    "res_status_code": 422  ,
+    "res_json":{'detail': [{'input': 'as',
+             'loc': ['path', 'order_id'],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]}
 }
 
 test_case_string_not_a_valid_id_failure                         = {
 "req_url": "/crud/orders/4",
 "method": "get",
     "res_status_code": 404  ,
-    "res_json":{}
+    "res_json":{'detail': 'No orders with specified id(s).'}
 }
 
 test_case_retrieve_suppliers_successful                         = {
@@ -307,7 +305,6 @@ test_case_retrieve_suppliers_successful                         = {
 "method": "get",
     "res_status_code": 200,
     "res_json":{
-                    "id": 2,
                     "name": "South Trading",
                     "address": "Coastal Blvd, Bandar Abbas",
                     "number": 'tel:+98-76-1234-5678',
@@ -319,5 +316,10 @@ test_case_retrieve_ingredient_successful                        = {
 "req_url": "/crud/orders/1/ingredients",
 "method": "get",
     "res_status_code": 200,
-    "res_json":{"id": 1, "name": "Wheat Flour", "quantity": 500.5}
+    "res_json":{'name': 'Wheat Flour',
+ 'quantity': 500.5,
+ 'suppliers': [{'address': '1st Valiasr St, Tehran',
+                'email': 'info@tehransupply.com',
+                'name': 'Tehran Supply Co.',
+                'number': 'tel:+98-21-1234-5678'}]}
 }

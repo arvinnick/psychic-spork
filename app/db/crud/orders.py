@@ -44,9 +44,9 @@ async def db_layer_create_order(db:Annotated[AsyncSession, Depends(get_db)], ord
 
 
 async def db_layer_retrieve_order(db:Annotated[AsyncSession, Depends(get_db)],
-                    order_id:int=None,
-                    ingredient_id:int=None,
-                    supplier_id:int=None,
+                    order_id:List[int]=None,
+                    ingredient_id:List[int]=None,
+                    supplier_id:List[int]=None,
                     date_time_from:str=None,
                     date_time_to:str=None,
                     quantity_lt:float=None,
