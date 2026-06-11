@@ -4,7 +4,12 @@ test_create_supplier_no_contact_fail = {
     "req_url": "/crud/suppliers/",
     "req_json": {"name": "Aramco"},
     "res_status_code": 422,
-    "res_json":{'detail': 'you should add at least one of the ways to contact the supplier.'}
+    "res_json":{'detail': [{'ctx': {'error': {}},
+             'input': {'name': 'Aramco'},
+             'loc': ['body'],
+             'msg': 'Value error, you should add at least one of the ways to '
+                    'contact the supplier.',
+             'type': 'value_error'}]}
 }
 #test case: the email format is wrong
 test_create_supplier_wrong_email_format_fail = {

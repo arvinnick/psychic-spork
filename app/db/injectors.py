@@ -14,4 +14,4 @@ async def db_item_injector(db_item:Base, db:Annotated[AsyncSession, Depends(get_
     :param db: dependency of a
     """
     db.add(db_item)
-    await db.commit()
+    await db.flush()

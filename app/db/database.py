@@ -5,9 +5,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from app.core.config import settings
 
 if settings.PROD:
-    engine = create_async_engine(settings.PROD_ENGINE_URI, echo=True)
+    engine = create_async_engine(settings.PROD_ENGINE_URI, echo=False)
 else:
-    engine = create_async_engine(settings.DEV_ENGINE_URI, echo=True)
+    engine = create_async_engine(settings.DEV_ENGINE_URI, echo=True if settings.DEBUG else False)
 
 
 
@@ -16,21 +16,6 @@ async_session_maker = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,  # Prevent lazy loading issues after commit
 )
-
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    """
-    Dependency that provides an async database session.
-    Automatically handles commit/rollback and session cleanup.
-    """
-    async with async_session_maker() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
 
 
 

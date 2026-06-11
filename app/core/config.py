@@ -2,6 +2,7 @@ from pathlib import Path
 from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+PARENT_DIR = BASE_DIR.parent
 class Settings(BaseSettings):
     PROD : bool = False
     PROD_ENGINE_URI : str = ''
@@ -11,6 +12,9 @@ class Settings(BaseSettings):
     TEST_ENGINE_URI: str = f"sqlite+aiosqlite:///{TEST_SQLITE_FILE_NAME}"
     DEBUG : bool = False
     echo_sql: bool = True
+    HASH_SALT : str | None = None
+    HASH_MIN_LEN: int | None = None
+
 
 
 settings = Settings()

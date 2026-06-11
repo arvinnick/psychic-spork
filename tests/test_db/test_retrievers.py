@@ -3,6 +3,7 @@ import pytest
 from app.db.retrievers import retrieve_inventory, retrieve_suppliers
 from fastapi.exceptions import HTTPException
 
+from app.core.logger import logger
 
 @pytest.mark.anyio
 async def test_retrieve_inventory(db_instance):
@@ -17,6 +18,7 @@ async def test_retrieve_inventory_not_found(db_instance):
         assert ex.status_code == 404
         assert ex.detail == "Ingredient not found in the database."
     except Exception as e:
+        logger.error(f"exception ocurred in test_rerievers: {e}")
         raise e
 
 @pytest.mark.anyio
@@ -33,4 +35,5 @@ async def test_retrieve_suppliers_not_found(db_instance):
         assert ex.status_code == 404
         assert ex.detail == "Supplier not found in the database."
     except Exception as e:
+        logger.error(f"An error occurred while testing supplier retrieval: {str(e)}")
         raise e

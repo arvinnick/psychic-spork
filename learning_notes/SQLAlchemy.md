@@ -20,7 +20,7 @@
   - Metadata: a facade (?) around a dictionary which will hold table objects as well as their string names. Metadata is a reflection of a database but it can be only reflecting to a part of it. Having a single MD obj for the entire application is the most common use. Metadata object has a “create\_all” method which emits all its relations to the database (just the create statements), doing everything in order. Also, “drop\_all” will emit drop statements in reverse order.  
   - Column: A DB col. Will be assigned to a table obj. Columns of a table are accessible via table\_obj.c  
   - Integer, String: a value in a database, will be assigned to a column even without instantiation.
-
+- Flush vs commit: flush will send the transaction to the db but will not permanently apply them. Commit, on the other hand, will close the transaction and will not be rolled back. So, if you want to find if something is agaisnt the constraints, you gotta flush it. Commiting will be done using the dependency manager. 
 ### Table reflection
 
 making Table and related objects using the current state of the database. To do that we can make a plain metadata and a plain table object and use the “autoload\_with” parameter for the table, passing the target “engine”.

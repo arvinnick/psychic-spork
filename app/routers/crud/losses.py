@@ -40,12 +40,15 @@ async def create_loss(loss: LossesCreate,
         )
         await db_item_injector(db_item, db)
         return db_item
+    except HTTPException as he:
+        if he.status_code in [400, 404]:
+            raise he
+        else:
+            raise HTTPException(
+                status_code=500, detail="The server has encountered an error"
+            )
     except Exception as e:
-        if isinstance(e, HTTPException):
-            if config.settings.DEBUG:
-                raise e
-            else:
-                raise HTTPException(status_code=500, detail="The server has encountered an error")
+        logger.error(f"error in creating loss endpoint: {e}")
         raise HTTPException(status_code=500,
                             detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
 
@@ -69,4 +72,5 @@ async def get_losses(loss:LossesRead, db:Annotated[AsyncSession, Depends(get_db)
         db_items = await db.execute(query).scalars().all()
         return db_items
     except Exception as e:
+        logger.error(f"error in getting losses endpoint: {e}")
         raise e
