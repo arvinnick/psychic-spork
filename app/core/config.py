@@ -13,9 +13,9 @@ class Settings(BaseSettings):
     TEST_ENGINE_URI: str = f"sqlite+aiosqlite:///{TEST_SQLITE_FILE_NAME}"
     DEBUG : bool = False
     echo_sql: bool = True
-    HASH_SALT : str
-    HASH_MIN_LEN: int
+    HASH_SALT : str | None = None
+    HASH_MIN_LEN: int | None = None
 
 
 
-settings = Settings(_env_file=f"{PARENT_DIR}{path.sep}.env")
+settings = Settings()
