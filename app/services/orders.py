@@ -1,6 +1,6 @@
 from typing import List, Annotated
 
-from fastapi import HTTPException, Depends, Query
+from fastapi import HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.crud.orders import db_layer_retrieve_order
@@ -11,9 +11,9 @@ from app.db.database import get_db
 
 
 async def get_orders(db:Annotated[AsyncSession, Depends(get_db)],
-                    order_id:Annotated[List[int] | None, Query()] = None,
-                    ingredient_id:Annotated[List[int] | None, Query()] = None,
-                    supplier_id:Annotated[List[int] |None, Query()] = None,
+                    order_id:List[int]|None = None,
+                    ingredient_id:List[int]|None = None,
+                    supplier_id:List[int]|None = None,
                     date_time_from:str=None,
                     date_time_to:str=None,
                     quantity_lt:float=None,
