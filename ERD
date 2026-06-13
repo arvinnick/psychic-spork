@@ -1,0 +1,41 @@
+erDiagram
+    INVENTORY {
+        int id PK
+        string name
+        float quantity
+    }
+
+    SUPPLIER {
+        int id PK
+        string name
+        string address
+        string number
+        string email
+    }
+
+    SUPPLIER_INVENTORY_ASSOCIATION {
+        int supplier_id PK, FK
+        int inventory_id PK, FK
+    }
+
+    LOSSES {
+        int id PK
+        datetime date_time
+        float quantity
+        int ingredient_id FK
+    }
+
+    ORDERS {
+        int id PK
+        datetime date_time
+        float quantity
+        int ingredient_id FK
+        int supplier_id FK
+    }
+
+    %% Relationships
+    SUPPLIER ||--o{ SUPPLIER_INVENTORY_ASSOCIATION : "has"
+    INVENTORY ||--o{ SUPPLIER_INVENTORY_ASSOCIATION : "appears in"
+    INVENTORY ||--o{ LOSSES : "tracks losses for"
+    INVENTORY ||--o{ ORDERS : "ordered in"
+    SUPPLIER ||--o{ ORDERS : "fulfills"

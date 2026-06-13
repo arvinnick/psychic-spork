@@ -1,17 +1,19 @@
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.params import Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
 import app.core.config as config
 from app.core.logger import logger
 from app.db.database import get_db
-from app.schemas.losses import Loss as LossesSchema, LossesRead
+from app.schemas.losses import Loss as LossesSchema, LossGet
 from app.schemas.losses import LossesCreate
-from app.db.models import Losses
+from app.schemas.inventory import InventoryBase as InventorySchema
+from app.db.models import Losses, Inventory
 from app.db.injectors import db_item_injector
 from app.db.retrievers import retrieve_inventory
+from app.services.losses import get_losses
 
 losses_crud_router = APIRouter(
     prefix="/losses",
@@ -53,24 +55,81 @@ async def create_loss(loss: LossesCreate,
                             detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
 
 
-@losses_crud_router.get('/', response_model=List[LossesRead], status_code=200,
-                        summary="reading and filtering the recorded losses")
-async def get_losses(loss:LossesRead, db:Annotated[AsyncSession, Depends(get_db)]):
+@losses_crud_router.get('/{loss_id}',
+                        response_model=LossGet,
+                        status_code=200,
+                        summary="reading a single recorded loss by id")
+async def get_single_loss(db:Annotated[AsyncSession, Depends(get_db)],
+                          loss_id: int
+                     ) -> List[Losses]:
     """
     main path operation for reading the losses. you can filter the losses by ingredient name, date_time, and quantity.
      if you don't provide any query parameters, it will return all the losses.
     """
-    logger.info(f"Getting losses by the parameters provided: {loss}")
+    logger.info("Getting losses by ID")
     try:
-        query = select(Losses)
-        if loss.ingredient:
-            query = query.filter(Losses.ingredient == loss.ingredient)
-        if loss.date_time:
-            query = query.filter(Losses.date_time == loss.date_time)
-        if loss.quantity:
-            query = query.filter(Losses.quantity == loss.quantity)
-        db_items = await db.execute(query).scalars().all()
-        return db_items
+        loss_objects = await get_losses(db, [loss_id])
+        return loss_objects
     except Exception as e:
         logger.error(f"error in getting losses endpoint: {e}")
-        raise e
+        raise HTTPException(500,
+                            "something went wrong and we don't know what it is:(")
+
+
+@losses_crud_router.get('',
+                        response_model=LossGet,
+                        status_code=200,
+                        summary="reading loss records based on the constraints and filters")
+async def get_losses_path_operation(db:Annotated[AsyncSession, Depends(get_db)],
+                                    loss_id: Annotated[List[int], int | None, Query()] = None,
+                                    ingredient_id: Annotated[List[int], int | None, Query()] = None,
+                                    datetime_to: str | None = None,
+                                    datetime_from: str | None = None,
+                                    quantity_lt: float | None = None,
+                                    quantity_gt: float | None = None,
+                     ) -> List[Losses]:
+    """
+    main path operation for reading the losses. you can filter the losses by ingredient name, date_time, and quantity.
+     if you don't provide any query parameters, it will return all the losses.
+    """
+    logger.info("Getting losses by constraints")
+    try:
+        loss_objects = await get_losses(db,
+                                        loss_id,
+                                        ingredient_id,
+                                        datetime_to,
+                                        datetime_from,
+                                        quantity_lt,
+                                        quantity_gt)
+        return loss_objects
+    except HTTPException as he:
+        logger.error(f"validation error in getting losses endpoint: {he}")
+        raise he
+    except Exception as e:
+        logger.error(f"error in getting losses endpoint: {e}")
+        raise HTTPException(500,
+                            "something went wrong and we don't know what it is:(")
+
+
+
+
+@losses_crud_router.get('/{loss_id}/ingredient',
+                        response_model=InventorySchema,
+                        status_code=200,
+                        summary="reading loss records based on the constraints and filters")
+async def get_losses_ingredient(db:Annotated[AsyncSession, Depends(get_db)],
+                                loss_id: int
+                                ) -> Inventory:
+    """
+    main path operation for reading the losses. you can filter the losses by ingredient name, date_time, and quantity.
+     if you don't provide any query parameters, it will return all the losses.
+    """
+    logger.info("Getting losses by constraints")
+    try:
+        loss_objects = await get_losses(db,
+                                        loss_id)
+        return loss_objects[0].ingredient
+    except Exception as e:
+        logger.error(f"error in getting losses endpoint: {e}")
+        raise HTTPException(500,
+                            "something went wrong and we don't know what it is:(")

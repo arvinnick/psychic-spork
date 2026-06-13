@@ -49,7 +49,7 @@ async def create_order(order: OrderCreate, db:Annotated[AsyncSession, Depends(ge
                         summary="order retrieval",
                         status_code=200
                         )
-async def get_order_by_uery_params(db:Annotated[AsyncSession, Depends(get_db)],
+async def get_order_by_query_params(db:Annotated[AsyncSession, Depends(get_db)],
                     order_id:Annotated[List[int] | None, Query()] = None,
                     ingredient_id:Annotated[List[int] | None, Query()] = None,
                     supplier_id:Annotated[List[int] |None, Query()] = None,
