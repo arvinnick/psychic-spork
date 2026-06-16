@@ -26,13 +26,13 @@ from tests.parameters.routers.crud.supplier import (test_create_supplier_phone_n
         ####get
         test_get_single_supplier_success,
         test_get_single_non_existent_supplier_success,
-        # test_get_supplier_ingredients_success, #todo: make it after finishing the inventory get because you will use its services here
+        test_get_supplier_ingredients_success,
         test_get_all_suppliers_success,
         test_get_single_supplier_wrong_format,
         test_get_supplier_wrong_property
     ]
 )
-async def test_orders(blueprint_fixture, param_dict):
+async def test_suppliers(blueprint_fixture, param_dict):
     await blueprint_fixture(param_dict)
 
 @pytest.mark.anyio

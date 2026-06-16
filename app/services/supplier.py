@@ -1,9 +1,8 @@
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from typing import Annotated, List
+from typing import List
 
-from app.db.database import get_db
 from app.db.models import Supplier
 from app.core.logger import logger
 from app.core import config
@@ -18,10 +17,10 @@ from app.db.retrievers import retrieve_suppliers_for_ingredient as db_layer_supp
 
 
 async def get_suppliers(
-        db:Annotated[AsyncSession, Depends(get_db)],
+        db:AsyncSession,
         supplier_id:int = None
 ) -> List[Supplier]:
-    logger.info("Getting supppliers by the specified constraints")
+    logger.info("Getting suppliers by the specified constraints")
     try:
         db_item = await db_layer_retrieve_supplier(db,
                                                    supplier_id)

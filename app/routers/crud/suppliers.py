@@ -9,9 +9,11 @@ from app.core.logger import logger
 from app.schemas.supplier import SupplierCreate
 from app.schemas.supplier import SupplierBase as SupplierSchema
 from app.schemas.supplier import Supplier as SupplierList
+from app.schemas.inventory import InventoryGet as InventoryList
 from app.db.injectors import db_item_injector
 from app.services.supplier import get_suppliers
 from app.db.models import Inventory
+from app.services.inventory import get_ingredients
 
 suppliers_crud_router = APIRouter(
     prefix="/suppliers",
@@ -62,7 +64,7 @@ async def get_suppliers_endpoint(db: Annotated[AsyncSession, Depends(get_db)]) -
                            status_code=200)
 async def get_supplier_item_endpoint(db: Annotated[AsyncSession, Depends(get_db)],
                                  supplier_id: int) -> List[Supplier]:
-    logger.info(f"Getting all suppliers in router level")
+    logger.info("Getting all suppliers in router level")
     try:
         supplier_objs = await get_suppliers(db, supplier_id)
         return supplier_objs
@@ -71,16 +73,16 @@ async def get_supplier_item_endpoint(db: Annotated[AsyncSession, Depends(get_db)
         raise HTTPException(500, "we got an error")
 
 
-# @suppliers_crud_router.get('/{supplier_id}/ingredient',
-#                            response_model=SupplierList,
-#                            summary="getter endpoint for all database entites",
-#                            status_code=200)
-# async def get_suppliers_ingredient_endpoint(db: Annotated[AsyncSession, Depends(get_db)],
-#                                  supplier_id: int) -> List[Inventory]:
-#     logger.info(f"Getting all suppliers in router level")
-#     try:
-#         supplier_objs = await get_suppliers_ingredients(db, supplier_id)
-#         return supplier_objs
-#     except Exception as e:
-#         logger.error(f"we got an error in router level: {e}")
-#         raise HTTPException(500, "we got an error")
+@suppliers_crud_router.get('/{supplier_id}/ingredients',
+                           response_model=InventoryList,
+                           summary="getter endpoint for all database entities",
+                           status_code=200)
+async def get_suppliers_ingredient_endpoint(db: Annotated[AsyncSession, Depends(get_db)],
+                                 supplier_id: int) -> List[Inventory]:
+    logger.info("Getting all suppliers in router level")
+    try:
+        supplier_objs = await get_ingredients(db=db, supplier_id=supplier_id)
+        return supplier_objs
+    except Exception as e:
+        logger.error(f"we got an error in router level: {e}")
+        raise HTTPException(500, "we got an error")
