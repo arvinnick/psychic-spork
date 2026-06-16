@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import HTTPException
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Inventory
 from app.core.logger import logger
