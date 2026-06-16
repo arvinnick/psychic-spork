@@ -3,20 +3,18 @@ from tests.conftest import frozen_test_time
 
 ##############post
 #test case: ingredient name is wrong
-test_ingredient_name_not_in_database_fail = {"req_url": "/crud/losses/",
+test_ingredient_name_not_in_database_fail = {"req_url": "/crud/losses",
                                                   "req_json": {
                                                                 "quantity": 1.0,
                                                                 "ingredient": "Wheat"
                                                             },
-                                                  "res_status_code": 404,
-                                                  "res_json": {
-                                                      'detail': 'Ingredient not found in the database.'
-                                                  }
+                                                  "res_status_code": 400,
+                                                  "res_json": {'detail': 'ingredient name is not in the database.'}
                                              }
 
 
 #test case: quantity is zero
-test_quantity_zero_fail = {"req_url": "/crud/losses/",
+test_quantity_zero_fail = {"req_url": "/crud/losses",
                                                   "req_json": {
                                                                 "quantity": 0.0,
                                                                 "ingredient": "Wheat Flour"
@@ -31,7 +29,7 @@ test_quantity_zero_fail = {"req_url": "/crud/losses/",
 
 
 #test case: quantity is less than zero
-test_quantity_negative_fail = {"req_url": "/crud/losses/",
+test_quantity_negative_fail = {"req_url": "/crud/losses",
                                                   "req_json": {
                                                                 "quantity": -1.0,
                                                                 "ingredient": "Wheat Flour"
@@ -46,7 +44,7 @@ test_quantity_negative_fail = {"req_url": "/crud/losses/",
 
 
 #test case: successful creation
-test_success_created = {"req_url": "/crud/losses/",
+test_success_created = {"req_url": "/crud/losses",
                                                   "req_json": {
                                                                 "quantity": 1.0,
                                                                 "ingredient": "Wheat Flour"

@@ -1,5 +1,6 @@
-from sqlalchemy import ForeignKey, Column, Table, DateTime, String, Float, Text
+from sqlalchemy import ForeignKey, Column, Table, DateTime, String, Float, Text, func
 from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
 from datetime import datetime
 from typing import List
@@ -9,6 +10,16 @@ from typing import List
 class Base(AsyncAttrs, DeclarativeBase):
     pass
 
+class SluggMaker:
+    @hybrid_property
+    def name_slug(self) -> str:
+        """Python-side: converts 'Olive Oil' → 'olive-oil'"""
+        return self.name.lower().replace(" ", "-")
+
+    @name_slug.expression
+    def name_slug(cls):
+        """SQL-side: applies the same transformation in the database"""
+        return func.replace(func.lower(cls.name), " ", "-")
 
 SupplierInventoryAssociation = Table(
     "supplier_inventory_association",
@@ -17,7 +28,7 @@ SupplierInventoryAssociation = Table(
     Column("inventory_id", ForeignKey("inventory.id"), primary_key=True)
 )
 
-class Inventory(Base):
+class Inventory(Base, SluggMaker):
     __tablename__ = "inventory"
     id: Mapped[int] = mapped_column(primary_key=True)
     name:Mapped[str] = mapped_column(String(50), unique=True)
@@ -27,7 +38,8 @@ class Inventory(Base):
         back_populates="inventories"
     )
 
-class Supplier(Base):
+
+class Supplier(Base, SluggMaker):
     __tablename__ = 'supplier'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))

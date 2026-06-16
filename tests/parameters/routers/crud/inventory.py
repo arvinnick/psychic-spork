@@ -1,3 +1,5 @@
+
+####post
 test_create_inventory_item_successful = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -32,7 +34,6 @@ test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                   "res_json": {
                                                       'detail': 'Supplier not found in the database.'}
                                                   }
-
 test_create_inventory_item_no_supplier_fail = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -161,4 +162,120 @@ test_multiple_suppliers_success = {
 
                  ]
                  }
+}
+
+
+####get
+test_get_all_inventory = {
+    "req_url": "/crud/inventory",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+                {"name": "Wheat Flour", "quantity": 500.5},
+                {"name": "White Sugar", "quantity": 200.0},
+                {"name": "Vegetable Oil", "quantity": 150.75},
+                {"name": "Peanut", "quantity": 150.75}
+    ]
+}
+test_get_ont_inventory_item = {
+    "req_url": "/crud/inventory/1",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [{"name": "Wheat Flour", "quantity": 500.5}],
+}
+test_get_one_inventory_item_suppliers = {
+    "req_url": "/crud/inventory/1/suppliers",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+            {
+                "address": "1st Valiasr St, Tehran",
+                "email": "info@tehransupply.com",
+                "name": "Tehran Supply Co.",
+                "number": "tel:+98-21-1234-5678",
+            }
+    ],
+}
+test_get_wrong_format_inventory_item_fail = {
+    "req_url": "/crud/inventory/as",
+    "method": "get",
+    "res_status_code": 422,
+    "res_json": {
+                    'detail': [
+                        {'input': 'as',
+                         'loc': [
+                             'path', 'ingredient_id'
+                         ],
+                         'msg': 'Input should be a valid integer, unable to parse string as an integer',
+                         'type': 'int_parsing'
+                         }
+                    ]
+    }
+}
+test_get_inventory_non_existent_id = {
+    "req_url": "/crud/inventory/5",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": []
+}
+test_get_inventory_wrong_property = {
+    "req_url": "/crud/inventory/1/something",
+    "method": "get",
+    "res_status_code": 404,
+    "res_json": {"detail": "Not Found"},
+}
+test_get_inventory_filter_suppliers = {
+    "req_url": "/crud/inventory?supplier_id=1",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+        {"name": "Wheat Flour", "quantity": 500.5},
+        {"name": "White Sugar", "quantity": 200.0}
+    ],
+}
+test_get_inventory_filter_quantity_from = {
+    "req_url": "/crud/inventory?quantity_from=300",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+        {"name": "Wheat Flour", "quantity": 500.5},
+    ]
+}
+test_get_inventory_filter_quantity_to_from = {
+    "req_url": "/crud/inventory?quantity_from=300&quantity_to=500",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": []
+}
+test_get_inventory_filter_quantity_to = {
+    "req_url": "/crud/inventory?quantity_to=175",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+        {"name": "Vegetable Oil", "quantity": 150.75},
+        {"name": "Peanut", "quantity": 150.75},
+    ],
+}
+test_get_inventory_filter_quantity_empty = {
+    "req_url": "/crud/inventory?quantity_to=100",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+
+    ],
+}
+test_get_inventory_by_name = {
+    "req_url": "/crud/inventory?name=peanut",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+        {"name": "Peanut", "quantity": 150.75}
+    ],
+}
+test_get_inventory_by_name_multiple = {
+    "req_url": "/crud/inventory?name=peanut&name=vegetable-oil",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [{'name': 'Vegetable Oil', 'quantity': 150.75},
+                 {'name': 'Peanut', 'quantity': 150.75}],
 }

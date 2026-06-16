@@ -1,4 +1,6 @@
-from pydantic import BaseModel, model_validator, EmailStr
+from typing import List
+
+from pydantic import BaseModel, model_validator, EmailStr, RootModel
 from typing_extensions import Self
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
@@ -17,6 +19,8 @@ class SupplierCreate(SupplierBase):
             raise ValueError('you should add at least one of the ways to contact the supplier.')
         return self
 
+class Supplier(RootModel[List[SupplierBase]]):
+    pass
 
 
 

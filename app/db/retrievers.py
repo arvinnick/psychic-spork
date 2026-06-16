@@ -8,11 +8,11 @@ from sqlalchemy.orm import selectinload
 from app.core.logger import logger
 
 from app.db.database import get_db
-from app.db.models import Supplier, Inventory, Losses
+from app.db.models import Supplier, Inventory, Losses, SupplierInventoryAssociation
 from app.db.models import Orders
 
 
-async def retrieve_suppliers(supplier_names:List[str],
+async def retrieve_suppliers_by_name(supplier_names:List[str],
                              db: Annotated[AsyncSession, Depends(get_db)],
                              model = Supplier):
     """
@@ -29,23 +29,77 @@ async def retrieve_suppliers(supplier_names:List[str],
     return suppliers
 
 
-async def retrieve_inventory(ingredient_name:str, db:Annotated[AsyncSession, Depends(get_db)],
-                             model=Inventory):
+async def retrieve_inventory(db:AsyncSession,
+                             model=Inventory,
+                             ingredient_name:str|List[str]|None=None,
+                             ingredient_id: List[int]|int|None=None,
+                             quantity_to:float|None=None,
+                             quantity_from:float|None=None,
+                             supplier_id: List[int]|int|None= None,
+                             slug:bool=False):
     """
     
-    :param supplier_id: 
-    :return: 
     """
-    smth = select(model).where(model.name == ingredient_name).options(
-        selectinload(model.suppliers))
+
+    if supplier_id:
+        if isinstance(supplier_id, list):
+            query = select(model).join(
+        SupplierInventoryAssociation, Inventory.id == SupplierInventoryAssociation.c.inventory_id).join(
+        Supplier, SupplierInventoryAssociation.c.supplier_id == Supplier.id
+    ).where(Supplier.id.in_(supplier_id))
+        elif isinstance(supplier_id, int):
+            query = (
+                select(model)
+                .join(
+                    SupplierInventoryAssociation,
+                    Inventory.id == SupplierInventoryAssociation.c.inventory_id,
+                )
+                .join(
+                    Supplier, SupplierInventoryAssociation.c.supplier_id == Supplier.id
+                )
+                .where(Supplier.id == supplier_id))
+    else:
+        query = select(model)
+    if ingredient_name:
+        if isinstance(ingredient_name, str):
+            if slug:
+                query = query.where(model.name_slug == ingredient_name).options(
+                    selectinload(model.suppliers))
+            else:
+                query = query.where(model.name == ingredient_name).options(
+                    selectinload(model.suppliers)
+                )
+        elif isinstance(ingredient_name, list):
+            if slug:
+                query = query.where(model.name_slug.in_(ingredient_name)).options(
+                selectinload(model.suppliers)
+            )
+            else:
+                query = query.where(model.name.in_(ingredient_name)).options(
+                    selectinload(model.suppliers)
+                )
+    if ingredient_id:
+        if isinstance(ingredient_id, list):
+            query = query.where(model.id.in_(ingredient_id)).options(
+            selectinload(model.suppliers))
+        elif isinstance(ingredient_id, int):
+            query = query.where(model.id == ingredient_id).options(
+                selectinload(model.suppliers)
+            )
+        else:
+            raise HTTPException(status_code=422, detail="Incorrect ingredient id.")
+        
+
+    if quantity_to:
+        query = query.where(model.quantity <= quantity_to)
+    if quantity_from:
+        query = query.where(model.quantity >= quantity_from)
     try:
-        ingredients_db_object = await db.execute(smth)
+        ingredients_db_object = await db.execute(query)
     except Exception as e:
         logger.error("An error occurred while retrieving inventory: " + str(e))
         raise e
-    ingredients = ingredients_db_object.scalars().first()
-    if ingredients is None:
-        raise HTTPException(status_code=404, detail="Ingredient not found in the database.")
+    ingredients = ingredients_db_object.scalars()
     return ingredients
 
 
@@ -146,3 +200,38 @@ async def retrieve_losses(db:Annotated[AsyncSession, Depends(get_db)],
     losses = await db.execute(query)
     losses = losses.scalars().all()
     return losses
+
+async def retrieve_suppliers_by_id(
+        db:Annotated[AsyncSession, Depends(get_db)],
+supplier_id:int = None
+                                   ) -> List[Supplier]:
+    logger.info("retrieving suppliers by id")
+    query = select(Supplier).options(selectinload(Supplier.inventories))
+    if supplier_id:
+        query = query.where(Supplier.id == supplier_id)
+    try:
+        suppliers = await db.execute(query)
+        suppliers = suppliers.scalars().all()
+    except Exception as e:
+        logger.error(f"An error occurred while retrieving suppliers: {str(e)}")
+        raise HTTPException(status_code=500, detail="we have gotten an error. We know no more")
+    return suppliers
+
+
+
+async def retrieve_suppliers_for_ingredient(ingredient: str,
+                                       db:AsyncSession) -> List[Supplier]:
+    """
+    the service function to check if the records of the supplier in the database indicates whether they provide the ingredint
+    :param suppliers: list of sqlalchemy objects for supplier record
+    :param ingredient: sqlalchemy object for ingredient record
+    :return: boolean result showing if the supplier provides the ingredient or not
+    """
+    supplier_ingredient_overlap_query = select(Supplier
+                                               ).join(
+        SupplierInventoryAssociation, Supplier.id == SupplierInventoryAssociation.c.supplier_id).join(
+        Inventory, SupplierInventoryAssociation.c.inventory_id == Inventory.id
+    ).where(Inventory.name == ingredient)
+
+    supplier_ingredient_result = await db.execute(supplier_ingredient_overlap_query)
+    return supplier_ingredient_result.scalars().all()

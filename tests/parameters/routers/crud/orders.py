@@ -11,10 +11,8 @@ test_ingredient_not_in_database_fail = {"req_url": "/crud/orders/",
                                                                 "ingredient": "Wheat",
                                                                 "supplier": "Tehran Supply Co.",
                                                             },
-                                                  "res_status_code": 404,
-                                                  "res_json": {
-                                                      'detail': 'Ingredient not found in the database.'
-                                                  }
+                                                  "res_status_code": 400,
+                                                  "res_json": {'detail': 'no such ingredient in the database.'}
     ,
                                         }
 
@@ -322,4 +320,11 @@ test_case_retrieve_ingredient_successful                        = {
                 'email': 'info@tehransupply.com',
                 'name': 'Tehran Supply Co.',
                 'number': 'tel:+98-21-1234-5678'}]}
+}
+
+test_case_retrieve_wrong_property = {
+"req_url": "/crud/orders/1/somthing_else",
+"method": "get",
+    "res_status_code": 404,
+    "res_json":{'detail': 'Not Found'}
 }

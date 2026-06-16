@@ -14,6 +14,7 @@ from app.db.models import Losses, Inventory
 from app.db.injectors import db_item_injector
 from app.db.retrievers import retrieve_inventory
 from app.services.losses import get_losses
+from services.inventory import get_ingredients
 
 losses_crud_router = APIRouter(
     prefix="/losses",
@@ -21,7 +22,7 @@ losses_crud_router = APIRouter(
 )
 logger.info("Defined the losses router.")
 
-@losses_crud_router.post('/', response_model=LossesSchema,
+@losses_crud_router.post('', response_model=LossesSchema,
                          summary="creating a loss of ingredients record in the database",
                          status_code=201)
 async def create_loss(loss: LossesCreate,
@@ -32,7 +33,10 @@ async def create_loss(loss: LossesCreate,
     """
     logger.info(f"Creating a loss of ingredient: {loss.ingredient}")
     try:
-        ingredients = await retrieve_inventory(loss.ingredient, db)
+        ingredients = await get_ingredients(db=db,
+                                            ingredient_name=loss.ingredient,
+                                            first_item=True)
+
         if not ingredients:
             raise HTTPException(status_code=400, detail="ingredient name is not in the database.")
         db_item = Losses(

@@ -1,4 +1,6 @@
 
+
+#####post
 #testcase: no contact is provided
 test_create_supplier_no_contact_fail = {
     "req_url": "/crud/suppliers/",
@@ -65,3 +67,87 @@ test_create_supplier_success = {
     }
 }
 
+#####get
+
+test_get_all_suppliers_success = {
+    "req_url": "/crud/suppliers",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json":[
+                {
+                    "name": "Tehran Supply Co.",
+                    "address": "1st Valiasr St, Tehran",
+                    "number": 'tel:+98-21-1234-5678',
+                    "email": "info@tehransupply.com"
+                },
+                {
+                    "name": "South Trading",
+                    "address": "Coastal Blvd, Bandar Abbas",
+                    "number": 'tel:+98-76-1234-5678',
+                    "email": None
+                },
+                {
+                    "name": "Sepehr Machinery",
+                    "address": "1st Valiasr St, Mashahad",
+                    "number": 'tel:+98-21-1234-5678',
+                    "email": "info@tehransupply.com"
+                },
+                {
+                    "name": "Sepehr Machinery",
+                    "address": "1st Valiasr St, Tehran",
+                    "number": 'tel:+98-21-1234-5678',
+                    "email": "info@tehransupply.com"
+                }
+            ]
+
+}
+test_get_single_supplier_success = {
+    "req_url": "/crud/suppliers/1",
+    "res_status_code": 200,
+    "method": "get",
+    "res_json": [
+        {
+            "name": "Tehran Supply Co.",
+            "address": "1st Valiasr St, Tehran",
+            "number": "tel:+98-21-1234-5678",
+            "email": "info@tehransupply.com"
+        }
+    ],
+}
+test_get_single_supplier_wrong_format = {
+    "req_url": "/crud/suppliers/a",
+    "res_status_code": 422,
+    "method": "get",
+    "res_json": {
+        "detail": [
+            {
+                "input": "a",
+                "loc": ["path", "supplier_id"],
+                "msg": "Input should be a valid integer, unable to parse string "
+                "as an integer",
+                "type": "int_parsing",
+            }
+        ]
+    },
+}
+test_get_supplier_ingredients_success = {
+    "req_url": "/crud/suppliers/1/ingredients",
+    "res_status_code": 200,
+    "method": "get",
+    "res_json": [
+        {"name": "Wheat Flour", "quantity": 500.5},
+        {"name": "White Sugar", "quantity": 200.0},
+    ],
+}
+test_get_supplier_wrong_property = {
+    "req_url": "/crud/suppliers/1/something_else",
+    "method": "get",
+    "res_status_code": 404,
+    "res_json": {"detail": "Not Found"},
+}
+test_get_single_non_existent_supplier_success = {
+    "req_url": "/crud/suppliers/54",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [],
+}
