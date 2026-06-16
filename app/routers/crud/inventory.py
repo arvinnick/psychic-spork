@@ -17,7 +17,7 @@ from app.db.injectors import db_item_injector
 from app.db.retrievers import retrieve_suppliers_by_name
 from app.services.inventory import get_ingredients
 from app.db.models import Supplier
-from services.supplier import get_suppliers_for_ingredient
+from app.services.supplier import get_suppliers_for_ingredient
 
 inventory_crud_router = APIRouter(
     prefix="/inventory",

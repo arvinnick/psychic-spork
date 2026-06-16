@@ -13,7 +13,7 @@ from app.schemas.inventory import InventoryBase as InventorySchema
 from app.db.models import Losses, Inventory
 from app.db.injectors import db_item_injector
 from app.services.losses import get_losses
-from services.inventory import get_ingredients
+from app.services.inventory import get_ingredients
 
 losses_crud_router = APIRouter(
     prefix="/losses",
