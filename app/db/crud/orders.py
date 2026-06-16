@@ -23,6 +23,7 @@ async def db_layer_create_order(db:AsyncSession, order: OrderCreate) -> Orders:
     try:
         sup_of_ingred = await get_suppliers_for_ingredient(db=db, ingredient_id=ingredient_obj.id)
     except AttributeError as ae:
+        logger.error(f"something has happened in db.crud.orders: {ae}")
         if ingredient_obj is None:
             raise HTTPException(status_code=400,
                                 detail="no such ingredient in the database.")

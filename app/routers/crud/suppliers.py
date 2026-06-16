@@ -49,7 +49,7 @@ async def create_supplier(supplier: SupplierCreate, db: Annotated[AsyncSession, 
                            summary="getter endpoint for all database entites",
                            status_code=200)
 async def get_suppliers_endpoint(db: Annotated[AsyncSession, Depends(get_db)]) -> List[Supplier]:
-    logger.info(f"Getting all suppliers in router level")
+    logger.info("Getting all suppliers in router level")
     try:
         supplier_objs = await get_suppliers(db)
         return supplier_objs

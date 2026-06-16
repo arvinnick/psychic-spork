@@ -5,7 +5,6 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.db.models import Inventory
 from app.core.logger import logger
 from app.db.crud.inventory import get_ingredients_db_level
-from db.retrievers import retrieve_inventory
 
 
 async def get_ingredients(db:AsyncSession,
