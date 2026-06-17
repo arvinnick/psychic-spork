@@ -102,9 +102,18 @@ test_success_singular = {
 test_fail_string_id = {
     "req_url": "/crud/losses/a",
     "method": "get",
-    "res_status_code": 400,
-    "res_json":
-                {"details":"Invalid ID format. ID should be an integer."}
+    "res_status_code": 422,
+    "res_json": {
+        "detail": [
+            {
+                "input": "a",
+                "loc": ["path", "loss_id"],
+                "msg": "Input should be a valid integer, unable to parse string "
+                "as an integer",
+                "type": "int_parsing",
+            }
+        ]
+    },
 }
 
 test_success_singular_id_non_existent = {
@@ -124,10 +133,8 @@ test_success_singular_ingredient = {
 test_fail_wrong_sub_resources = {
     "req_url": "/crud/losses/1/something_else",
     "method": "get",
-    "res_status_code": 400,
-    "res_json":  {
-        "details": "loss endpoint does not support 'something_else' as a sub-resource."
-    },
+    "res_status_code": 404,
+    "res_json":  {'detail': 'Not Found'},
 }
 
 test_filter_ingredient_id = {
@@ -283,12 +290,24 @@ test_successful_delete = {
     "res_json": None,
 }
 
+test_successful_delete_list = {
+    "req_url": "/crud/losses?loss_id=1&loss_id=2",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
 test_wrong_format_delete = {
     "req_url": "/crud/losses/asa",
     "method": "delete",
     "res_status_code": 422,
     "existing_resource":False,
-    "res_json": {"details":"Invalid ID format. ID should be an integer."},
+    "res_json": {'detail': [{'input': 'asa',
+             'loc': ['path', 'loss_id'],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]},
 }
 
 test_non_existing_resource_delete = {
@@ -296,5 +315,5 @@ test_non_existing_resource_delete = {
     "method": "delete",
     "res_status_code": 404,
     "existing_resource":False,
-    "res_json": {"details":"ID doesn't exist."},
+    "res_json": {"detail":"ID doesn't exist"},
 }

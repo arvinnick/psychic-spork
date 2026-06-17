@@ -161,7 +161,7 @@ async def retrieve_orders(
 
 
 async def retrieve_losses(db:Annotated[AsyncSession, Depends(get_db)],
-                          loss_id:List[int]|None=None,
+                          loss_id:List[int]|int|None=None,
                           ingredient_id:List[int]|int|None=None,
                           datetime_to: str | None = None,
                           datetime_from: str | None = None,

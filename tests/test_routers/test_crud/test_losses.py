@@ -20,11 +20,12 @@ from tests.parameters.routers.crud.loss import (test_quantity_zero_fail,
                                                 test_success_all,
                                                 test_success_singular_id_non_existent,
                                                 test_fail_wrong_sub_resources,
+                                                test_fail_string_id,
                                                 ###delete
                                                 test_non_existing_resource_delete,
                                                 test_wrong_format_delete,
                                                 test_successful_delete,
-                                                test_fail_string_id
+                                                test_successful_delete_list
                                                 )
 
 
@@ -55,12 +56,13 @@ from tests.parameters.routers.crud.loss import (test_quantity_zero_fail,
         test_success_all,
         test_success_singular_id_non_existent,
         test_fail_wrong_sub_resources,
+        test_fail_string_id,
         ############delete
         test_non_existing_resource_delete,
         test_wrong_format_delete,
         test_successful_delete,
-        test_fail_string_id
-    ]
+        test_successful_delete_list
+        ]
 )
 async def test_losses(blueprint_fixture, param_dict):
     await blueprint_fixture(param_dict)

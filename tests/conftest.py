@@ -4,7 +4,6 @@ Hardcoded stuff for the tests
 import pytest_asyncio
 
 from httpx import AsyncClient, ASGITransport
-from poetry.console.commands import check
 
 from app.db.database import get_db
 from app.main import app
@@ -59,7 +58,8 @@ async def blueprint_fixture():
             else:
                 raise ValueError("Invalid HTTP method specified in the test case.")
             assert response.status_code == res_status_code, str(response.json())
-            assert response.json() == res_json
+            if res_status_code != 204:
+                assert response.json() == res_json
         yield blueprint
         await mock_db.teardown()
         app.dependency_overrides.clear()

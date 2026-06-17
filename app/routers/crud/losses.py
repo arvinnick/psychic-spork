@@ -12,8 +12,9 @@ from app.schemas.losses import LossesCreate
 from app.schemas.inventory import InventoryBase as InventorySchema
 from app.db.models import Losses, Inventory
 from app.db.injectors import db_item_injector
-from app.services.losses import get_losses
+from app.services.losses import get_losses, service_delete_loss
 from app.services.inventory import get_ingredients
+from services.losses import check_if_id_exists
 
 losses_crud_router = APIRouter(
     prefix="/losses",
@@ -136,3 +137,55 @@ async def get_losses_ingredient(db:Annotated[AsyncSession, Depends(get_db)],
         logger.error(f"error in getting losses endpoint: {e}")
         raise HTTPException(500,
                             "something went wrong and we don't know what it is:(")
+
+
+@losses_crud_router.delete('/{loss_id}', status_code=204,
+                           summary="deleting a loss object")
+async def delete_loss(db:Annotated[AsyncSession, Depends(get_db)],
+                      loss_id: int):
+    logger.info(f"deleting loss object: {loss_id}")
+
+    try:
+        existence_of_obj = await check_if_id_exists(db, loss_id)
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="there is a problem in the server and we know no more",
+        )
+    if not existence_of_obj:
+        logger.info(f"no losses found for loss id: {loss_id}")
+        raise HTTPException(status_code=404, detail="ID doesn't exist")
+    try:
+        deleted_loss = await service_delete_loss(db, loss_id)
+        if not deleted_loss:
+            raise Exception(f"there was a problem in deleting {loss_id}")
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        raise HTTPException(500,"something went wrong and we don't know what it is:(")
+
+
+
+@losses_crud_router.delete('', status_code=204,
+                           summary="deleting a loss object")
+async def delete_loss_criteria(db:Annotated[AsyncSession, Depends(get_db)],
+                      loss_id: Annotated[List[int]|int|None, Query()]=None):
+    logger.info(f"deleting loss object: {loss_id}")
+    #check if it exists
+    try:
+        existence_of_obj = await check_if_id_exists(db, loss_id)
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
+    if not existence_of_obj:
+        logger.info(f"no losses found for loss id: {loss_id}")
+        raise HTTPException(status_code=404, detail="ID doesn't exist")
+    try:
+        deleted_loss = await service_delete_loss(db, loss_id)
+        if deleted_loss:
+            return []
+        else:
+            raise Exception(f"there was a problem in deleting {loss_id}")
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        raise HTTPException(500,"something went wrong and we don't know what it is:(")
