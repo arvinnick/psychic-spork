@@ -14,7 +14,7 @@ from app.db.models import Losses, Inventory
 from app.db.injectors import db_item_injector
 from app.services.losses import get_losses, service_delete_loss
 from app.services.inventory import get_ingredients
-from services.losses import check_if_id_exists
+from app.services.losses import check_if_id_exists
 
 losses_crud_router = APIRouter(
     prefix="/losses",
