@@ -4,6 +4,7 @@ Hardcoded stuff for the tests
 import pytest_asyncio
 
 from httpx import AsyncClient, ASGITransport
+from poetry.console.commands import check
 
 from app.db.database import get_db
 from app.main import app
@@ -48,6 +49,9 @@ async def blueprint_fixture():
                 response = await client.put(req_url, json=req_json)
             elif method == "delete":
                 response = await client.delete(req_url)
+                if param_dict.get("existing_resource"):
+                    check_deleted_resource = await client.get(req_url)
+                    assert check_deleted_resource.json() == []
             elif method == "patch":
                 response = await client.patch(req_url, json=req_json)
             elif method == "get":

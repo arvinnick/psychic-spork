@@ -272,3 +272,29 @@ test_filter_quantity_gt_lt = {
         }
     ]
 }
+
+
+###delete
+test_successful_delete = {
+    "req_url": "/crud/losses/1",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+test_wrong_format_delete = {
+    "req_url": "/crud/losses/asa",
+    "method": "delete",
+    "res_status_code": 422,
+    "existing_resource":False,
+    "res_json": {"details":"Invalid ID format. ID should be an integer."},
+}
+
+test_non_existing_resource_delete = {
+    "req_url": "/crud/losses/5",
+    "method": "delete",
+    "res_status_code": 404,
+    "existing_resource":False,
+    "res_json": {"details":"ID doesn't exist."},
+}
