@@ -279,3 +279,40 @@ test_get_inventory_by_name_multiple = {
     "res_json": [{'name': 'Vegetable Oil', 'quantity': 150.75},
                  {'name': 'Peanut', 'quantity': 150.75}],
 }
+
+##delete
+test_successful_delete = {
+    "req_url": "/crud/inventory/1",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+test_successful_delete_list = {
+    "req_url": "/crud/inventory?ingredient_id=1&ingredient_id=2",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+test_wrong_format_delete = {
+    "req_url": "/crud/inventory/asa",
+    "method": "delete",
+    "res_status_code": 422,
+    "existing_resource":False,
+    "res_json": {'detail': [{'input': 'asa',
+             'loc': ['path', 'ingredient_id'],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]},
+}
+
+test_non_existing_resource_delete = {
+    "req_url": "/crud/inventory/5",
+    "method": "delete",
+    "res_status_code": 404,
+    "existing_resource":False,
+    "res_json": {"detail":"ID doesn't exist"},
+}

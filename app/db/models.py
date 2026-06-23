@@ -24,8 +24,12 @@ class SluggMaker:
 SupplierInventoryAssociation = Table(
     "supplier_inventory_association",
     Base.metadata,
-    Column("supplier_id", ForeignKey("supplier.id"), primary_key=True),
-    Column("inventory_id", ForeignKey("inventory.id"), primary_key=True)
+    Column("supplier_id", ForeignKey("supplier.id",
+                                     ondelete="SET NULL",
+                                     onupdate="CASCADE"), primary_key=True),
+    Column("inventory_id", ForeignKey("inventory.id",
+                                     ondelete="SET NULL",
+                                     onupdate="CASCADE"), primary_key=True)
 )
 
 class Inventory(Base, SluggMaker):
@@ -46,13 +50,14 @@ class Supplier(Base, SluggMaker):
     address: Mapped[str | None] = mapped_column(Text)
     number: Mapped[str] = mapped_column(String(15))
     email: Mapped[str | None] = mapped_column(Text)
-    inventories:Mapped[List["Inventory"]] = relationship(secondary=SupplierInventoryAssociation)
+    inventories:Mapped[List["Inventory"]] = relationship(secondary=SupplierInventoryAssociation,
+                                                         back_populates="suppliers")
 
 class Losses(Base):
     __tablename__ = "losses"
     id: Mapped[int] = mapped_column(primary_key=True)
     date_time: Mapped[datetime] = mapped_column(DateTime)
-    ingredient_id: Mapped[int] = mapped_column(ForeignKey("inventory.id"))
+    ingredient_id: Mapped[int] = mapped_column(ForeignKey("inventory.id", ondelete="RESTRICT"))
     ingredient: Mapped[Inventory] = relationship("Inventory")
     quantity: Mapped[float] = mapped_column(Float)
 
@@ -61,9 +66,9 @@ class Orders(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     date_time: Mapped[datetime] = mapped_column(DateTime)
     quantity: Mapped[float] = mapped_column(Float)
-    ingredient_id: Mapped[int] = mapped_column(ForeignKey("inventory.id"))
+    ingredient_id: Mapped[int] = mapped_column(ForeignKey("inventory.id", ondelete="RESTRICT"))
     ingredient: Mapped[Inventory] = relationship("Inventory")
-    supplier_id: Mapped[int] = mapped_column(ForeignKey("supplier.id"))
+    supplier_id: Mapped[int] = mapped_column(ForeignKey("supplier.id", ondelete="RESTRICT"))
     supplier: Mapped[Supplier] = relationship("Supplier")
 
 
