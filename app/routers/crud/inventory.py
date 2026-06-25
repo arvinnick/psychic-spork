@@ -81,7 +81,7 @@ async def create_inventory_item(inventory_item: InventoryCreate,
                            response_model=InventoryGet,
                            status_code=200)
 async def get_inventory(db: Annotated[AsyncSession, Depends(get_db)],
-                        ingredient_id:Annotated[int|List[int], Query()],
+                        ingredient_id:Annotated[int|List[int], Query()]=None,
                         quantity_to: float|None=None,
                         quantity_from:float|None=None,
                         name:Annotated[str|List[str], Query()]=None,

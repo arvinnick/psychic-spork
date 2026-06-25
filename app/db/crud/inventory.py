@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from app.core.logger import logger
 from app.db.retrievers import retrieve_inventory
 from app.db.models import Inventory
-from db.deleters import deleter
+from app.db.deleters import deleter
 
 
 async def get_ingredients_db_level(db:AsyncSession,

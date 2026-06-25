@@ -23,7 +23,7 @@ async def db_instance():
 
 
 
-@pytest_asyncio.fixture()
+@pytest_asyncio.fixture(scope="class")
 async def blueprint_fixture():
     mock_db = MockDatabase()
     await mock_db.setup()
