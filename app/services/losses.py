@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Losses
 from app.core.logger import logger
-from app.db.crud.losses import db_layer_get_orders, db_layer_delete_losses
+from app.db.crud.losses import db_layer_get_losses, db_layer_delete_losses
 
 
 async def get_losses(
@@ -18,15 +18,10 @@ async def get_losses(
     quantity_gt: float | None = None,
 ) -> List[Losses]:
     try:
-        return await db_layer_get_orders(
-            db,
-            loss_id,
-            ingredient_id,
-            datetime_to,
-            datetime_from,
-            quantity_lt,
-            quantity_gt,
-        )
+        return await db_layer_get_losses(db, loss_id, ingredient_id, datetime_to, datetime_from, quantity_lt,
+                                         quantity_gt)
+        
+        
     except HTTPException as he:
         logger.error(f"validation error in getting losses in service layer: {he}")
         raise he
@@ -35,6 +30,8 @@ async def get_losses(
         raise HTTPException(500, "Something went wrong and we don't know what it is:(")
 
 
+async def check_losses_exist(db: AsyncSession, loss_id: int) -> List[bool]|bool:
+    pass
 
 async def service_delete_loss(
         db: AsyncSession,
@@ -57,19 +54,25 @@ async def service_delete_loss(
             raise HTTPException
 
 
-async def check_if_id_exists(db: AsyncSession, loss_id: int) -> bool:
+async def check_if_loss_id_exists(db: AsyncSession, loss_id: List[int]|int) -> bool:
     # check if it exists
     try:
         loss_objects = await get_losses(db, loss_id)
-        if not loss_objects:
-            return False
+        if isinstance(loss_id, list):
+            if len(loss_objects) == len(loss_id):
+                return True
+        elif isinstance(loss_id, int):
+            if loss_objects:
+                return True
         else:
-            return True
+            raise TypeError("Loss_id is not int")
+        return False
     except Exception as e:
         if isinstance(e, HTTPException):
             if e.status_code == 404:
                 raise e
             else:
+                logger.error(f"error in check_if_loss_id_exists: {e}")
                 pass
         else:
             logger.error(f"error in deleting loss object, checking for existence: {e}")

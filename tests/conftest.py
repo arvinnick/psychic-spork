@@ -48,9 +48,6 @@ async def blueprint_fixture():
                 response = await client.put(req_url, json=req_json)
             elif method == "delete":
                 response = await client.delete(req_url)
-                if param_dict.get("existing_resource"):
-                    check_deleted_resource = await client.get(req_url)
-                    assert check_deleted_resource.json() == []
             elif method == "patch":
                 response = await client.patch(req_url, json=req_json)
             elif method == "get":
@@ -60,6 +57,12 @@ async def blueprint_fixture():
             assert response.status_code == res_status_code, str(response.json())
             if res_status_code != 204:
                 assert response.json() == res_json
+            if param_dict.get("existing_resource"):
+                check_deleted_resource = await client.get(req_url)
+                try:
+                    assert check_deleted_resource.json() == []
+                except AssertionError:
+                    raise AssertionError("the resources are not deleted")
         yield blueprint
         await mock_db.teardown()
         app.dependency_overrides.clear()

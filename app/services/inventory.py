@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Inventory
 from app.core.logger import logger
-from app.db.crud.inventory import get_ingredients_db_level
+from app.db.crud.inventory import get_ingredients_db_level, db_layer_delete_inventory
 
 
 async def get_ingredients(db:AsyncSession,
@@ -33,3 +33,48 @@ async def get_ingredients(db:AsyncSession,
 
 
 
+async def check_if_ingredient_id_exists(db:AsyncSession,
+                                        ingredient_id: int|None) -> bool:
+    # check if it exists
+    try:
+        inventory_objects = await get_ingredients(db,
+                                                  ingredient_id)
+
+        if not inventory_objects:
+            return False
+        else:
+            return True
+
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            if e.status_code == 404:
+                raise e
+            else:
+                pass
+        else:
+            logger.error(
+                f"error in deleting inventory object, checking for existence: {e}"
+            )
+            raise HTTPException(
+                500, "something went wrong and we don't know what it is:("
+            )
+
+
+async def service_delete_ingredient(db:AsyncSession,
+                                    ingredient_id:List[int]|int|None)-> List[int]|int|None:
+    logger.info(f"deleting inventory item: {ingredient_id} at the service layer")
+    try:
+        deleted_loss_object = await db_layer_delete_inventory(db=db, ingredient_id=ingredient_id)
+    except HTTPException as he:
+        logger.error(f"error in deleting loss: {he}")
+        raise he
+    if isinstance(ingredient_id, int):
+        if deleted_loss_object == [ingredient_id]:
+            return ingredient_id
+        else:
+            raise HTTPException
+    elif isinstance(ingredient_id, list):
+        if deleted_loss_object == ingredient_id:
+            return ingredient_id
+        else:
+            raise HTTPException

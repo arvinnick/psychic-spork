@@ -15,7 +15,11 @@ from sqlalchemy.exc import IntegrityError
 
 from app.db.injectors import db_item_injector
 from app.db.retrievers import retrieve_suppliers_by_name
-from app.services.inventory import get_ingredients
+from app.services.inventory import (
+    get_ingredients,
+    check_if_ingredient_id_exists,
+    service_delete_ingredient,
+)
 from app.db.models import Supplier
 from app.services.supplier import get_suppliers_for_ingredient
 
@@ -77,6 +81,7 @@ async def create_inventory_item(inventory_item: InventoryCreate,
                            response_model=InventoryGet,
                            status_code=200)
 async def get_inventory(db: Annotated[AsyncSession, Depends(get_db)],
+                        ingredient_id:Annotated[int|List[int], Query()],
                         quantity_to: float|None=None,
                         quantity_from:float|None=None,
                         name:Annotated[str|List[str], Query()]=None,
@@ -88,6 +93,7 @@ async def get_inventory(db: Annotated[AsyncSession, Depends(get_db)],
                                                quantity_from=quantity_from,
                                                ingredient_name=name,
                                                supplier_id=supplier_id,
+                                               ingredient_id=ingredient_id,
                                                slug=True if name else False)
         return inventory_objs
     except Exception as e:
@@ -141,3 +147,61 @@ async def get_inventory_item_suppliers(db: Annotated[AsyncSession, Depends(get_d
     except Exception as e:
         logger.error(f"we got an error in router level: {e}")
         raise HTTPException(500, "we got an error")
+
+
+
+###delete operations
+@inventory_crud_router.delete("/{ingredient_id}",
+                              status_code=204,
+                              summary="deleting an inventory item (ingredient)")
+async def delete_inventory_item(db: Annotated[AsyncSession, Depends(get_db)],
+                                ingredient_id: int):
+    logger.info(f"deleting inventory object: {ingredient_id}")
+    #check if it exists
+    try:
+        existence_of_obj = await check_if_ingredient_id_exists(db, ingredient_id)
+    except Exception as e:
+        logger.error(f"error in deleting inventory object: {e}")
+        raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
+    if not existence_of_obj:
+        logger.info(f"no inventory item found for inventory id: {ingredient_id}")
+        raise HTTPException(status_code=404, detail="ID doesn't exist")
+    try:
+        deleted_inventory = await service_delete_ingredient(db, ingredient_id)
+        if deleted_inventory:
+            return []
+        else:
+            raise Exception(f"there was a problem in deleting {ingredient_id}")
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        raise HTTPException(500,"something went wrong and we don't know what it is:(")
+
+
+
+@inventory_crud_router.delete("",
+                              status_code=204,
+                              summary="deleting an inventory item (ingredient)")
+async def delete_inventory_list(db: Annotated[AsyncSession, Depends(get_db)],
+                                ingredient_id: Annotated[List[int]|int, Query()]):
+    logger.info(f"deleting inventory object(s): {ingredient_id}")
+    # check if it exists
+    try:
+        existence_of_obj = await check_if_ingredient_id_exists(db, ingredient_id)
+    except Exception as e:
+        logger.error(f"error in deleting inventory object: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="there is a problem in the server and we know no more",
+        )
+    if not existence_of_obj:
+        logger.info(f"no inventory item found for inventory id: {ingredient_id}")
+        raise HTTPException(status_code=404, detail="ID doesn't exist")
+    try:
+        deleted_inventory = await service_delete_ingredient(db, ingredient_id)
+        if deleted_inventory:
+            return []
+        else:
+            raise Exception(f"there was a problem in deleting {ingredient_id}")
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        raise HTTPException(500, "something went wrong and we don't know what it is:(")

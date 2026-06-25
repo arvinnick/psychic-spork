@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from app.core.logger import logger
 from app.db.retrievers import retrieve_inventory
 from app.db.models import Inventory
+from db.deleters import deleter
 
 
 async def get_ingredients_db_level(db:AsyncSession,
@@ -32,3 +33,16 @@ async def get_ingredients_db_level(db:AsyncSession,
     except Exception as e:
         logger.error("An error occurred while retrieving ingredients: " + str(e))
         raise HTTPException(status_code=500, detail="An error occurred and we don't know what it is")
+
+
+async def db_layer_delete_inventory(db:AsyncSession,
+                                    ingredient_id:int|List[int]):
+    logger.info(f"deleting inventory items at db layer: {ingredient_id}")
+    try:
+        objs = await deleter(db=db,
+                             model=Inventory,
+                             id=ingredient_id)
+    except Exception as e:
+        logger.error(f"an error in db layer for inventory deletion: {e}")
+        raise HTTPException(500, detail="we got an error, we don't know what it is:(")
+    return objs

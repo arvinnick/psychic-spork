@@ -14,7 +14,7 @@ from app.db.models import Losses, Inventory
 from app.db.injectors import db_item_injector
 from app.services.losses import get_losses, service_delete_loss
 from app.services.inventory import get_ingredients
-from app.services.losses import check_if_id_exists
+from app.services.losses import check_if_loss_id_exists
 
 losses_crud_router = APIRouter(
     prefix="/losses",
@@ -146,7 +146,7 @@ async def delete_loss(db:Annotated[AsyncSession, Depends(get_db)],
     logger.info(f"deleting loss object: {loss_id}")
 
     try:
-        existence_of_obj = await check_if_id_exists(db, loss_id)
+        existence_of_obj = await check_if_loss_id_exists(db, loss_id)
     except Exception as e:
         logger.error(f"error in deleting loss object: {e}")
         raise HTTPException(
@@ -173,13 +173,13 @@ async def delete_loss_criteria(db:Annotated[AsyncSession, Depends(get_db)],
     logger.info(f"deleting loss object: {loss_id}")
     #check if it exists
     try:
-        existence_of_obj = await check_if_id_exists(db, loss_id)
+        existence_of_obj = await check_if_loss_id_exists(db, loss_id)
     except Exception as e:
         logger.error(f"error in deleting loss object: {e}")
         raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
     if not existence_of_obj:
         logger.info(f"no losses found for loss id: {loss_id}")
-        raise HTTPException(status_code=404, detail="ID doesn't exist")
+        raise HTTPException(status_code=404, detail="ID(s) doesn't exist")
     try:
         deleted_loss = await service_delete_loss(db, loss_id)
         if deleted_loss:

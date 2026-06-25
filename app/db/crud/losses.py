@@ -9,7 +9,7 @@ from app.db.retrievers import retrieve_losses
 from app.db.deleters import deleter
 
 
-async def db_layer_get_orders(
+async def db_layer_get_losses(
     db: AsyncSession,
     loss_id: List[int] |int | None = None,
     ingredient_name: List[int] | int | None = None,
@@ -48,3 +48,4 @@ async def db_layer_delete_losses(db: AsyncSession, loss_id: int|List[int]) -> Li
         logger.error(f"an error in db layer for deletion: {e}")
         raise HTTPException(500, detail="we got an error, we don't know what it is:(")
     return objs
+

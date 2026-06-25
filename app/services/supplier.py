@@ -39,3 +39,7 @@ async def get_suppliers_for_ingredient(db:AsyncSession,
     ingredient_name = ingredient_obj.name
     suppliers = await db_layer_supplier_ingredient_retriever(db=db, ingredient=ingredient_name)
     return suppliers
+
+
+
+

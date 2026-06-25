@@ -298,6 +298,14 @@ test_successful_delete_list = {
     "res_json": None,
 }
 
+test_fail_not_existing_delete_list = {
+    "req_url": "/crud/losses?loss_id=1&loss_id=2&loss_id=34",
+    "method": "delete",
+    "res_status_code": 404,
+    "existing_resource":False,
+    "res_json": {'detail': "ID(s) doesn't exist"},
+}
+
 test_wrong_format_delete = {
     "req_url": "/crud/losses/asa",
     "method": "delete",
