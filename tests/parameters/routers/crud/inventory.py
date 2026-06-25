@@ -316,3 +316,12 @@ test_non_existing_resource_delete = {
     "existing_resource":False,
     "res_json": {"detail":"ID doesn't exist"},
 }
+
+
+test_dependant_entity_delete_restrict = {
+    "req_url": "/crud/inventory/1",
+    "method": "delete",
+    "res_status_code": 500,
+    "existing_resource":False,
+    "res_json": {"detail":"restrict"},
+}
