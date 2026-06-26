@@ -23,21 +23,6 @@ async_session_maker = async_sessionmaker(
 )
 
 
-@event.listens_for(engine.sync_engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    # the sqlite3 driver will not set PRAGMA foreign_keys
-    # if autocommit=False; set to True temporarily
-    ac = dbapi_connection.autocommit
-    dbapi_connection.autocommit = True
-
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
-
-    # restore previous autocommit setting
-    dbapi_connection.autocommit = ac
-
-
 
 # Alternative: Session with transaction control
 async def get_db() -> AsyncGenerator[AsyncSession, Any]:
