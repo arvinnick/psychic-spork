@@ -172,6 +172,10 @@ async def delete_inventory_item(db: Annotated[AsyncSession, Depends(get_db)],
             return []
         else:
             raise Exception(f"there was a problem in deleting {ingredient_id}")
+    except HTTPException as he:
+        if he.status_code == 409:
+            logger.error(he)
+            raise he
     except Exception as e:
         logger.error(f"error in deleting loss object: {e}")
         raise HTTPException(500,"something went wrong and we don't know what it is:(")
@@ -202,6 +206,9 @@ async def delete_inventory_list(db: Annotated[AsyncSession, Depends(get_db)],
             return []
         else:
             raise Exception(f"there was a problem in deleting {ingredient_id}")
+    except HTTPException as he:
+        if he.status_code == 409:
+            raise he
     except Exception as e:
         logger.error(f"error in deleting loss object: {e}")
         raise HTTPException(500, "something went wrong and we don't know what it is:(")

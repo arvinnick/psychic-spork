@@ -174,7 +174,8 @@ test_get_all_inventory = {
                 {"name": "Wheat Flour", "quantity": 500.5},
                 {"name": "White Sugar", "quantity": 200.0},
                 {"name": "Vegetable Oil", "quantity": 150.75},
-                {"name": "Peanut", "quantity": 150.75}
+                {"name": "Peanut", "quantity": 150.75},
+                {'name': 'Cucumber', 'quantity': 3.75}
     ]
 }
 test_get_ont_inventory_item = {
@@ -213,7 +214,7 @@ test_get_wrong_format_inventory_item_fail = {
     }
 }
 test_get_inventory_non_existent_id = {
-    "req_url": "/crud/inventory/5",
+    "req_url": "/crud/inventory/6",
     "method": "get",
     "res_status_code": 200,
     "res_json": []
@@ -254,6 +255,7 @@ test_get_inventory_filter_quantity_to = {
     "res_json": [
         {"name": "Vegetable Oil", "quantity": 150.75},
         {"name": "Peanut", "quantity": 150.75},
+        {'name': 'Cucumber', 'quantity': 3.75}
     ],
 }
 test_get_inventory_filter_quantity_empty = {
@@ -261,7 +263,7 @@ test_get_inventory_filter_quantity_empty = {
     "method": "get",
     "res_status_code": 200,
     "res_json": [
-
+        {'name': 'Cucumber', 'quantity': 3.75}
     ],
 }
 test_get_inventory_by_name = {
@@ -282,7 +284,7 @@ test_get_inventory_by_name_multiple = {
 
 ##delete
 test_successful_delete = {
-    "req_url": "/crud/inventory/1",
+    "req_url": "/crud/inventory/4",
     "method": "delete",
     "res_status_code": 204,
     "existing_resource":True,
@@ -290,7 +292,7 @@ test_successful_delete = {
 }
 
 test_successful_delete_list = {
-    "req_url": "/crud/inventory?ingredient_id=1&ingredient_id=2",
+    "req_url": "/crud/inventory?ingredient_id=4&ingredient_id=5",
     "method": "delete",
     "res_status_code": 204,
     "existing_resource":True,
@@ -310,7 +312,7 @@ test_wrong_format_delete = {
 }
 
 test_non_existing_resource_delete = {
-    "req_url": "/crud/inventory/5",
+    "req_url": "/crud/inventory/6",
     "method": "delete",
     "res_status_code": 404,
     "existing_resource":False,
@@ -321,7 +323,7 @@ test_non_existing_resource_delete = {
 test_dependant_entity_delete_restrict = {
     "req_url": "/crud/inventory/1",
     "method": "delete",
-    "res_status_code": 500,
+    "res_status_code": 409,
     "existing_resource":False,
-    "res_json": {"detail":"restrict"},
+    "res_json": {"detail":"the operation is restricted by database constraints"},
 }

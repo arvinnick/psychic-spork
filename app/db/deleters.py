@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import delete
@@ -21,6 +22,9 @@ async def deleter(db: AsyncSession,
     try:
         result = await db.execute(query, )
         return result.scalars().all()
+    except IntegrityError as ie:
+        logger.error(ie)
+        raise HTTPException(status_code=409, detail="the operation is restricted by database constraints")
     except Exception as e:
         logger.error(f"error in retrieving database object for deleting: {e}")
         raise HTTPException(status_code=500, detail="there is a problem in the server and we don't know whtat it is:(")

@@ -42,6 +42,9 @@ async def db_layer_delete_inventory(db:AsyncSession,
         objs = await deleter(db=db,
                              model=Inventory,
                              id=ingredient_id)
+    except HTTPException as he:
+        if he.status_code == 409:
+            raise he
     except Exception as e:
         logger.error(f"an error in db layer for inventory deletion: {e}")
         raise HTTPException(500, detail="we got an error, we don't know what it is:(")
