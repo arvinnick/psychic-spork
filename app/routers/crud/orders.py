@@ -105,3 +105,17 @@ async def get_order_ingredient(db:Annotated[AsyncSession, Depends(get_db)],
     order =  await get_orders(db,
                      order_id)
     return order[0].ingredient
+
+
+# @orders_crud_router.delete(
+#     "/{order_id}",
+#     summary="delete an order",
+#     status_code=204
+# )
+# async def delete_order_item(
+#         db: Annotated[AsyncSession, Depends(get_db)],
+#         order_id: int
+# ):
+#     logger.info(f"deleting order id {order_id}")
+#     try:
+#         existence_of_object =

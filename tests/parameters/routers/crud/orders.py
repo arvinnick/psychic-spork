@@ -328,3 +328,43 @@ test_case_retrieve_wrong_property = {
     "res_status_code": 404,
     "res_json":{'detail': 'Not Found'}
 }
+
+
+#######delete
+test_case_successful_delete = {
+    "req_url": "/crud/orders/1",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+
+test_case_successful_delete_list = {
+    "req_url": "/crud/orders?orders_id=1&iorders_id=2",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+test_wrong_format_delete = {
+    "req_url": "/crud/orders/asa",
+    "method": "delete",
+    "res_status_code": 422,
+    "existing_resource":False,
+    "res_json": {'detail': [{'input': 'asa',
+             'loc': ['path', 'order_id'],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]},
+}
+
+test_non_existing_resource_delete = {
+    "req_url": "/crud/orders/6",
+    "method": "delete",
+    "res_status_code": 404,
+    "existing_resource":False,
+    "res_json": {"detail":"ID doesn't exist"},
+}
+

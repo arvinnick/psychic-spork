@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models import Inventory
 from app.core.logger import logger
 from app.db.crud.inventory import get_ingredients_db_level, db_layer_delete_inventory
+from app.services.commons import check_if_item_exists
 
 
 async def get_ingredients(db:AsyncSession,
@@ -35,29 +36,16 @@ async def get_ingredients(db:AsyncSession,
 
 async def check_if_ingredient_id_exists(db:AsyncSession,
                                         ingredient_id: int|None) -> bool:
-    # check if it exists
     try:
-        inventory_objects = await get_ingredients(db,
-                                                  ingredient_id)
-
-        if not inventory_objects:
-            return False
-        else:
-            return True
-
+        existance = await check_if_item_exists(db, ingredient_id, Inventory, get_ingredients)
+    except HTTPException as he:
+        logger.error(f"error in check_if_ingredient_id_exists: {he}")
+        raise he
     except Exception as e:
-        if isinstance(e, HTTPException):
-            if e.status_code == 404:
-                raise e
-            else:
-                pass
-        else:
-            logger.error(
-                f"error in deleting inventory object, checking for existence: {e}"
-            )
-            raise HTTPException(
-                500, "something went wrong and we don't know what it is:("
-            )
+        logger.error(f"error in check_if_ingredient_id_exists: {e}")
+        raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
+    return existance
+
 
 
 async def service_delete_ingredient(db:AsyncSession,
