@@ -3,7 +3,6 @@ from typing import List
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from typing import List
 
 from app.db.models import Supplier
 from app.core.logger import logger
