@@ -292,10 +292,10 @@ test_case_string_as_id_failure                                  = {
 }
 
 test_case_string_not_a_valid_id_failure                         = {
-"req_url": "/crud/orders/4",
-"method": "get",
-    "res_status_code": 404  ,
-    "res_json":{'detail': 'No orders with specified id(s).'}
+    "req_url": "/crud/orders/4",
+    "method": "get",
+    "res_status_code": 200  ,
+    "res_json":[]
 }
 
 test_case_retrieve_suppliers_successful                         = {
@@ -341,7 +341,7 @@ test_case_successful_delete = {
 
 
 test_case_successful_delete_list = {
-    "req_url": "/crud/orders?orders_id=1&iorders_id=2",
+    "req_url": "/crud/orders?order_id=1&order_id=2",
     "method": "delete",
     "res_status_code": 204,
     "existing_resource":True,

@@ -146,16 +146,6 @@ async def retrieve_orders(
         logger.error(f"An error occurred while retrieving orders: {str(e)}")
         raise e
     orders = orders_cor.scalars().all()
-    if not any([
-        ingredient_id,
-        supplier_id,
-        date_time_from,
-        date_time_to,
-        quantity_lt,
-        quantity_gt
-    ]):
-        if not orders:
-            raise HTTPException(status_code=404, detail="No orders with specified id(s).")
     return orders
 
 

@@ -162,7 +162,10 @@ async def delete_loss(db:Annotated[AsyncSession, Depends(get_db)],
             raise Exception(f"there was a problem in deleting {loss_id}")
     except Exception as e:
         logger.error(f"error in deleting loss object: {e}")
-        raise HTTPException(500,"something went wrong and we don't know what it is:(")
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(500,"something went wrong and we don't know what it is:(")
 
 
 
@@ -188,4 +191,7 @@ async def delete_loss_criteria(db:Annotated[AsyncSession, Depends(get_db)],
             raise Exception(f"there was a problem in deleting {loss_id}")
     except Exception as e:
         logger.error(f"error in deleting loss object: {e}")
-        raise HTTPException(500,"something went wrong and we don't know what it is:(")
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(500,"something went wrong and we don't know what it is:(")

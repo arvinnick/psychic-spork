@@ -54,15 +54,15 @@ async def service_delete_ingredient(db:AsyncSession,
     try:
         deleted_loss_object = await db_layer_delete_inventory(db=db, ingredient_id=ingredient_id)
     except HTTPException as he:
-        logger.error(f"error in deleting loss: {he}")
+        logger.error(f"error in deleting inventory: {he}")
         raise he
     if isinstance(ingredient_id, int):
         if deleted_loss_object == [ingredient_id]:
             return ingredient_id
         else:
-            raise HTTPException
+            raise HTTPException(404, "ID doesn't exist")
     elif isinstance(ingredient_id, list):
         if deleted_loss_object == ingredient_id:
             return ingredient_id
         else:
-            raise HTTPException
+            raise HTTPException(404, "ID doesn't exist")

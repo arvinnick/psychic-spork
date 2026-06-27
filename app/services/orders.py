@@ -3,14 +3,14 @@ from typing import List, Annotated
 from fastapi import HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.crud.orders import db_layer_retrieve_order
+from app.db.crud.orders import db_layer_retrieve_order, db_layer_delete_order
 from app.db.models import Orders
 from app.core.logger import logger
 from app.core import config
-from app.db.database import get_db
+from services.commons import check_if_item_exists
 
 
-async def get_orders(db:Annotated[AsyncSession, Depends(get_db)],
+async def get_orders(db:AsyncSession,
                     order_id:List[int]|None = None,
                     ingredient_id:List[int]|None = None,
                     supplier_id:List[int]|None = None,
@@ -40,4 +40,36 @@ async def get_orders(db:Annotated[AsyncSession, Depends(get_db)],
                                 detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
 
 
+async def check_if_order_id_exists(db:AsyncSession,
+                                        ingredient_id: int|None) -> bool:
+    try:
+        existance = await check_if_item_exists(db, ingredient_id, Orders, get_orders)
+    except HTTPException as he:
+        logger.error(f"error in check_if_order_id_exists: {he}")
+        raise he
+    except Exception as e:
+        logger.error(f"error in check_if_order_id_exists: {e}")
+        raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
+    return existance
+
+
+
+async def delete_orders_service_layer(db:AsyncSession,
+                        order_id:List[int]|int) -> Orders|List[Orders]:
+    logger.info(f"deleting order(s): {order_id}")
+    try:
+        deleted_loss_object = await db_layer_delete_order(db=db, order_id=order_id)
+    except HTTPException as he:
+        logger.error(f"error in deleting order: {he}")
+        raise he
+    if isinstance(order_id, int):
+        if deleted_loss_object == [order_id]:
+            return order_id
+        else:
+            raise HTTPException(404, "ID doesn't exist")
+    elif isinstance(order_id, list):
+        if deleted_loss_object == order_id:
+            return order_id
+        else:
+            raise HTTPException(404, "ID doesn't exist")
 

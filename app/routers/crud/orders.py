@@ -12,7 +12,8 @@ from app.schemas.supplier import SupplierBase as SchemasSupplier
 from app.schemas.inventory import Inventory as SchemasIngredient
 from app.db.models import Orders, Supplier, Inventory
 from app.db.crud.orders import db_layer_create_order
-from app.services.orders import get_orders
+from app.services.orders import get_orders, delete_orders_service_layer
+from app.routers.crud.commons import delete_item
 
 orders_crud_router = APIRouter(
     prefix="/orders",
@@ -107,15 +108,50 @@ async def get_order_ingredient(db:Annotated[AsyncSession, Depends(get_db)],
     return order[0].ingredient
 
 
-# @orders_crud_router.delete(
-#     "/{order_id}",
-#     summary="delete an order",
-#     status_code=204
-# )
-# async def delete_order_item(
-#         db: Annotated[AsyncSession, Depends(get_db)],
-#         order_id: int
-# ):
-#     logger.info(f"deleting order id {order_id}")
-#     try:
-#         existence_of_object =
+@orders_crud_router.delete(
+    "/{order_id}",
+    summary="delete an order",
+    status_code=204
+)
+async def delete_order_item(
+        db: Annotated[AsyncSession, Depends(get_db)],
+        order_id: int
+):
+    logger.info(f"deleting order object: {order_id}")
+    try:
+        deleted_item = await delete_item(
+            db=db,
+            item_id=order_id,
+            getter_func=get_orders,
+            model=Orders,
+            service_delete_function=delete_orders_service_layer,
+        )
+    except HTTPException as he:
+        logger.error(he)
+        raise he
+    except Exception as e:
+        logger.error(f"error in deleting inventory object: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="there is a problem in the server and we know no more",
+        )
+    return deleted_item
+
+
+@orders_crud_router.delete("",
+                              status_code=204,
+                              summary="deleting a list of orders")
+async def delete_inventory_list(db: Annotated[AsyncSession, Depends(get_db)],
+                                order_id: Annotated[List[int]|int, Query()]):
+    logger.info(f"deleting inventory object(s): {order_id}")
+    try:
+        deleted_item = await delete_item(db=db, item_id=order_id,
+                                             getter_func=get_orders, model=Orders,
+                                             service_delete_function=delete_orders_service_layer)
+    except HTTPException as he:
+        logger.error(he)
+        raise he
+    except Exception as e:
+        logger.error(f"error in deleting inventory object: {e}")
+        raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
+    return deleted_item

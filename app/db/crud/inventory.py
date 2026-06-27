@@ -5,7 +5,7 @@ from fastapi import HTTPException
 
 from app.core.logger import logger
 from app.db.retrievers import retrieve_inventory
-from app.db.models import Inventory
+from app.db.models import Inventory, Base
 from app.db.deleters import deleter
 
 
@@ -36,7 +36,7 @@ async def get_ingredients_db_level(db:AsyncSession,
 
 
 async def db_layer_delete_inventory(db:AsyncSession,
-                                    ingredient_id:int|List[int]):
+                                    ingredient_id:int|List[int]) -> Base|List[Base]:
     logger.info(f"deleting inventory items at db layer: {ingredient_id}")
     try:
         objs = await deleter(db=db,

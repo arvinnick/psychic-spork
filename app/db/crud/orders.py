@@ -10,6 +10,7 @@ from app.db.database import get_db
 from app.schemas.orders import OrderCreate
 from app.db.models import Orders
 from app.core.logger import logger
+from app.db.deleters import deleter
 
 
 async def db_layer_create_order(db:AsyncSession, order: OrderCreate) -> Orders:
@@ -69,3 +70,21 @@ async def db_layer_retrieve_order(db:Annotated[AsyncSession, Depends(get_db)],
         quantity_gt=quantity_gt
     )
     return orders
+
+
+
+async def db_layer_delete_order(
+    order_id:List[int]|int,
+        db:AsyncSession,
+
+):
+    logger.info(f"deleting order items at db layer: {order_id}")
+    try:
+        objs = await deleter(db=db, model=Orders, id=order_id)
+    except HTTPException as he:
+        if he.status_code == 409:
+            raise he
+    except Exception as e:
+        logger.error(f"an error in db layer for order deletion: {e}")
+        raise HTTPException(500, detail="we got an error, we don't know what it is:(")
+    return objs

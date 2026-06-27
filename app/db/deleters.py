@@ -14,7 +14,7 @@ from app.core.logger import logger
 async def deleter(db: AsyncSession,
                    model: Base,
                    id:int|List[int]) -> Base|List[Base]:
-    logger.info(f"deleting {id} from {model.__name__}")
+    logger.info(f"deleting {id} from {model.__tablename__}")
     if isinstance(id, int):
         query = delete(model).where(model.id == id).returning(model.id)
     else:

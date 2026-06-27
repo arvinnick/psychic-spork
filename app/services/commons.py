@@ -1,3 +1,5 @@
+from typing import Callable, List
+
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,9 +8,9 @@ from app.core.logger import logger
 
 
 async def check_if_item_exists(db:AsyncSession,
-                                  item_id: int|None,
+                                  item_id: List[int]|int|None,
                                   model:BaseDBModel,
-                                  getter_func:callable) -> bool:
+                                  getter_func:Callable) -> bool:
     # check if it exists
     try:
         objects = await getter_func(db,

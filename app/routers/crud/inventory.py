@@ -22,6 +22,7 @@ from app.services.inventory import (
 )
 from app.db.models import Supplier
 from app.services.supplier import get_suppliers_for_ingredient
+from routers.crud.commons import delete_item
 
 inventory_crud_router = APIRouter(
     prefix="/inventory",
@@ -159,27 +160,16 @@ async def delete_inventory_item(db: Annotated[AsyncSession, Depends(get_db)],
     logger.info(f"deleting inventory object: {ingredient_id}")
     #check if it exists
     try:
-        existence_of_obj = await check_if_ingredient_id_exists(db, ingredient_id)
+        deleted_item = await delete_item(db=db, item_id=ingredient_id,
+                                             getter_func=get_ingredients, model=Inventory,
+                                             service_delete_function=service_delete_ingredient)
+    except HTTPException as he:
+        logger.error(he)
+        raise he
     except Exception as e:
         logger.error(f"error in deleting inventory object: {e}")
         raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
-    if not existence_of_obj:
-        logger.info(f"no inventory item found for inventory id: {ingredient_id}")
-        raise HTTPException(status_code=404, detail="ID doesn't exist")
-    try:
-        deleted_inventory = await service_delete_ingredient(db, ingredient_id)
-        if deleted_inventory:
-            return []
-        else:
-            raise Exception(f"there was a problem in deleting {ingredient_id}")
-    except HTTPException as he:
-        if he.status_code == 409:
-            logger.error(he)
-            raise he
-    except Exception as e:
-        logger.error(f"error in deleting loss object: {e}")
-        raise HTTPException(500,"something went wrong and we don't know what it is:(")
-
+    return deleted_item
 
 
 @inventory_crud_router.delete("",
@@ -188,27 +178,14 @@ async def delete_inventory_item(db: Annotated[AsyncSession, Depends(get_db)],
 async def delete_inventory_list(db: Annotated[AsyncSession, Depends(get_db)],
                                 ingredient_id: Annotated[List[int]|int, Query()]):
     logger.info(f"deleting inventory object(s): {ingredient_id}")
-    # check if it exists
     try:
-        existence_of_obj = await check_if_ingredient_id_exists(db, ingredient_id)
+        deleted_item = await delete_item(db=db, item_id=ingredient_id,
+                                             getter_func=get_ingredients, model=Inventory,
+                                             service_delete_function=service_delete_ingredient)
+    except HTTPException as he:
+        logger.error(he)
+        raise he
     except Exception as e:
         logger.error(f"error in deleting inventory object: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="there is a problem in the server and we know no more",
-        )
-    if not existence_of_obj:
-        logger.info(f"no inventory item found for inventory id: {ingredient_id}")
-        raise HTTPException(status_code=404, detail="ID doesn't exist")
-    try:
-        deleted_inventory = await service_delete_ingredient(db, ingredient_id)
-        if deleted_inventory:
-            return []
-        else:
-            raise Exception(f"there was a problem in deleting {ingredient_id}")
-    except HTTPException as he:
-        if he.status_code == 409:
-            raise he
-    except Exception as e:
-        logger.error(f"error in deleting loss object: {e}")
-        raise HTTPException(500, "something went wrong and we don't know what it is:(")
+        raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
+    return deleted_item
