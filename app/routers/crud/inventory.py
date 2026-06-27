@@ -1,27 +1,24 @@
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Inventory
-from app.db.database import get_db
-from app.core.logger import logger
 from app.core.config import settings
-from app.schemas.inventory import InventoryCreate, InventoryGet
-from app.schemas.inventory import Inventory as SchemasInventory
-from app.schemas.supplier import Supplier as SupplierListSchema
-
-from sqlalchemy.exc import IntegrityError
-
+from app.core.logger import logger
+from app.db.database import get_db
 from app.db.injectors import db_item_injector
+from app.db.models import Inventory, Supplier
 from app.db.retrievers import retrieve_suppliers_by_name
+from app.routers.crud.commons import delete_item
+from app.schemas.inventory import Inventory as SchemasInventory
+from app.schemas.inventory import InventoryCreate, InventoryGet
+from app.schemas.supplier import Supplier as SupplierListSchema
 from app.services.inventory import (
     get_ingredients,
     service_delete_ingredient,
 )
-from app.db.models import Supplier
 from app.services.supplier import get_suppliers_for_ingredient
-from app.routers.crud.commons import delete_item
 
 inventory_crud_router = APIRouter(
     prefix="/inventory",

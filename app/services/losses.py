@@ -3,9 +3,9 @@ from typing import List
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Losses
 from app.core.logger import logger
-from app.db.crud.losses import db_layer_get_losses, db_layer_delete_losses
+from app.db.crud.losses import db_layer_delete_losses, db_layer_get_losses
+from app.db.models import Losses
 from app.services.commons import check_if_item_exists
 
 

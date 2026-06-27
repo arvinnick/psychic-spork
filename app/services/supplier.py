@@ -1,19 +1,16 @@
+from typing import List
+
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from typing import List
-
-from app.db.models import Supplier
-from app.core.logger import logger
 from app.core import config
-from app.db.crud.suppliers import db_layer_retrieve_supplier
+from app.core.logger import logger
 from app.db.crud.inventory import get_ingredients_db_level
-from app.db.retrievers import retrieve_suppliers_for_ingredient as db_layer_supplier_ingredient_retriever
-
-
-
-
-
+from app.db.crud.suppliers import db_layer_retrieve_supplier
+from app.db.models import Supplier
+from app.db.retrievers import (
+    retrieve_suppliers_for_ingredient as db_layer_supplier_ingredient_retriever,
+)
 
 
 async def get_suppliers(
