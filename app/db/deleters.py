@@ -20,7 +20,7 @@ async def deleter(db: AsyncSession,
     else:
         query = delete(model).where(model.id.in_(id)).returning(model.id)
     try:
-        result = await db.execute(query, )
+        result = await db.execute(query)
         return result.scalars().all()
     except IntegrityError as ie:
         logger.error(ie)

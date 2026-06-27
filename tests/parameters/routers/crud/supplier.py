@@ -151,3 +151,64 @@ test_get_single_non_existent_supplier_success = {
     "res_status_code": 200,
     "res_json": [],
 }
+
+
+test_case_get_list = {
+    "req_url": "/crud/suppliers?supplier_id=3&supplier_id=4",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+                {
+                    "name": "Sepehr Machinery",
+                    "address": "1st Valiasr St, Mashahad",
+                    "number": 'tel:+98-21-1234-5678',
+                    "email": "info@tehransupply.com"
+                },
+                {
+                    "name": "Sepehr Machinery",
+                    "address": "1st Valiasr St, Tehran",
+                    "number": 'tel:+98-21-1234-5678',
+                    "email": "info@tehransupply.com"
+                }
+    ],
+}
+
+
+####delete
+test_case_successful_delete = {
+    "req_url": "/crud/suppliers/3",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+
+test_case_successful_delete_list = {
+    "req_url": "/crud/suppliers?supplier_id=3&supplier_id=4",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+test_wrong_format_delete = {
+    "req_url": "/crud/suppliers/asa",
+    "method": "delete",
+    "res_status_code": 422,
+    "existing_resource":False,
+    "res_json": {'detail': [{'input': 'asa',
+             'loc': ['path', 'supplier_id'],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]},
+}
+
+test_non_existing_resource_delete = {
+    "req_url": "/crud/suppliers/5",
+    "method": "delete",
+    "res_status_code": 404,
+    "existing_resource":False,
+    "res_json": {"detail":"ID doesn't exist"},
+}
+
