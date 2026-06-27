@@ -1,6 +1,6 @@
 from typing import Annotated, List
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 import app.core.config as config
 from app.db.database import get_db
@@ -11,9 +11,10 @@ from app.schemas.supplier import SupplierBase as SupplierSchema
 from app.schemas.supplier import Supplier as SupplierList
 from app.schemas.inventory import InventoryGet as InventoryList
 from app.db.injectors import db_item_injector
-from app.services.supplier import get_suppliers
+from app.services.supplier import get_suppliers, service_delete_supplier
 from app.db.models import Inventory
 from app.services.inventory import get_ingredients
+from app.routers.crud.commons import delete_item
 
 suppliers_crud_router = APIRouter(
     prefix="/suppliers",
@@ -46,12 +47,14 @@ async def create_supplier(supplier: SupplierCreate, db: Annotated[AsyncSession, 
 
 @suppliers_crud_router.get('',
                            response_model=SupplierList,
-                           summary="getter endpoint for all database entites",
+                           summary="getter endpoint for selected database entites",
                            status_code=200)
-async def get_suppliers_endpoint(db: Annotated[AsyncSession, Depends(get_db)]) -> List[Supplier]:
+async def get_suppliers_endpoint(db: Annotated[AsyncSession, Depends(get_db)],
+                                 supplier_id:Annotated[int|List[int]|None, Query()]=None) -> List[Supplier]:
     logger.info("Getting all suppliers in router level")
     try:
-        supplier_objs = await get_suppliers(db)
+        supplier_objs = await get_suppliers(db,
+                                            supplier_id)
         return supplier_objs
     except Exception as e:
         logger.error(f"we got an error in router level: {e}")
@@ -86,3 +89,43 @@ async def get_suppliers_ingredient_endpoint(db: Annotated[AsyncSession, Depends(
     except Exception as e:
         logger.error(f"we got an error in router level: {e}")
         raise HTTPException(500, "we got an error")
+
+
+###delete operations
+@suppliers_crud_router.delete("/{supplier_id}",
+                              status_code=204,
+                              summary="deleting a supplier")
+async def delete_supplier_item(db: Annotated[AsyncSession, Depends(get_db)],
+                                supplier_id: int):
+    logger.info(f"deleting inventory object: {supplier_id}")
+    #check if it exists
+    try:
+        deleted_item = await delete_item(db=db, item_id=supplier_id,
+                                             getter_func=get_suppliers, model=Supplier,
+                                             service_delete_function=service_delete_supplier)
+    except HTTPException as he:
+        logger.error(he)
+        raise he
+    except Exception as e:
+        logger.error(f"error in deleting inventory object: {e}")
+        raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
+    return deleted_item
+
+
+@suppliers_crud_router.delete("",
+                              status_code=204,
+                              summary="deleting an inventory item (ingredient)")
+async def delete_inventory_list(db: Annotated[AsyncSession, Depends(get_db)],
+                                supplier_id: Annotated[List[int]|int, Query()]):
+    logger.info(f"deleting supplier object(s): {supplier_id}")
+    try:
+        deleted_item = await delete_item(db=db, item_id=supplier_id,
+                                             getter_func=get_suppliers, model=Supplier,
+                                             service_delete_function=service_delete_supplier)
+    except HTTPException as he:
+        logger.error(he)
+        raise he
+    except Exception as e:
+        logger.error(f"error in deleting inventory object: {e}")
+        raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
+    return deleted_item

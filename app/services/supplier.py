@@ -3,19 +3,24 @@ from typing import List
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from app.core import config
-from app.core.logger import logger
-from app.db.crud.inventory import get_ingredients_db_level
-from app.db.crud.suppliers import db_layer_retrieve_supplier
+from typing import List
+
 from app.db.models import Supplier
-from app.db.retrievers import (
-    retrieve_suppliers_for_ingredient as db_layer_supplier_ingredient_retriever,
-)
+from app.core.logger import logger
+from app.core import config
+from app.db.crud.suppliers import db_layer_retrieve_supplier, db_layer_delete_supplier
+from app.db.crud.inventory import get_ingredients_db_level
+from app.db.retrievers import retrieve_suppliers_for_ingredient as db_layer_supplier_ingredient_retriever
+
+
+
+
+
 
 
 async def get_suppliers(
         db:AsyncSession,
-        supplier_id:int = None
+        supplier_id:int|List[int]|None=None
 ) -> List[Supplier]:
     logger.info("Getting suppliers by the specified constraints")
     try:
@@ -40,3 +45,21 @@ async def get_suppliers_for_ingredient(db:AsyncSession,
 
 
 
+async def service_delete_supplier(db:AsyncSession,
+                                    supplier_id:List[int]|int|None)-> List[int]|int|None:
+    logger.info(f"deleting inventory item: {supplier_id} at the service layer")
+    try:
+        deleted_loss_object = await db_layer_delete_supplier(db=db, supplier_id=supplier_id)
+    except HTTPException as he:
+        logger.error(f"error in deleting inventory: {he}")
+        raise he
+    if isinstance(supplier_id, int):
+        if deleted_loss_object == [supplier_id]:
+            return supplier_id
+        else:
+            raise HTTPException(404, "ID doesn't exist")
+    elif isinstance(supplier_id, list):
+        if deleted_loss_object == supplier_id:
+            return supplier_id
+        else:
+            raise HTTPException(404, "ID doesn't exist")

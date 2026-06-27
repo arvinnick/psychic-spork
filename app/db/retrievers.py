@@ -193,12 +193,14 @@ async def retrieve_losses(db:Annotated[AsyncSession, Depends(get_db)],
 
 async def retrieve_suppliers_by_id(
         db:Annotated[AsyncSession, Depends(get_db)],
-supplier_id:int = None
+        supplier_id:List[int]|int|None = None
                                    ) -> List[Supplier]:
     logger.info("retrieving suppliers by id")
     query = select(Supplier).options(selectinload(Supplier.inventories))
-    if supplier_id:
+    if isinstance(supplier_id, int):
         query = query.where(Supplier.id == supplier_id)
+    elif isinstance(supplier_id, list):
+        query = query.where(Supplier.id.in_(supplier_id))
     try:
         suppliers = await db.execute(query)
         suppliers = suppliers.scalars().all()
