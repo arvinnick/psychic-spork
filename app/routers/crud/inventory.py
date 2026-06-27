@@ -21,7 +21,7 @@ from app.services.inventory import (
 )
 from app.db.models import Supplier
 from app.services.supplier import get_suppliers_for_ingredient
-from routers.crud.commons import delete_item
+from app.routers.crud.commons import delete_item
 
 inventory_crud_router = APIRouter(
     prefix="/inventory",
