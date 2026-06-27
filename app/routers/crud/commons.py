@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Base as BaseDBModel
 from app.core.logger import logger
-from services.commons import check_if_item_exists
+from app.services.commons import check_if_item_exists
 
 
 async def delete_item(db: AsyncSession,
