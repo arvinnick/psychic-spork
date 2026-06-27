@@ -1,6 +1,6 @@
-from typing import List, Annotated
+from typing import List
 
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.crud.orders import db_layer_retrieve_order, db_layer_delete_order

@@ -17,7 +17,6 @@ from app.db.injectors import db_item_injector
 from app.db.retrievers import retrieve_suppliers_by_name
 from app.services.inventory import (
     get_ingredients,
-    check_if_ingredient_id_exists,
     service_delete_ingredient,
 )
 from app.db.models import Supplier
