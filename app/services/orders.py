@@ -1,13 +1,13 @@
-from typing import List, Annotated
+from typing import List
 
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.crud.orders import db_layer_retrieve_order, db_layer_delete_order
 from app.db.models import Orders
 from app.core.logger import logger
 from app.core import config
-from services.commons import check_if_item_exists
+from app.services.commons import check_if_item_exists
 
 
 async def get_orders(db:AsyncSession,

@@ -1,7 +1,6 @@
 from typing import List
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
-from sqlalchemy import Table
 
 from app.db.models import Inventory
 from app.core.logger import logger

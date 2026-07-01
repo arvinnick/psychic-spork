@@ -1,9 +1,8 @@
 from typing import List
 
-from sqlalchemy import update, Table, delete, insert
+from sqlalchemy import update, delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 from fastapi import HTTPException
-from sqlalchemy.orm import selectinload
 
 from app.core.logger import logger
 from app.db.retrievers import retrieve_inventory

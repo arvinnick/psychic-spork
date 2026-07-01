@@ -1,14 +1,12 @@
-from typing import Annotated
 
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import List
 
-from app.db.database import get_db
 from app.db.models import Supplier, Base
 from app.core.logger import logger
 from app.db.retrievers import retrieve_suppliers_by_id
-from db.deleters import deleter
+from app.db.deleters import deleter
 
 
 async def db_layer_retrieve_supplier(db:AsyncSession,
