@@ -11,7 +11,7 @@ from app.db.retrievers import retrieve_suppliers_by_id
 from db.deleters import deleter
 
 
-async def db_layer_retrieve_supplier(db:Annotated[AsyncSession, Depends(get_db)],
+async def db_layer_retrieve_supplier(db:AsyncSession,
                                      supplier_id:int|List[int]|None=None) -> List[Supplier]:
     logger.info("Getting order by the specified constraints")
     suppliers = await retrieve_suppliers_by_id(

@@ -17,3 +17,10 @@ class InventoryCreate(Inventory):
 
 class InventoryGet(RootModel[List[InventoryBase]]):
     pass
+
+
+class InventoryPutItem(InventoryBase):
+    suppliers: List[int]
+
+class InventoryPutResponse(InventoryBase):
+    pass

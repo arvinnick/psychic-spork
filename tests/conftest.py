@@ -5,7 +5,7 @@ import pytest_asyncio
 
 from httpx import AsyncClient, ASGITransport
 
-from app.db.database import get_db
+from app.db.database import get_db, get_engine
 from app.main import app
 from tests.mock_database import MockDatabase
 
@@ -28,6 +28,7 @@ async def blueprint_fixture():
     mock_db = MockDatabase()
     await mock_db.setup()
     app.dependency_overrides[get_db] = mock_db.override_get_db
+    app.dependency_overrides[get_engine] = mock_db.override_get_engine
     async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
@@ -42,6 +43,7 @@ async def blueprint_fixture():
             res_status_code = param_dict["res_status_code"]
             res_json = param_dict["res_json"]
             method = param_dict.get("method", "post")
+            dependent_objects =  param_dict.get("dependent_objects")
             if method == "post":
                 response = await client.post(req_url, json=req_json)
             elif method == "put":
@@ -58,11 +60,17 @@ async def blueprint_fixture():
             if res_status_code != 204:
                 assert response.json() == res_json
             if param_dict.get("existing_resource"):
-                check_deleted_resource = await client.get(req_url)
-                try:
-                    assert check_deleted_resource.json() == []
-                except AssertionError:
-                    raise AssertionError("the resources are not deleted")
+                if method == "delete":
+                    check_deleted_resource = await client.get(req_url)
+                    try:
+                        assert check_deleted_resource.json() == []
+                    except AssertionError:
+                        raise AssertionError("the resources are not deleted")
+                elif method == "put":
+                    if dependent_objects:
+                        async for dependent_object in dependent_objects:
+                            await blueprint(param_dict=dependent_object)
+
         yield blueprint
         await mock_db.teardown()
         app.dependency_overrides.clear()

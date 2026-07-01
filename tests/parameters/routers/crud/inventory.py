@@ -327,3 +327,151 @@ test_dependant_entity_delete_restrict = {
     "existing_resource":False,
     "res_json": {"detail":"the operation is restricted by database constraints"},
 }
+
+
+####put
+#success
+test_put_inventory_item_successful_quantity = {
+    "req_url": "/crud/inventory/3",
+    "method": "put",
+    "req_json": {
+        "name": "Vegetable Oil",
+        "quantity": 200,
+        "suppliers": [
+           2
+        ]
+    },
+    "res_status_code": 200,
+    'res_json': {
+        "name": "Vegetable Oil",
+        "quantity": 200,
+                 },
+    "dependent_objects": [
+        {
+            "req_url": "/crud/suppliers/2/ingredients",
+            "res_status_code": 200,
+            "method": "get",
+            "res_json": [
+                {"name": "Vegetable Oil", "quantity": 150.75}
+            ]
+        }
+    ]
+}
+
+
+
+
+test_put_inventory_item_successful_name_and_supplier = {
+    "req_url": "/crud/inventory/3",
+    "method": "put",
+    "req_json": {
+        "name": "Vegetable Oil",
+        "quantity": 2,
+        "suppliers": [1],
+    },
+    "res_status_code": 200,
+    "res_json": {
+        "name": "Vegetable Oil",
+        "quantity": 2,
+    },
+    "dependent_objects": [
+        {
+            "req_url": "/crud/suppliers/3/ingredients",
+            "res_status_code": 200,
+            "method": "get",
+            "res_json": [
+                {"name": "Vegetable Oil", "quantity": 200}
+            ]
+        }
+    ]
+}
+
+
+#fail
+test_put_inventory_item_fail_non_existing_entity = {
+    "req_url": "/crud/inventory/8",
+    "method": "put",
+    "req_json": {
+        "name": "updated_string",
+        "quantity": 2,
+        "suppliers": [2],
+    },
+    "res_status_code": 204,
+    "res_json": {"details": "the inventory item doesn't exist"},
+}
+
+
+test_put_inventory_item_fail_no_suppliers = {
+    "req_url": "/crud/inventory/8",
+    "method": "put",
+    "req_json": {
+        "name": "updated_string",
+        "quantity": 2,
+        "suppliers": [],
+    },
+    "res_status_code": 400,
+    "res_json": {"details": "the inventory item doesn't exist"},
+}
+
+
+test_put_inventory_item_fail_non_existing_attribute = {
+    "req_url": "/crud/inventory/1",
+    "method": "put",
+    "req_json": {
+        "namee": "updated_string",
+        "quantity": 2,
+        "suppliers": [2],
+    },
+    "res_status_code": 422,
+    "res_json": {'detail': [{'input': {'namee': 'updated_string',
+                       'quantity': 2,
+                       'suppliers': [2]},
+             'loc': ['body', 'name'],
+             'msg': 'Field required',
+             'type': 'missing'}]},
+}
+
+test_put_inventory_item_fail_validation = {
+    "req_url": "/crud/inventory/1",
+    "method": "put",
+    "req_json": {
+        "namee": "updated_string",
+        "quantity": -1,
+        "suppliers": [2],
+    },
+    "res_status_code": 422,
+    "res_json": {'detail': [{'input': {'namee': 'updated_string',
+                       'quantity': -1,
+                       'suppliers': [2]},
+             'loc': ['body', 'name'],
+             'msg': 'Field required',
+             'type': 'missing'},
+            {'ctx': {'ge': 0.0},
+             'input': -1,
+             'loc': ['body', 'quantity'],
+             'msg': 'Input should be greater than or equal to 0',
+             'type': 'greater_than_equal'}]},
+}
+
+test_put_inventory_item_fail_type = {
+    "req_url": "/crud/inventory/1",
+    "method": "put",
+    "req_json": {
+        "namee": "updated_string",
+        "quantity": "asa",
+        "suppliers": [2],
+    },
+    "res_status_code": 422,
+    "res_json": {'detail': [{'input': {'namee': 'updated_string',
+                       'quantity': 'asa',
+                       'suppliers': [2]},
+             'loc': ['body', 'name'],
+             'msg': 'Field required',
+             'type': 'missing'},
+            {'input': 'asa',
+             'loc': ['body', 'quantity'],
+             'msg': 'Input should be a valid number, unable to parse string as '
+                    'a number',
+             'type': 'float_parsing'}]},
+}
+
