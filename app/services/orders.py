@@ -3,10 +3,10 @@ from typing import List
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import config
-from app.core.logger import logger
-from app.db.crud.orders import db_layer_delete_order, db_layer_retrieve_order
+from app.db.crud.orders import db_layer_retrieve_order, db_layer_delete_order
 from app.db.models import Orders
+from app.core.logger import logger
+from app.core import config
 from app.services.commons import check_if_item_exists
 
 

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import StaticPool
 from sqlalchemy.exc import DBAPIError
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
 
 from app.main import app
 from app.core.config import settings
@@ -149,3 +149,9 @@ class MockDatabase:
         """
         session = await async_session_maker(self.__test_engine)
         return session()
+
+    async def override_get_engine(self) -> AsyncEngine:
+        """
+        Provides a session that automatically begins a transaction.
+        """
+        yield self.__test_engine

@@ -28,6 +28,12 @@ from tests.parameters.routers.crud.inventory import (
     test_non_existing_resource_delete,
     test_wrong_format_delete,
     test_dependant_entity_delete_restrict,
+    test_put_inventory_item_successful_name_and_supplier,
+    test_put_inventory_item_fail_non_existing_attribute,
+    test_put_inventory_item_successful_quantity,
+    test_put_inventory_item_fail_validation,
+    test_put_inventory_item_fail_type,
+    test_put_inventory_item_fail_non_existing_entity
 )
 
 @pytest.mark.anyio
@@ -62,8 +68,14 @@ from tests.parameters.routers.crud.inventory import (
         test_successful_delete,
         test_non_existing_resource_delete,
         test_wrong_format_delete,
-        test_dependant_entity_delete_restrict
-
+        test_dependant_entity_delete_restrict,
+        #put
+        test_put_inventory_item_successful_name_and_supplier,
+        test_put_inventory_item_fail_non_existing_attribute,
+        test_put_inventory_item_successful_quantity,
+        test_put_inventory_item_fail_validation,
+        test_put_inventory_item_fail_type,
+        test_put_inventory_item_fail_non_existing_entity
     ]
 )
 async def test_inventory(blueprint_fixture, param_dict):

@@ -1,24 +1,34 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 
-from app.core.config import settings
+from app.db.models import Inventory
+from app.db.database import get_db, get_engine
 from app.core.logger import logger
-from app.db.database import get_db
-from app.db.injectors import db_item_injector
-from app.db.models import Inventory, Supplier
-from app.db.retrievers import retrieve_suppliers_by_name
-from app.routers.crud.commons import delete_item
+from app.core.config import settings
+from app.schemas.inventory import (
+    InventoryCreate,
+    InventoryGet,
+    InventoryPutResponse,
+)
 from app.schemas.inventory import Inventory as SchemasInventory
-from app.schemas.inventory import InventoryCreate, InventoryGet
 from app.schemas.supplier import Supplier as SupplierListSchema
+
+from sqlalchemy.exc import IntegrityError
+
+from app.db.injectors import db_item_injector
+from app.db.retrievers import retrieve_suppliers_by_name
 from app.services.inventory import (
     get_ingredients,
     service_delete_ingredient,
+    service_layer_update_ingredient,
 )
+from app.db.models import Supplier
 from app.services.supplier import get_suppliers_for_ingredient
+from app.routers.crud.commons import delete_item
+from app.schemas.inventory import InventoryPutItem
 
 inventory_crud_router = APIRouter(
     prefix="/inventory",
@@ -185,3 +195,32 @@ async def delete_inventory_list(db: Annotated[AsyncSession, Depends(get_db)],
         logger.error(f"error in deleting inventory object: {e}")
         raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
     return deleted_item
+
+
+
+#put (update)
+@inventory_crud_router.put("/{ingredient_id}",status_code=200,
+                           response_model=InventoryPutResponse)
+async def update_inventory_item(
+        db: Annotated[AsyncSession, Depends(get_db)],
+        engine: Annotated[AsyncEngine, Depends(get_engine)],
+        ingredient_id:int,
+        ingredient: InventoryPutItem,
+) -> List[Inventory]:
+    logger.info(f"updating inventory object: {ingredient_id}")
+    form_data = jsonable_encoder(ingredient)
+    try:
+        updated_ingredient = await service_layer_update_ingredient(db=db, engine=engine,
+                                                                   ingredient_id=ingredient_id,
+                                                                   form_data=form_data)
+    except HTTPException as he:
+        logger.error(he)
+        raise he
+    except Exception as e:
+        logger.error(f"error in updating inventory object: {e}")
+        raise HTTPException(status_code=500, detail="there is a problem in server and we know no more")
+    if updated_ingredient:
+        return updated_ingredient
+    else:
+        return Response(content="ingredient not found",
+                        status_code=204)

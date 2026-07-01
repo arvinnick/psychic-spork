@@ -1,10 +1,15 @@
 from typing import List
 from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 
 from app.db.models import Inventory
 from app.core.logger import logger
-from app.db.crud.inventory import get_ingredients_db_level, db_layer_delete_inventory
+from app.db.crud.inventory import (
+    get_ingredients_db_level,
+    db_layer_delete_inventory,
+    db_layer_update_inventory,
+    db_layer_update_ingred_supp_relation,
+)
 from app.services.commons import check_if_item_exists
 
 
@@ -36,15 +41,16 @@ async def get_ingredients(db:AsyncSession,
 
 async def check_if_ingredient_id_exists(db:AsyncSession,
                                         ingredient_id: int|None) -> bool:
+    logger.info(f"checking if {ingredient_id} exists as an ingredient")
     try:
-        existance = await check_if_item_exists(db, ingredient_id, Inventory, get_ingredients)
+        existence = await check_if_item_exists(db, ingredient_id, Inventory, get_ingredients)
     except HTTPException as he:
         logger.error(f"error in check_if_ingredient_id_exists: {he}")
         raise he
     except Exception as e:
         logger.error(f"error in check_if_ingredient_id_exists: {e}")
         raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
-    return existance
+    return existence
 
 
 
@@ -66,3 +72,57 @@ async def service_delete_ingredient(db:AsyncSession,
             return ingredient_id
         else:
             raise HTTPException(404, "ID doesn't exist")
+
+
+async def service_layer_update_ingredient(db:AsyncSession,
+                                          engine:AsyncEngine,
+                                          ingredient_id:int,
+                                          form_data:dict,
+                                          first_item:bool=True) -> List[Inventory]:
+    logger.info(f"updating ingredient: {ingredient_id} at the service layer")
+    try:
+        existence = await check_if_ingredient_id_exists(db=db, ingredient_id=ingredient_id)
+    except HTTPException as he:
+        logger.error(f"error in updating ingredient: {he}")
+        raise he
+    except Exception as e:
+        logger.error(f"error in updating ingredient: {e}")
+        raise e
+    if existence:
+        try:
+            supplier_ids = form_data.pop("suppliers")
+            await update_supply_ingred_association(engine=engine, ingredient_id=ingredient_id,
+                                                                               supplier_ids=supplier_ids)
+        except Exception as e:
+            logger.error(f"error in assigning suppliers ingredient: {e}")
+            raise e
+        try:
+            updated_ingredient = await db_layer_update_inventory(db=db,
+                                                                 engine=engine,
+                                                                 ingredient_id=ingredient_id,
+                                                                 form_data=form_data,
+                                                                 supplier_ids=supplier_ids,
+                                                                 first_item=first_item)
+        except HTTPException as he:
+            logger.error(f"error in updating ingredient: {he}")
+            raise he
+        except Exception as e:
+            logger.error(f"error in updating ingredient: {e}")
+            raise e
+        return updated_ingredient
+    else:
+        return None
+
+
+async def update_supply_ingred_association(engine:AsyncEngine,ingredient_id:int,
+                               supplier_ids:List[int]):
+    logger.info(f"updating ingredient: {ingredient_id} at the service layer")
+    try:
+        await db_layer_update_ingred_supp_relation(
+            engine=engine,
+            ingredient_id=ingredient_id,
+            supplier_ids=supplier_ids
+        )
+    except Exception as e:
+        logger.error(f"error in updating ingredient supplier relation: {e}")
+        raise e
