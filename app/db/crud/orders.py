@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, List
 
 from fastapi import Depends, HTTPException
@@ -11,6 +12,7 @@ from app.schemas.orders import OrderCreate
 from app.db.models import Orders
 from app.core.logger import logger
 from app.db.deleters import deleter
+from internals.helpers import datetime_converter
 
 
 async def db_layer_create_order(db:AsyncSession, order: OrderCreate) -> Orders:
@@ -54,8 +56,8 @@ async def db_layer_retrieve_order(db:Annotated[AsyncSession, Depends(get_db)],
                     order_id:List[int]=None,
                     ingredient_id:List[int]=None,
                     supplier_id:List[int]=None,
-                    date_time_from:str=None,
-                    date_time_to:str=None,
+                    date_time_from:datetime|None=None,
+                    date_time_to:datetime|None=None,
                     quantity_lt:float=None,
                     quantity_gt:float=None) -> List[Orders]:
     logger.info("Getting order by the specified constraints")

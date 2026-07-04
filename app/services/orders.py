@@ -8,6 +8,7 @@ from app.db.models import Orders
 from app.core.logger import logger
 from app.core import config
 from app.services.commons import check_if_item_exists
+from app.internals.helpers import datetime_converter
 
 
 async def get_orders(db:AsyncSession,
@@ -21,6 +22,10 @@ async def get_orders(db:AsyncSession,
 
     logger.info("Getting order by the specified constraints")
     try:
+        if date_time_from:
+            date_time_from = datetime_converter(date_time_from)
+        if date_time_to:
+            date_time_to = datetime_converter(date_time_to)
         db_item = await db_layer_retrieve_order(db,
                                                 order_id,
                                                 ingredient_id,
@@ -33,8 +38,13 @@ async def get_orders(db:AsyncSession,
         return db_item
     except Exception as e:
         logger.error(f"service layer, getting orders, has encountered an error: {e}")
-        if isinstance(e, HTTPException) and e.status_code in [400,404, 422]:
+        if isinstance(e, HTTPException) and e.status_code in [400, 422]:
             raise e
+        elif isinstance(e, ValueError):
+            if any(
+                [date_time_from in e.args[0], date_time_to in e.args[0] ]
+            ):
+                raise HTTPException(422, detail=e.args[0])
         else:
             raise HTTPException(status_code=500,
                                 detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")

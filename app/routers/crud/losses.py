@@ -1,20 +1,29 @@
+import datetime
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.encoders import jsonable_encoder
 from fastapi.params import Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.status import HTTP_204_NO_CONTENT
+from starlette.responses import JSONResponse, Response
 
 import app.core.config as config
 from app.core.logger import logger
 from app.db.database import get_db
 from app.schemas.losses import Loss as LossesSchema, LossGet
-from app.schemas.losses import LossesCreate
-from app.schemas.inventory import InventoryBase as InventorySchema
+from app.schemas.losses import LossesCreate, LossPutSchema
+from app.schemas.inventory import InventoryBase as InventorySchema, InventoryPutItem
 from app.db.models import Losses, Inventory
 from app.db.injectors import db_item_injector
-from app.services.losses import get_losses, service_delete_loss
+from app.services.losses import (
+    get_losses,
+    service_delete_loss,
+    service_layer_update_loss,
+)
 from app.services.inventory import get_ingredients
 from app.services.losses import check_if_loss_id_exists
+from routers.crud.commons import update_item
 
 losses_crud_router = APIRouter(
     prefix="/losses",
@@ -47,7 +56,7 @@ async def create_loss(loss: LossesCreate,
         await db_item_injector(db_item, db)
         return db_item
     except HTTPException as he:
-        if he.status_code in [400, 404]:
+        if he.status_code == 400:
             raise he
         else:
             raise HTTPException(
@@ -155,7 +164,8 @@ async def delete_loss(db:Annotated[AsyncSession, Depends(get_db)],
         )
     if not existence_of_obj:
         logger.info(f"no losses found for loss id: {loss_id}")
-        raise HTTPException(status_code=404, detail="ID doesn't exist")
+        return JSONResponse(status_code=HTTP_204_NO_CONTENT,
+                            content={"detail":"ID doesn't exist"})
     try:
         deleted_loss = await service_delete_loss(db, loss_id)
         if not deleted_loss:
@@ -182,7 +192,9 @@ async def delete_loss_criteria(db:Annotated[AsyncSession, Depends(get_db)],
         raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
     if not existence_of_obj:
         logger.info(f"no losses found for loss id: {loss_id}")
-        raise HTTPException(status_code=404, detail="ID(s) doesn't exist")
+        return JSONResponse(
+            status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
+        )
     try:
         deleted_loss = await service_delete_loss(db, loss_id)
         if deleted_loss:
@@ -195,3 +207,26 @@ async def delete_loss_criteria(db:Annotated[AsyncSession, Depends(get_db)],
             raise e
         else:
             raise HTTPException(500,"something went wrong and we don't know what it is:(")
+
+
+
+
+####update
+@losses_crud_router.put(
+    '/{loss_id}',
+    status_code=200,
+    summary="updating a loss object",
+)
+async def update_loss(db:Annotated[AsyncSession, Depends(get_db)],
+                      loss_id:int,
+                      loss_object: LossPutSchema) -> LossPutSchema:
+    logger.info(f"updating loss object: {loss_id}")
+    form_data = jsonable_encoder(loss_object)
+    try:
+        updated_loss = await update_item(db=db,
+                                         item_id=loss_id,
+                                         form_data=form_data,
+                                         service_layer_callable=service_layer_update_loss)
+    except Exception as e:
+        raise e
+    return updated_loss

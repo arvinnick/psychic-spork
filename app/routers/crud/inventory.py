@@ -29,6 +29,7 @@ from app.db.models import Supplier
 from app.services.supplier import get_suppliers_for_ingredient
 from app.routers.crud.commons import delete_item
 from app.schemas.inventory import InventoryPutItem
+from routers.crud.commons import update_item
 
 inventory_crud_router = APIRouter(
     prefix="/inventory",
@@ -210,17 +211,11 @@ async def update_inventory_item(
     logger.info(f"updating inventory object: {ingredient_id}")
     form_data = jsonable_encoder(ingredient)
     try:
-        updated_ingredient = await service_layer_update_ingredient(db=db, engine=engine,
-                                                                   ingredient_id=ingredient_id,
-                                                                   form_data=form_data)
-    except HTTPException as he:
-        logger.error(he)
-        raise he
+        returned_obj = await update_item(service_layer_update_ingredient,
+                                   item_id=ingredient_id,
+                                   engine=engine,
+                                   db=db,
+                                   form_data=form_data)
     except Exception as e:
-        logger.error(f"error in updating inventory object: {e}")
-        raise HTTPException(status_code=500, detail="there is a problem in server and we know no more")
-    if updated_ingredient:
-        return updated_ingredient
-    else:
-        return Response(content="ingredient not found",
-                        status_code=204)
+        raise e
+    return returned_obj

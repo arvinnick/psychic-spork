@@ -21,3 +21,7 @@ class LossGetItem(LossBase):
 
 class LossGet(RootModel[List[LossGetItem]]):
     pass
+
+
+class LossPutSchema(LossBase):
+    ingredient_id: int

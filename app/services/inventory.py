@@ -1,6 +1,8 @@
 from typing import List
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
+from starlette.responses import JSONResponse
+from starlette.status import HTTP_204_NO_CONTENT
 
 from app.db.models import Inventory
 from app.core.logger import logger
@@ -66,19 +68,24 @@ async def service_delete_ingredient(db:AsyncSession,
         if deleted_loss_object == [ingredient_id]:
             return ingredient_id
         else:
-            raise HTTPException(404, "ID doesn't exist")
+            return JSONResponse(
+                status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
+            )
     elif isinstance(ingredient_id, list):
         if deleted_loss_object == ingredient_id:
             return ingredient_id
         else:
-            raise HTTPException(404, "ID doesn't exist")
+            return JSONResponse(
+                status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
+            )
 
 
 async def service_layer_update_ingredient(db:AsyncSession,
                                           engine:AsyncEngine,
-                                          ingredient_id:int,
+                                          item_id:int,
                                           form_data:dict,
                                           first_item:bool=True) -> List[Inventory]:
+    ingredient_id = item_id
     logger.info(f"updating ingredient: {ingredient_id} at the service layer")
     try:
         existence = await check_if_ingredient_id_exists(db=db, ingredient_id=ingredient_id)

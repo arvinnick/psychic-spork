@@ -109,8 +109,8 @@ async def retrieve_orders(
                     order_id:List[int]=None,
                     ingredient_id:List[int]=None,
                     supplier_id:List[int]=None,
-                    date_time_from:str=None,
-                    date_time_to:str=None,
+                    date_time_from:datetime|None=None,
+                    date_time_to: datetime|None=None,
                     quantity_lt:float=None,
                     quantity_gt:float=None
             )  -> List[Orders]:
@@ -127,9 +127,9 @@ async def retrieve_orders(
         if supplier_id:
             query = query.where(Orders.supplier_id.in_(supplier_id))#.options(selectinload(Orders.supplier)).options(selectinload(Orders.supplier.inventories))
         if date_time_from:
-            query = query.where(Orders.date_time >= datetime.fromisoformat(date_time_from))
+            query = query.where(Orders.date_time >= date_time_from)
         if date_time_to:
-            query = query.where(Orders.date_time <= datetime.fromisoformat(date_time_to))
+            query = query.where(Orders.date_time <= date_time_to)
         if quantity_lt:
             query = query.where(Orders.quantity <= quantity_lt)
         if quantity_gt:
