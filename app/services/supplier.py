@@ -3,6 +3,9 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from typing import List
 
+from starlette.responses import JSONResponse
+from starlette.status import HTTP_204_NO_CONTENT
+
 from app.db.models import Supplier
 from app.core.logger import logger
 from app.core import config
@@ -27,7 +30,7 @@ async def get_suppliers(
         return db_item
     except Exception as e:
         logger.error(f"service layer, getting suppliers, has encountered an error: {e}")
-        if isinstance(e, HTTPException) and e.status_code in [400,404, 422]:
+        if isinstance(e, HTTPException) and e.status_code in [400, 422]:
             raise e
         else:
             raise HTTPException(status_code=500,
@@ -55,9 +58,13 @@ async def service_delete_supplier(db:AsyncSession,
         if deleted_loss_object == [supplier_id]:
             return supplier_id
         else:
-            raise HTTPException(404, "ID doesn't exist")
+            return JSONResponse(
+                status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
+            )
     elif isinstance(supplier_id, list):
         if deleted_loss_object == supplier_id:
             return supplier_id
         else:
-            raise HTTPException(404, "ID doesn't exist")
+            return JSONResponse(
+                status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
+            )

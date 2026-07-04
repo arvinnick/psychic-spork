@@ -1,12 +1,20 @@
+import datetime
 from typing import List
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.responses import JSONResponse
+from starlette.status import HTTP_204_NO_CONTENT
 
 from app.db.models import Losses
 from app.core.logger import logger
-from app.db.crud.losses import db_layer_get_losses, db_layer_delete_losses
+from app.db.crud.losses import (
+    db_layer_get_losses,
+    db_layer_delete_losses,
+    db_layer_update_loss,
+)
 from app.services.commons import check_if_item_exists
+from internals.helpers import datetime_converter
 
 
 async def get_losses(
@@ -45,12 +53,16 @@ async def service_delete_loss(
         if deleted_loss_object == [loss_id]:
             return loss_id
         else:
-            raise HTTPException(404, "ID(s) doesn't exist")
+            return JSONResponse(
+                status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
+            )
     elif isinstance(loss_id, list):
         if deleted_loss_object == loss_id:
             return loss_id
         else:
-            raise HTTPException(404, "ID(s) doesn't exist")
+            return JSONResponse(
+                status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
+            )
 
 
 # async def check_if_loss_id_exists(db: AsyncSession, loss_id: List[int]|int) -> bool:
@@ -91,3 +103,40 @@ async def check_if_loss_id_exists(db:AsyncSession,
         logger.error(f"error in check_if_loss_id_exists: {e}")
         raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
     return existence
+
+
+async def service_layer_update_loss(db: AsyncSession,
+                                    item_id:int,
+                                    form_data: dict,
+                                    engine=None,
+                                    first_item:bool=True) -> Losses:
+    loss_id = item_id
+    logger.info(f"updating loss object: {loss_id} at the service layer")
+    try:
+        existence = await check_if_loss_id_exists(db=db, loss_id=loss_id)
+    except HTTPException as he:
+        logger.error(f"error in updating loss object: {he}")
+        raise he
+    except Exception as e:
+        logger.error(f"error in updating loss object: {e}")
+        raise e
+    if existence:
+        try:
+            form_data["date_time"] = datetime_converter(
+                form_data.get("date_time")
+            )
+            updated_loss = await db_layer_update_loss(
+                db=db,
+                loss_id=loss_id,
+                form_data=form_data,
+                first_item=first_item,
+            )
+        except HTTPException as he:
+            logger.error(f"error in updating loss object: {he}")
+            raise he
+        except Exception as e:
+            logger.error(f"error in updating loss object: {e}")
+            raise e
+        return updated_loss
+    else:
+        return None

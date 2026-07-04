@@ -1,7 +1,8 @@
 from typing import Callable, List
 
 from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
+from starlette.responses import Response
 
 from app.db.models import Base as BaseDBModel
 from app.core.logger import logger
@@ -37,3 +38,26 @@ async def delete_item(db: AsyncSession,
     except Exception as e:
         logger.error(f"error in deleting loss object: {e}")
         raise HTTPException(500,"something went wrong and we don't know what it is:(")
+
+
+async def update_item(service_layer_callable:callable,
+                      db:AsyncSession,
+                      item_id:int,
+                      form_data:dict,
+                      engine:AsyncEngine|None=None):
+    try:
+        updated_item = await service_layer_callable(
+            db=db, engine=engine, item_id=item_id, form_data=form_data
+        )
+    except HTTPException as he:
+        logger.error(he)
+        raise he
+    except Exception as e:
+        logger.error(f"error in updating object: {e}")
+        raise HTTPException(
+            status_code=500, detail="there is a problem in server and we know no more"
+        )
+    if updated_item:
+        return updated_item
+    else:
+        return Response(content="ingredient not found", status_code=204)

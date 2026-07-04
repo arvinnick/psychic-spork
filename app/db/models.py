@@ -61,7 +61,7 @@ class Losses(Base):
                                                           ondelete="RESTRICT",
                                                           onupdate="CASCADE"),
                                                nullable=False)
-    ingredient: Mapped[Inventory] = relationship("Inventory")
+    ingredient: Mapped[Inventory] = relationship()
     quantity: Mapped[float] = mapped_column(Float)
 
 class Orders(Base):
