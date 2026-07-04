@@ -13,7 +13,7 @@ from app.db.models import Orders
 
 
 async def retrieve_suppliers_by_name(supplier_names:List[str],
-                             db: Annotated[AsyncSession, Depends(get_db)],
+                             db: AsyncSession,
                              model = Supplier):
     """
     The
@@ -25,7 +25,7 @@ async def retrieve_suppliers_by_name(supplier_names:List[str],
     suppliers_db_object = await db.execute(smth)
     suppliers = suppliers_db_object.scalars().all()
     if not suppliers:
-        raise HTTPException(status_code=404, detail="Supplier not found in the database.")
+        raise HTTPException(status_code=204, detail="Supplier not found in the database.")
     return suppliers
 
 
@@ -150,7 +150,7 @@ async def retrieve_orders(
 
 
 
-async def retrieve_losses(db:Annotated[AsyncSession, Depends(get_db)],
+async def retrieve_losses(db:AsyncSession,
                           loss_id:List[int]|int|None=None,
                           ingredient_id:List[int]|int|None=None,
                           datetime_to: str | None = None,

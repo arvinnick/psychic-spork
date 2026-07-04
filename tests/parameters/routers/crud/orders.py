@@ -59,7 +59,7 @@ test_supplier_not_in_database_fail = {"req_url": "/crud/orders/",
                                                                 "ingredient": "White Sugar",
                                                                 "supplier": "Aramco",
                                                             },
-                                                  "res_status_code": 404,
+                                                  "res_status_code": 204,
                                                   "res_json": {
                                                       'detail': 'Supplier not found in the database.'
                                                   }
@@ -363,8 +363,9 @@ test_wrong_format_delete = {
 test_non_existing_resource_delete = {
     "req_url": "/crud/orders/6",
     "method": "delete",
-    "res_status_code": 404,
+    "res_status_code": 204,
     "existing_resource":False,
     "res_json": {"detail":"ID doesn't exist"},
 }
 
+###put

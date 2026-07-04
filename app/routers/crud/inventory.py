@@ -66,7 +66,7 @@ async def create_inventory_item(inventory_item: InventoryCreate,
             raise ie
     except HTTPException as he:
         logger.error(he.detail)
-        if he.status_code in [409, 400, 404]:
+        if he.status_code in [409, 400, 204]:
             raise he
         else:
             if settings.DEBUG:

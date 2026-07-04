@@ -24,7 +24,7 @@ async def delete_item(db: AsyncSession,
         raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
     if not existence_of_obj:
         logger.info(f"no inventory item found for inventory id: {item_id}")
-        raise HTTPException(status_code=404, detail="ID doesn't exist")
+        raise HTTPException(status_code=204, detail="ID doesn't exist")
     try:
         deleted_item = await service_delete_function(db, item_id)
         if deleted_item:
