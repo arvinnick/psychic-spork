@@ -1,4 +1,3 @@
-import datetime
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -6,14 +5,14 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.params import Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.status import HTTP_204_NO_CONTENT
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse
 
 import app.core.config as config
 from app.core.logger import logger
 from app.db.database import get_db
 from app.schemas.losses import Loss as LossesSchema, LossGet
 from app.schemas.losses import LossesCreate, LossPutSchema
-from app.schemas.inventory import InventoryBase as InventorySchema, InventoryPutItem
+from app.schemas.inventory import InventoryBase as InventorySchema
 from app.db.models import Losses, Inventory
 from app.db.injectors import db_item_injector
 from app.services.losses import (
