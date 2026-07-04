@@ -13,7 +13,7 @@ from app.db.crud.losses import (
     db_layer_update_loss,
 )
 from app.services.commons import check_if_item_exists
-from internals.helpers import datetime_converter
+from app.internals.helpers import datetime_converter
 
 
 async def get_losses(

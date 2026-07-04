@@ -29,7 +29,7 @@ from app.db.models import Supplier
 from app.services.supplier import get_suppliers_for_ingredient
 from app.routers.crud.commons import delete_item
 from app.schemas.inventory import InventoryPutItem
-from routers.crud.commons import update_item
+from app.routers.crud.commons import update_item
 
 inventory_crud_router = APIRouter(
     prefix="/inventory",
