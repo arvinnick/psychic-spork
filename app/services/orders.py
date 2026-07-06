@@ -10,7 +10,7 @@ from app.db.crud.orders import (
 from app.db.models import Orders
 from app.core.logger import logger
 from app.services.commons import check_if_item_exists, update_service_layer
-from services.commons import get_orders
+from app.services.commons import get_orders
 
 
 async def check_if_order_id_exists(db:AsyncSession,

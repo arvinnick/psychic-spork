@@ -8,8 +8,8 @@ from app.core.logger import logger
 from app.db.models import Losses
 from app.db.retrievers import retrieve_losses
 from app.db.deleters import deleter
-from db.crud.commons import db_layer_updater
-from services.inventory import check_if_ingredient_id_exists
+from app.db.crud.commons import db_layer_updater
+from app.services.inventory import check_if_ingredient_id_exists
 
 
 async def db_layer_get_losses(

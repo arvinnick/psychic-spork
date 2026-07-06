@@ -22,7 +22,7 @@ from app.services.losses import (
 )
 from app.services.inventory import get_ingredients
 from app.services.losses import check_if_loss_id_exists
-from routers.crud.commons import update_item
+from app.routers.crud.commons import update_item
 
 losses_crud_router = APIRouter(
     prefix="/losses",

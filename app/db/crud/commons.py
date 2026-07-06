@@ -1,4 +1,4 @@
-from db.models import Base
+from app.db.models import Base
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError

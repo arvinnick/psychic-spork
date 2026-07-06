@@ -13,8 +13,8 @@ from app.db.crud.losses import (
     db_layer_update_loss,
 )
 from app.services.commons import check_if_item_exists, update_service_layer
-from schemas.inventory import Inventory
-from services.inventory import get_ingredients
+from app.schemas.inventory import Inventory
+from app.services.inventory import get_ingredients
 
 
 async def get_losses(
@@ -63,33 +63,6 @@ async def service_delete_loss(
             return JSONResponse(
                 status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
             )
-
-
-# async def check_if_loss_id_exists(db: AsyncSession, loss_id: List[int]|int) -> bool:
-#     # check if it exists
-#     try:
-#         loss_objects = await get_losses(db, loss_id)
-#         if isinstance(loss_id, list):
-#             if len(loss_objects) == len(loss_id):
-#                 return True
-#         elif isinstance(loss_id, int):
-#             if loss_objects:
-#                 return True
-#         else:
-#             raise TypeError("Loss_id is not int")
-#         return False
-#     except Exception as e:
-#         if isinstance(e, HTTPException):
-#             if e.status_code == 404:
-#                 raise e
-#             else:
-#                 logger.error(f"error in check_if_loss_id_exists: {e}")
-#                 pass
-#         else:
-#             logger.error(f"error in deleting loss object, checking for existence: {e}")
-#             raise HTTPException(
-#                 500, "something went wrong and we don't know what it is:("
-#             )
 
 
 async def check_if_loss_id_exists(db:AsyncSession,
