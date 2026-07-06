@@ -12,8 +12,9 @@ from app.db.crud.losses import (
     db_layer_delete_losses,
     db_layer_update_loss,
 )
-from app.services.commons import check_if_item_exists
-from app.internals.helpers import datetime_converter
+from app.services.commons import check_if_item_exists, update_service_layer
+from app.schemas.inventory import Inventory
+from app.services.inventory import get_ingredients
 
 
 async def get_losses(
@@ -64,35 +65,10 @@ async def service_delete_loss(
             )
 
 
-# async def check_if_loss_id_exists(db: AsyncSession, loss_id: List[int]|int) -> bool:
-#     # check if it exists
-#     try:
-#         loss_objects = await get_losses(db, loss_id)
-#         if isinstance(loss_id, list):
-#             if len(loss_objects) == len(loss_id):
-#                 return True
-#         elif isinstance(loss_id, int):
-#             if loss_objects:
-#                 return True
-#         else:
-#             raise TypeError("Loss_id is not int")
-#         return False
-#     except Exception as e:
-#         if isinstance(e, HTTPException):
-#             if e.status_code == 404:
-#                 raise e
-#             else:
-#                 logger.error(f"error in check_if_loss_id_exists: {e}")
-#                 pass
-#         else:
-#             logger.error(f"error in deleting loss object, checking for existence: {e}")
-#             raise HTTPException(
-#                 500, "something went wrong and we don't know what it is:("
-#             )
-
-
 async def check_if_loss_id_exists(db:AsyncSession,
-                                        loss_id: List[int]|int) -> bool:
+                                        item_id: List[int]|int) -> bool:
+    logger.info("checking if loss id exists")
+    loss_id = item_id
     try:
         existence = await check_if_item_exists(db, loss_id, Losses, get_losses)
     except HTTPException as he:
@@ -111,31 +87,14 @@ async def service_layer_update_loss(db: AsyncSession,
                                     first_item:bool=True) -> Losses:
     loss_id = item_id
     logger.info(f"updating loss object: {loss_id} at the service layer")
-    try:
-        existence = await check_if_loss_id_exists(db=db, loss_id=loss_id)
-    except HTTPException as he:
-        logger.error(f"error in updating loss object: {he}")
-        raise he
-    except Exception as e:
-        logger.error(f"error in updating loss object: {e}")
-        raise e
-    if existence:
-        try:
-            form_data["date_time"] = datetime_converter(
-                form_data.get("date_time")
-            )
-            updated_loss = await db_layer_update_loss(
-                db=db,
-                loss_id=loss_id,
-                form_data=form_data,
-                first_item=first_item,
-            )
-        except HTTPException as he:
-            logger.error(f"error in updating loss object: {he}")
-            raise he
-        except Exception as e:
-            logger.error(f"error in updating loss object: {e}")
-            raise e
-        return updated_loss
-    else:
-        return None
+    logger.info(f"checking if the ingredient exists: {form_data.get('ingredient_id')}")
+    ingredient_exists = await check_if_item_exists(db, form_data.get('ingredient_id'), Inventory, get_ingredients)
+    if not(ingredient_exists):
+        raise HTTPException(status_code=204, detail="ingredient doesn't exist")
+    updated_loss = await update_service_layer(item_id=item_id,
+                                        db=db,
+                                        form_data=form_data,
+                                        db_layer_callable=db_layer_update_loss,
+                                        existence_checker=check_if_loss_id_exists,
+                                        first_item=first_item)
+    return updated_loss

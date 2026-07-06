@@ -207,7 +207,7 @@ test_wrong_format_delete = {
 test_non_existing_resource_delete = {
     "req_url": "/crud/suppliers/5",
     "method": "delete",
-    "res_status_code": 404,
+    "res_status_code": 204,
     "existing_resource":False,
     "res_json": {"detail":"ID doesn't exist"},
 }

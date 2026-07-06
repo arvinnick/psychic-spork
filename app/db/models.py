@@ -1,4 +1,14 @@
-from sqlalchemy import ForeignKey, Column, Table, DateTime, String, Float, Text, func
+from sqlalchemy import (
+    ForeignKey,
+    Column,
+    Table,
+    DateTime,
+    String,
+    Float,
+    Text,
+    func,
+    ForeignKeyConstraint,
+)
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
@@ -73,8 +83,9 @@ class Orders(Base):
     ingredient: Mapped[Inventory] = relationship("Inventory")
     supplier_id: Mapped[int] = mapped_column(ForeignKey("supplier.id", ondelete="RESTRICT"))
     supplier: Mapped[Supplier] = relationship("Supplier")
-
-
-
-
-
+    
+    __table_args__ = (ForeignKeyConstraint([ingredient_id, supplier_id],
+                                           [
+                                               SupplierInventoryAssociation.c.inventory_id,
+                                               SupplierInventoryAssociation.c.supplier_id
+                                           ]),)

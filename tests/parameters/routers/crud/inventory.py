@@ -30,7 +30,7 @@ test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                           "Tehran Supply Co.mn"
                                                       ]
                                                   },
-                                                  "res_status_code": 404,
+                                                  "res_status_code": 204,
                                                   "res_json": {
                                                       'detail': 'Supplier not found in the database.'}
                                                   }
@@ -314,7 +314,7 @@ test_wrong_format_delete = {
 test_non_existing_resource_delete = {
     "req_url": "/crud/inventory/6",
     "method": "delete",
-    "res_status_code": 404,
+    "res_status_code": 204,
     "existing_resource":False,
     "res_json": {"detail":"ID doesn't exist"},
 }

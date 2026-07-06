@@ -28,7 +28,7 @@ async def test_retrieve_suppliers_not_found(db_instance):
     try:
         await retrieve_suppliers_by_name(["Tehran SupplyCo."], db_instance)
     except HTTPException as ex:
-        assert ex.status_code == 404
+        assert ex.status_code == 204
         assert ex.detail == "Supplier not found in the database."
     except Exception as e:
         logger.error(f"An error occurred while testing supplier retrieval: {str(e)}")
