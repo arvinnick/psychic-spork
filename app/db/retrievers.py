@@ -192,7 +192,7 @@ async def retrieve_losses(db:AsyncSession,
     return losses
 
 async def retrieve_suppliers_by_id(
-        db:Annotated[AsyncSession, Depends(get_db)],
+        db:AsyncSession,
         supplier_id:List[int]|int|None = None
                                    ) -> List[Supplier]:
     logger.info("retrieving suppliers by id")

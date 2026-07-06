@@ -22,11 +22,19 @@ from tests.parameters.routers.crud.orders import (test_create_order_item_success
                                                 test_case_retrieve_suppliers_successful,
                                                 test_case_retrieve_ingredient_successful,
                                                 test_case_retrieve_wrong_property,
-test_case_successful_delete_list,
-test_wrong_format_delete,
-test_non_existing_resource_delete,
-test_case_successful_delete,
-test_case_all_orders_successful
+                                                test_case_successful_delete_list,
+                                                test_wrong_format_delete,
+                                                test_non_existing_resource_delete,
+                                                test_case_successful_delete,
+                                                test_case_all_orders_successful,
+                                                update_fail_supplier_not_providing_ingredient,
+                                                update_fail_negative_quantity,
+                                                update_fail_ingredient_not_existing,
+                                                update_fail_supplier_not_existing,
+                                                update_success_supplier_id,
+                                                update_success_ingredient_id,
+                                                update_success_quantity,
+                                                update_success_date_time
                                                   )
 
 
@@ -65,7 +73,16 @@ test_case_all_orders_successful
         test_wrong_format_delete,
         test_non_existing_resource_delete,
         test_case_successful_delete,
-    ]
+        ###update
+        update_fail_supplier_not_providing_ingredient,
+        update_fail_negative_quantity,
+        update_fail_ingredient_not_existing,
+        update_fail_supplier_not_existing,
+        update_success_supplier_id,
+        update_success_ingredient_id,
+        update_success_quantity,
+        update_success_date_time
+]
 )
 async def test_orders(blueprint_fixture, param_dict):
     await blueprint_fixture(param_dict)

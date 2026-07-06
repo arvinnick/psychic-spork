@@ -1,16 +1,14 @@
 from typing import List
 
-
 from fastapi import HTTPException
-from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.responses import Response
-from sqlalchemy.exc import IntegrityError
+
 
 from app.core.logger import logger
 from app.db.models import Losses
 from app.db.retrievers import retrieve_losses
 from app.db.deleters import deleter
+from db.crud.commons import db_layer_updater
 from services.inventory import check_if_ingredient_id_exists
 
 
@@ -58,28 +56,20 @@ async def db_layer_update_loss(
         db:AsyncSession,
         loss_id: int,
         form_data:dict,
-        first_item:bool=True):
+        first_item:bool=True,
+existence_cach=None):
     logger.info(f"updating inventory items at db layer: {loss_id}")
     try:
-        query = (
-            update(Losses).where(Losses.id == loss_id).returning(Losses)
+        updated_obj = await db_layer_updater(
+            model=Losses,
+            item_id=loss_id,
+            form_data=form_data,
+            first_item=first_item,
+            db=db,
+            db_layer_id_checker=check_if_ingredient_id_exists,
+            existence_cache=existence_cach
         )
-        updated_loss = await db.execute(query, form_data)
-    except IntegrityError as ie:
-        if not await check_if_ingredient_id_exists(db, form_data.get("ingredient_id")):
-            return Response("ingredient ID doesn't exist", 204)
-        else:
-            raise ie
     except Exception as e:
-        logger.error(f"an error in db layer for inventory update: {e}")
+        logger.error(f"an error in db layer updater: {e}")
         raise e
-    try:
-        await db.commit()
-        if first_item:
-            return_value = updated_loss.scalars().first()
-        else:
-            return_value = updated_loss.scalars().all()
-    except Exception as e:
-        logger.error(f"an error in db layer for inventory update: {e}")
-        raise e
-    return return_value
+    return updated_obj

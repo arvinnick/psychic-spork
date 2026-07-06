@@ -45,6 +45,7 @@ async def update_item(service_layer_callable:callable,
                       item_id:int,
                       form_data:dict,
                       engine:AsyncEngine|None=None):
+    logger.info("common updater method called")
     try:
         updated_item = await service_layer_callable(
             db=db, engine=engine, item_id=item_id, form_data=form_data
