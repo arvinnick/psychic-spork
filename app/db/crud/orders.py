@@ -15,7 +15,6 @@ from db.crud.commons import db_layer_updater
 from app.services.commons import check_if_item_exists
 from db.crud.inventory import get_ingredients_db_level
 from db.models import Supplier
-from routers.crud.inventory import get_inventory
 from schemas.inventory import Inventory
 from services.commons import get_orders
 

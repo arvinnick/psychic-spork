@@ -1,4 +1,3 @@
-import datetime
 from typing import List
 
 from fastapi import HTTPException
@@ -14,7 +13,6 @@ from app.db.crud.losses import (
     db_layer_update_loss,
 )
 from app.services.commons import check_if_item_exists, update_service_layer
-from internals.helpers import datetime_converter
 from schemas.inventory import Inventory
 from services.inventory import get_ingredients
 

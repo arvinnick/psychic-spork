@@ -4,7 +4,6 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Base as BaseDBModel
-from app.core.logger import logger
 from core import config
 from core.logger import logger
 from db.models import Orders
