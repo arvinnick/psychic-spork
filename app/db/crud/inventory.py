@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import update, delete, insert
+from sqlalchemy import update, insert
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 from fastapi import HTTPException
 
@@ -57,7 +57,6 @@ async def db_layer_update_inventory(db:AsyncSession,
                                     engine:AsyncEngine,
                                     ingredient_id:int,
                                     form_data:dict,
-                                    supplier_ids:List[int],
                                     first_item:bool=True) -> Inventory:
     logger.info(f"updating inventory items at db layer: {ingredient_id}")
     try:
@@ -66,12 +65,12 @@ async def db_layer_update_inventory(db:AsyncSession,
     except Exception as e:
         logger.error(f"an error in db layer for inventory update: {e}")
         raise e
-    try:
-        _ = await db_layer_update_ingred_supp_relation(engine=engine, ingredient_id=ingredient_id,
-                                                       supplier_ids=supplier_ids)
-    except Exception as e:
-        logger.error(f"an error in db layer for inventory_supplier association update: {e}")
-        raise e
+    # try:
+    #     _ = await db_layer_update_ingred_supp_relation(engine=engine, ingredient_id=ingredient_id,
+    #                                                    supplier_ids=supplier_ids)
+    # except Exception as e:
+    #     logger.error(f"an error in db layer for inventory_supplier association update: {e}")
+    #     raise e
     try:
         await db.commit()
         if first_item:
@@ -84,36 +83,40 @@ async def db_layer_update_inventory(db:AsyncSession,
     return return_value
 
 
-async def db_layer_update_ingred_supp_relation(
-        engine:AsyncEngine,
-        ingredient_id:int,
-        supplier_ids:List[int]
-):
-    logger.info(
-        f"updating inventory items' relation with suppliers at db layer: {ingredient_id}"
-    )
-    try:
-        deletion_query = delete(SupplierInventoryAssociation).where(
-            SupplierInventoryAssociation.c.inventory_id == ingredient_id
-        )
-    except Exception as e:
-        logger.error(f"an error in deleting table entity when updating association table: {e}")
-        raise e
-    insertion_queries = []
-    for supplier_id in supplier_ids:
-        try:
-            query = insert(SupplierInventoryAssociation).values(supplier_id=supplier_id,
-                                                                 inventory_id=ingredient_id)
-            insertion_queries.append(query)
-        except Exception as e:
-            logger.info(f"there is an error in updating inventory items' relation: {e}")
-            raise e
-    smths = []
-    smths.extend(insertion_queries)
-    smths.append(deletion_query)
-    try:
-        async with engine.begin() as conn:
-            for smth in smths:
-                await conn.execute(smth)
-    except Exception as e:
-        logger.info(f"there is an error in updating inventory items' relation, executing the actual SQL statements: {e}")
+# async def db_layer_update_ingred_supp_relation(
+#         engine:AsyncEngine,
+#         ingredient_id:int,
+#         supplier_ids:List[int]
+# ): #todo: we can't update it. It doesn't make any sense from business logic point of view. We have to have 2 endpints: deleting a supplier from an ingredient and adding a supplier to the ingredient. These two should be working with the
+#     logger.info(
+#         f"updating inventory items' relation with suppliers at db layer: {ingredient_id}"
+#     )
+#     # queries = []
+#     # try:
+#     #     for supplier_id in supplier_ids:
+#     #         queries.append(
+#     #             (SupplierInventoryAssociation).where(
+#     #             SupplierInventoryAssociation.c.inventory_id == ingredient_id,
+#     #             SupplierInventoryAssociation.c.supplier_id != supplier_id)
+#     #         .values(ingredient_id, supplier_id))
+#     # except Exception as e:
+#     #     logger.error(f"an error in deleting table entity when updating association table: {e}")
+#     #     raise e
+#     insertion_queries = []
+#     for supplier_id in supplier_ids:
+#         try:
+#             query = insert(SupplierInventoryAssociation).values(supplier_id=supplier_id,
+#                                                                  inventory_id=ingredient_id)
+#             insertion_queries.append(query)
+#         except Exception as e:
+#             logger.error(f"there is an error in updating inventory items' relation: {e}")
+#             raise e
+#     # smths = [deletion_query]
+#     # smths.extend(insertion_queries)
+#     async with engine.begin() as conn:
+#         for query in queries:
+#             try:
+#                 await conn.execute(query)
+#             except Exception as e:
+#                 logger.error(f"there is an error in updating inventory items' relation, executing the actual SQL statements: {e}")
+#                 raise e

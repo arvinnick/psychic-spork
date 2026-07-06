@@ -9,8 +9,7 @@ from app.core.logger import logger
 from app.db.crud.inventory import (
     get_ingredients_db_level,
     db_layer_delete_inventory,
-    db_layer_update_inventory,
-    db_layer_update_ingred_supp_relation,
+    db_layer_update_inventory
 )
 from app.services.commons import check_if_item_exists
 
@@ -96,19 +95,21 @@ async def service_layer_update_ingredient(db:AsyncSession,
         logger.error(f"error in updating ingredient: {e}")
         raise e
     if existence:
-        try:
-            supplier_ids = form_data.pop("suppliers")
-            await update_supply_ingred_association(engine=engine, ingredient_id=ingredient_id,
-                                                                               supplier_ids=supplier_ids)
-        except Exception as e:
-            logger.error(f"error in assigning suppliers ingredient: {e}")
-            raise e
+        # if not form_data.get("suppliers"):
+        #     raise HTTPException(status_code=400, detail="No supplier is provided")
+        # try:
+        #     supplier_ids = form_data.pop("suppliers")
+        #     await update_supply_ingred_association(engine=engine, ingredient_id=ingredient_id,
+        #                                                                        supplier_ids=supplier_ids)
+        # except Exception as e:
+        #     logger.error(f"error in assigning suppliers ingredient: {e}")
+        #     raise e
         try:
             updated_ingredient = await db_layer_update_inventory(db=db,
                                                                  engine=engine,
                                                                  ingredient_id=ingredient_id,
                                                                  form_data=form_data,
-                                                                 supplier_ids=supplier_ids,
+                                                                 # supplier_ids=supplier_ids,
                                                                  first_item=first_item)
         except HTTPException as he:
             logger.error(f"error in updating ingredient: {he}")
@@ -121,15 +122,16 @@ async def service_layer_update_ingredient(db:AsyncSession,
         return None
 
 
-async def update_supply_ingred_association(engine:AsyncEngine,ingredient_id:int,
-                               supplier_ids:List[int]):
-    logger.info(f"updating ingredient: {ingredient_id} at the service layer")
-    try:
-        await db_layer_update_ingred_supp_relation(
-            engine=engine,
-            ingredient_id=ingredient_id,
-            supplier_ids=supplier_ids
-        )
-    except Exception as e:
-        logger.error(f"error in updating ingredient supplier relation: {e}")
-        raise e
+# async def update_supply_ingred_association(engine:AsyncEngine,
+#                                            ingredient_id:int,
+#                                            supplier_ids:List[int]):
+#     logger.info(f"updating ingredient: {ingredient_id} at the service layer")
+#     try:
+#         await db_layer_update_ingred_supp_relation(
+#             engine=engine,
+#             ingredient_id=ingredient_id,
+#             supplier_ids=supplier_ids
+#         )
+#     except Exception as e:
+#         logger.error(f"error in updating ingredient supplier relation: {e}")
+#         raise e

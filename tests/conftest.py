@@ -68,7 +68,7 @@ async def blueprint_fixture():
                         raise AssertionError("the resources are not deleted")
                 elif method == "put":
                     if dependent_objects:
-                        async for dependent_object in dependent_objects:
+                        for dependent_object in dependent_objects:
                             await blueprint(param_dict=dependent_object)
 
         yield blueprint

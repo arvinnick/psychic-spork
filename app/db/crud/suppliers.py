@@ -1,6 +1,7 @@
 
 from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import update
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 from typing_extensions import List
 
 from app.db.models import Supplier, Base
@@ -32,3 +33,26 @@ async def db_layer_delete_supplier(db:AsyncSession,
         logger.error(f"an error in db layer for inventory deletion: {e}")
         raise HTTPException(500, detail="we got an error, we don't know what it is:(")
     return objs
+
+
+async def db_layer_update_supplier(db:AsyncSession,
+                                    supplier_id:int,
+                                    form_data:dict,
+                                    first_item:bool=True) -> Supplier:
+    logger.info(f"updating supplier items at db layer: {supplier_id}")
+    try:
+        query = update(Supplier).where(Supplier.id == supplier_id).returning(Supplier)
+        updated_supplier = await db.execute(query, form_data)
+    except Exception as e:
+        logger.error(f"an error in db layer for inventory update: {e}")
+        raise e
+    try:
+        await db.commit()
+        if first_item:
+            return_value = updated_supplier.scalars().first()
+        else:
+            return_value = updated_supplier.scalars().all()
+    except Exception as e:
+        logger.error(f"an error in db layer for supplier update: {e}")
+        raise e
+    return return_value

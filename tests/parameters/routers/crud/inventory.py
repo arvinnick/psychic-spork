@@ -333,13 +333,11 @@ test_dependant_entity_delete_restrict = {
 #success
 test_put_inventory_item_successful_quantity = {
     "req_url": "/crud/inventory/3",
+    "existing_resource":True,
     "method": "put",
     "req_json": {
         "name": "Vegetable Oil",
-        "quantity": 200,
-        "suppliers": [
-           2
-        ]
+        "quantity": 200
     },
     "res_status_code": 200,
     'res_json': {
@@ -352,7 +350,7 @@ test_put_inventory_item_successful_quantity = {
             "res_status_code": 200,
             "method": "get",
             "res_json": [
-                {"name": "Vegetable Oil", "quantity": 150.75}
+                {"name": "Vegetable Oil", "quantity": 200}
             ]
         }
     ]
@@ -364,26 +362,26 @@ test_put_inventory_item_successful_quantity = {
 test_put_inventory_item_successful_name_and_supplier = {
     "req_url": "/crud/inventory/3",
     "method": "put",
+    "existing_resource": True,
     "req_json": {
         "name": "Vegetable Oil",
-        "quantity": 2,
-        "suppliers": [1],
+        "quantity": 120,
     },
     "res_status_code": 200,
     "res_json": {
         "name": "Vegetable Oil",
-        "quantity": 2,
+        "quantity": 120,
     },
     "dependent_objects": [
         {
-            "req_url": "/crud/suppliers/3/ingredients",
+            "req_url": "/crud/suppliers/2/ingredients",
             "res_status_code": 200,
             "method": "get",
             "res_json": [
-                {"name": "Vegetable Oil", "quantity": 200}
-            ]
+                {"name": "Vegetable Oil", "quantity": 120},
+            ],
         }
-    ]
+    ],
 }
 
 
@@ -394,24 +392,11 @@ test_put_inventory_item_fail_non_existing_entity = {
     "req_json": {
         "name": "updated_string",
         "quantity": 2,
-        "suppliers": [2],
     },
     "res_status_code": 204,
     "res_json": {"details": "the inventory item doesn't exist"},
 }
 
-
-test_put_inventory_item_fail_no_suppliers = {
-    "req_url": "/crud/inventory/8",
-    "method": "put",
-    "req_json": {
-        "name": "updated_string",
-        "quantity": 2,
-        "suppliers": [],
-    },
-    "res_status_code": 400,
-    "res_json": {"details": "the inventory item doesn't exist"},
-}
 
 
 test_put_inventory_item_fail_non_existing_attribute = {
@@ -420,12 +405,10 @@ test_put_inventory_item_fail_non_existing_attribute = {
     "req_json": {
         "namee": "updated_string",
         "quantity": 2,
-        "suppliers": [2],
     },
     "res_status_code": 422,
     "res_json": {'detail': [{'input': {'namee': 'updated_string',
-                       'quantity': 2,
-                       'suppliers': [2]},
+                       'quantity': 2},
              'loc': ['body', 'name'],
              'msg': 'Field required',
              'type': 'missing'}]},
@@ -436,13 +419,11 @@ test_put_inventory_item_fail_validation = {
     "method": "put",
     "req_json": {
         "namee": "updated_string",
-        "quantity": -1,
-        "suppliers": [2],
+        "quantity": -1
     },
     "res_status_code": 422,
     "res_json": {'detail': [{'input': {'namee': 'updated_string',
-                       'quantity': -1,
-                       'suppliers': [2]},
+                       'quantity': -1},
              'loc': ['body', 'name'],
              'msg': 'Field required',
              'type': 'missing'},
@@ -458,13 +439,11 @@ test_put_inventory_item_fail_type = {
     "method": "put",
     "req_json": {
         "namee": "updated_string",
-        "quantity": "asa",
-        "suppliers": [2],
+        "quantity": "asa"
     },
     "res_status_code": 422,
     "res_json": {'detail': [{'input': {'namee': 'updated_string',
-                       'quantity': 'asa',
-                       'suppliers': [2]},
+                       'quantity': 'asa'},
              'loc': ['body', 'name'],
              'msg': 'Field required',
              'type': 'missing'},

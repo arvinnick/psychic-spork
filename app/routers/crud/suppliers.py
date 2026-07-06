@@ -1,9 +1,11 @@
 from typing import Annotated, List
-from sqlalchemy.ext.asyncio import AsyncSession
+
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 import app.core.config as config
-from app.db.database import get_db
+from app.db.database import get_db, get_engine
 from app.db.models import Supplier
 from app.core.logger import logger
 from app.schemas.supplier import SupplierCreate
@@ -11,10 +13,14 @@ from app.schemas.supplier import SupplierBase as SupplierSchema
 from app.schemas.supplier import Supplier as SupplierList
 from app.schemas.inventory import InventoryGet as InventoryList
 from app.db.injectors import db_item_injector
-from app.services.supplier import get_suppliers, service_delete_supplier
+from app.services.supplier import (
+    get_suppliers,
+    service_delete_supplier,
+    service_layer_update_supplier,
+)
 from app.db.models import Inventory
 from app.services.inventory import get_ingredients
-from app.routers.crud.commons import delete_item
+from app.routers.crud.commons import delete_item, update_item
 
 suppliers_crud_router = APIRouter(
     prefix="/suppliers",
@@ -129,3 +135,25 @@ async def delete_inventory_list(db: Annotated[AsyncSession, Depends(get_db)],
         logger.error(f"error in deleting inventory object: {e}")
         raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
     return deleted_item
+
+
+@suppliers_crud_router.put("/{supplier_id}",status_code=200,
+                           response_model=SupplierCreate,
+                           summary="updating an supplier object")
+async def update_supplier_item(
+        db: Annotated[AsyncSession, Depends(get_db)],
+        engine: Annotated[AsyncEngine, Depends(get_engine)],
+        supplier_id:int,
+        supplier: SupplierCreate,
+) -> List[Inventory]:
+    logger.info(f"updating supplier object: {supplier_id}")
+    form_data = jsonable_encoder(supplier)
+    try:
+        returned_obj = await update_item(service_layer_update_supplier,
+                                   item_id=supplier_id,
+                                   engine=engine,
+                                   db=db,
+                                   form_data=form_data)
+    except Exception as e:
+        raise e
+    return returned_obj

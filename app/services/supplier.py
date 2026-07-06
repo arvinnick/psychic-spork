@@ -1,4 +1,6 @@
 from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncEngine
+
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from typing import List
@@ -9,14 +11,14 @@ from starlette.status import HTTP_204_NO_CONTENT
 from app.db.models import Supplier
 from app.core.logger import logger
 from app.core import config
-from app.db.crud.suppliers import db_layer_retrieve_supplier, db_layer_delete_supplier
+from app.db.crud.suppliers import (
+    db_layer_retrieve_supplier,
+    db_layer_delete_supplier,
+    db_layer_update_supplier,
+)
 from app.db.crud.inventory import get_ingredients_db_level
 from app.db.retrievers import retrieve_suppliers_for_ingredient as db_layer_supplier_ingredient_retriever
-
-
-
-
-
+from services.commons import check_if_item_exists
 
 
 async def get_suppliers(
@@ -68,3 +70,46 @@ async def service_delete_supplier(db:AsyncSession,
             return JSONResponse(
                 status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
             )
+
+async def check_if_supplier_id_exists(db:AsyncSession,
+                                        supplier_id: int|None) -> bool:
+    logger.info(f"checking if {supplier_id} exists as an ingredient")
+    try:
+        existence = await check_if_item_exists(db, supplier_id, Supplier, get_suppliers)
+    except HTTPException as he:
+        logger.error(f"error in check_if_supplier_id_exists: {he}")
+        raise he
+    except Exception as e:
+        logger.error(f"error in check_if_supplier_id_exists: {e}")
+        raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
+    return existence
+
+async def service_layer_update_supplier(db:AsyncSession,
+    item_id:int,
+    form_data:dict,
+    first_item:bool=True) -> Supplier:
+    supplier_id = item_id
+    logger.info(f"updating supplier: {supplier_id} at the service layer")
+    try:
+        existence = await check_if_supplier_id_exists(db=db, supplier_id=supplier_id)
+    except HTTPException as he:
+        logger.error(f"error in updating supplier: {he}")
+        raise he
+    except Exception as e:
+        logger.error(f"error in updating supplier: {e}")
+        raise e
+    if existence:
+        try:
+            updated_supplier = await db_layer_update_supplier(db=db,
+                                                             supplier_id=supplier_id,
+                                                             form_data=form_data,
+                                                             first_item=first_item)
+        except HTTPException as he:
+            logger.error(f"error in updating supplier: {he}")
+            raise he
+        except Exception as e:
+            logger.error(f"error in updating supplier: {e}")
+            raise e
+        return updated_supplier
+    else:
+        return None

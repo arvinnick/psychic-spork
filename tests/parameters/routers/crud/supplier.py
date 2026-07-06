@@ -212,3 +212,96 @@ test_non_existing_resource_delete = {
     "res_json": {"detail":"ID doesn't exist"},
 }
 
+###update
+
+test_case_update_fail_non_existing_supplier = {
+    "req_url": "/crud/suppliers/8",
+    "req_json": {
+        "name": "MammadCo",
+        "email": "info@aram.co",
+        "number": "57034727"},
+    "method": "put",
+    "res_status_code": 204,
+    "res_json": {"detail":"Supplier doesn't exist"},
+}
+
+test_case_update_fail_non_existing_attribute = {
+   "req_url": "/crud/suppliers/1",
+    "req_json": {
+        "name_": "MammadCo",
+        "email": "info@aram.co",
+        "number": "57034727"},
+    "method": "put",
+    "res_status_code": 400,
+    "res_json": {"detail":"attribute name_ doesn't exist"},
+}
+
+test_case_update_success_name = {
+   "req_url": "/crud/suppliers/1",
+    "req_json": {
+        "name": "MammadCo",
+        "email": "info@aram.co",
+        "number": "tel:+1-650-253-0000"},
+    "method": "put",
+    "res_status_code": 200,
+    "res_json": {
+        "name": "MammadCo",
+        "email": "info@aram.co",
+        "number": "tel:+1-650-253-0000"},
+}
+
+test_case_update_success_email = {
+   "req_url": "/crud/suppliers/1",
+    "req_json": {
+        "name": "MammadCo",
+        "email": "info@mammad.co",
+        "number": "tel:+1-650-253-0000"},
+    "method": "put",
+    "res_status_code": 200,
+    "res_json": {
+        "name": "MammadCo",
+        "email": "info@mammad.co",
+        "number": "tel:+1-650-253-0000"},
+}
+
+test_case_update_success_phone = {
+   "req_url": "/crud/suppliers/1",
+    "req_json": {
+        "name": "MammadCo",
+        "email": "info@mammad.co",
+        "number": "tel:+1-650-253-0000"},
+    "method": "put",
+    "res_status_code": 200,
+    "res_json": {
+        "name": "MammadCo",
+        "email": "info@mammad.co",
+        "number": "tel:+1-650-253-0000"},
+}
+
+test_case_update_fail_phone = {
+   "req_url": "/crud/suppliers/1",
+    "req_json": {
+        "name": "MammadCo",
+        "email": "info@mammad.co",
+        "number": "ds"},
+    "method": "put",
+    "res_status_code": 422,
+    "res_json": {
+        "name": "MammadCo",
+        "email": "info@mammad.co",
+        "number": "ds"},
+}
+
+test_case_update_fail_email = {
+   "req_url": "/crud/suppliers/1",
+    "req_json": {
+        "name": "MammadCo",
+        "email": "12",
+        "number": "tel:+1-650-253-0000"},
+    "method": "put",
+    "res_status_code": 422,
+    "res_json": {
+        "name": "MammadCo",
+        "email": "info@mammad.co",
+        "number": "tel:+1-650-253-0000"},
+}
