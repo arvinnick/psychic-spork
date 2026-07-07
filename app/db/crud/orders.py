@@ -10,7 +10,7 @@ from app.db.retrievers import retrieve_inventory, retrieve_suppliers_by_name
 from app.schemas.orders import OrderCreate
 from app.db.models import Orders
 from app.core.logger import logger
-from app.db.deleters import deleter
+from app.db.deleters import entity_deleter
 from app.db.crud.commons import db_layer_updater
 from app.services.commons import check_if_item_exists
 from app.db.crud.inventory import get_ingredients_db_level
@@ -79,7 +79,7 @@ async def db_layer_delete_order(
 ):
     logger.info(f"deleting order items at db layer: {order_id}")
     try:
-        objs = await deleter(db=db, model=Orders, id=order_id)
+        objs = await entity_deleter(db=db, model=Orders, id=order_id)
     except HTTPException as he:
         if he.status_code == 409:
             raise he

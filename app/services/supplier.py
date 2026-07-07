@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from sqlalchemy.ext.asyncio import AsyncEngine
 
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
@@ -18,7 +17,7 @@ from app.db.crud.suppliers import (
 )
 from app.db.crud.inventory import get_ingredients_db_level
 from app.db.retrievers import retrieve_suppliers_for_ingredient as db_layer_supplier_ingredient_retriever
-from services.commons import check_if_item_exists
+from app.services.commons import check_if_item_exists
 
 
 async def get_suppliers(
@@ -72,7 +71,7 @@ async def service_delete_supplier(db:AsyncSession,
             )
 
 async def check_if_supplier_id_exists(db:AsyncSession,
-                                        supplier_id: int|None) -> bool:
+                                        supplier_id: List[int]|int) -> bool:
     logger.info(f"checking if {supplier_id} exists as an ingredient")
     try:
         existence = await check_if_item_exists(db, supplier_id, Supplier, get_suppliers)

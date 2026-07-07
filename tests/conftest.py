@@ -38,38 +38,63 @@ async def blueprint_fixture():
             this is a blueprint for the testcases, assuming that most of them are just going to send a request to the server,
             then check the status code and response payload.
             """
-            req_url = param_dict["req_url"]
-            req_json = param_dict.get("req_json")
-            res_status_code = param_dict["res_status_code"]
-            res_json = param_dict["res_json"]
-            method = param_dict.get("method", "post")
-            dependent_objects =  param_dict.get("dependent_objects")
-            if method == "post":
-                response = await client.post(req_url, json=req_json)
-            elif method == "put":
-                response = await client.put(req_url, json=req_json)
-            elif method == "delete":
-                response = await client.delete(req_url)
-            elif method == "patch":
-                response = await client.patch(req_url, json=req_json)
-            elif method == "get":
-                response = await client.get(req_url)
+            if param_dict.get("supplier_ingredient_relation", False):
+                if param_dict.get("success"):
+                    # success #param1
+                    # step1:get the orders and store them
+                    if param_dict.get("orders_check"):
+                        orders = await ac.get("/crud/orders")  # param2
+                    # step2:send the request
+                    if param_dict.get("method") == "post":
+                        response = await ac.post(param_dict.get("request_endpoint"))  # param3
+                    elif param_dict.get("method") == "delete":
+                        response = await ac.delete(param_dict.get("request_endpoint"))  # param3
+                    else:
+                        raise ValueError(f"the method should be delete or put. It is {param_dict.get("method")}")
+                    # step3:make sure the status code is 200
+                    assert response.status_code == param_dict.get("response_status_code")  # param4
+                    # step4:get the supplier for the ingredient
+                    suppliers = await ac.get(param_dict.get("child_checking_endpoint"))  # param5
+                    # step5:make sure the get method for dependent suppliers contains the new one
+                    assert param_dict.get(
+                        "child_check_response_payload") in suppliers.json()  # json is param6
+                    if param_dict.get("orders_check"):
+                        # step6:make sure the orders are not affected
+                        updated_orders = await ac.get("/crud/orders")
+                        assert orders.json() == updated_orders.json()
             else:
-                raise ValueError("Invalid HTTP method specified in the test case.")
-            assert response.status_code == res_status_code, str(response.json())
-            if res_status_code != 204:
-                assert response.json() == res_json
-            if param_dict.get("existing_resource"):
-                if method == "delete":
-                    check_deleted_resource = await client.get(req_url)
-                    try:
-                        assert check_deleted_resource.json() == []
-                    except AssertionError:
-                        raise AssertionError("the resources are not deleted")
+                req_url = param_dict["req_url"]
+                req_json = param_dict.get("req_json")
+                res_status_code = param_dict["res_status_code"]
+                res_json = param_dict["res_json"]
+                method = param_dict.get("method", "post")
+                dependent_objects =  param_dict.get("dependent_objects")
+                if method == "post":
+                    response = await client.post(req_url, json=req_json)
                 elif method == "put":
-                    if dependent_objects:
-                        for dependent_object in dependent_objects:
-                            await blueprint(param_dict=dependent_object)
+                    response = await client.put(req_url, json=req_json)
+                elif method == "delete":
+                    response = await client.delete(req_url)
+                elif method == "patch":
+                    response = await client.patch(req_url, json=req_json)
+                elif method == "get":
+                    response = await client.get(req_url)
+                else:
+                    raise ValueError("Invalid HTTP method specified in the test case.")
+                assert response.status_code == res_status_code, str(response.json())
+                if res_status_code != 204:
+                    assert response.json() == res_json
+                if param_dict.get("existing_resource"):
+                    if method == "delete":
+                        check_deleted_resource = await client.get(req_url)
+                        try:
+                            assert check_deleted_resource.json() == []
+                        except AssertionError:
+                            raise AssertionError("the resources are not deleted")
+                    elif method == "put":
+                        if dependent_objects:
+                            for dependent_object in dependent_objects:
+                                await blueprint(param_dict=dependent_object)
 
         yield blueprint
         await mock_db.teardown()

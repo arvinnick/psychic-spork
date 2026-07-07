@@ -91,8 +91,8 @@ class Orders(Base):
     supplier_id: Mapped[int] = mapped_column(ForeignKey("supplier.id", ondelete="RESTRICT"))
     supplier: Mapped[Supplier] = relationship("Supplier")
     
-    __table_args__ = (ForeignKeyConstraint([ingredient_id, supplier_id],
-                                           [
-                                               SupplierInventoryAssociation.c.inventory_id,
-                                               SupplierInventoryAssociation.c.supplier_id
-                                           ]),)
+    # __table_args__ = (ForeignKeyConstraint([ingredient_id, supplier_id],
+    #                                        [
+    #                                            SupplierInventoryAssociation.c.inventory_id,
+    #                                            SupplierInventoryAssociation.c.supplier_id
+    #                                        ]),)

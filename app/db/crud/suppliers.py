@@ -7,7 +7,7 @@ from typing_extensions import List
 from app.db.models import Supplier, Base
 from app.core.logger import logger
 from app.db.retrievers import retrieve_suppliers_by_id
-from app.db.deleters import deleter
+from app.db.deleters import entity_deleter
 
 
 async def db_layer_retrieve_supplier(db:AsyncSession,
@@ -23,9 +23,7 @@ async def db_layer_delete_supplier(db:AsyncSession,
                                     supplier_id:int|List[int]) -> Base|List[Base]:
     logger.info(f"deleting supplier items at db layer: {supplier_id}")
     try:
-        objs = await deleter(db=db,
-                             model=Supplier,
-                             id=supplier_id)
+        objs = await entity_deleter(db=db, model=Supplier, id=supplier_id)
     except HTTPException as he:
         if he.status_code == 409:
             raise he

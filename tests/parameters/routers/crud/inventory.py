@@ -454,3 +454,21 @@ test_put_inventory_item_fail_type = {
              'type': 'float_parsing'}]},
 }
 
+
+
+#######supplier ingredient relationship checker
+test_case_insert_single_supplier_success = {
+    "supplier_ingredient_relation":True,
+    "success":True,
+    "orders_check":True,
+    "request_endpoint":"/crud/inventory/1/suppliers/2",
+    "method":"post",
+    "response_status_code":200,
+    "child_checking_endpoint":"/crud/inventory/1/suppliers",
+    "child_check_response_payload":{
+                    "name": "South Trading",
+                    "address": "Coastal Blvd, Bandar Abbas",
+                    "number": "tel:+98-76-1234-5678",
+                    "email": None,
+                }
+}

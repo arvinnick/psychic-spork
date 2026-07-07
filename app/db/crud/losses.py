@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.logger import logger
 from app.db.models import Losses
 from app.db.retrievers import retrieve_losses
-from app.db.deleters import deleter
+from app.db.deleters import entity_deleter
 from app.db.crud.commons import db_layer_updater
 from app.services.inventory import check_if_ingredient_id_exists
 
@@ -44,9 +44,7 @@ async def db_layer_get_losses(
 async def db_layer_delete_losses(db: AsyncSession, loss_id: int|List[int]) -> List[int]|int:
     logger.info(f"deleting loss at db layer: {loss_id}")
     try:
-        objs = await deleter(db=db,
-                             model=Losses,
-                             id=loss_id)
+        objs = await entity_deleter(db=db, model=Losses, id=loss_id)
     except Exception as e:
         logger.error(f"an error in db layer for deletion: {e}")
         raise HTTPException(500, detail="we got an error, we don't know what it is:(")
