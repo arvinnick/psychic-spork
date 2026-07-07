@@ -38,30 +38,38 @@ async def blueprint_fixture():
             this is a blueprint for the testcases, assuming that most of them are just going to send a request to the server,
             then check the status code and response payload.
             """
+            async def ingred_association_commons():
+                # step2:send the request
+                if param_dict.get("method") == "post":
+                    response = await ac.post(param_dict.get("request_endpoint"))  # param3
+                elif param_dict.get("method") == "delete":
+                    response = await ac.delete(param_dict.get("request_endpoint"))  # param3
+                else:
+                    raise ValueError(f"the method should be delete or put. It is {param_dict.get("method")}")
+                # step3:make sure the status code is 200
+                assert response.status_code == param_dict.get("response_status_code")  # param4
+                supposed_response_load = param_dict.get("response_payload")
+                if supposed_response_load:
+                    assert response.json() == supposed_response_load
             if param_dict.get("supplier_ingredient_relation", False):
                 if param_dict.get("success"):
                     # success #param1
                     # step1:get the orders and store them
                     if param_dict.get("orders_check"):
                         orders = await ac.get("/crud/orders")  # param2
-                    # step2:send the request
-                    if param_dict.get("method") == "post":
-                        response = await ac.post(param_dict.get("request_endpoint"))  # param3
-                    elif param_dict.get("method") == "delete":
-                        response = await ac.delete(param_dict.get("request_endpoint"))  # param3
-                    else:
-                        raise ValueError(f"the method should be delete or put. It is {param_dict.get("method")}")
-                    # step3:make sure the status code is 200
-                    assert response.status_code == param_dict.get("response_status_code")  # param4
+                    await ingred_association_commons()
                     # step4:get the supplier for the ingredient
                     suppliers = await ac.get(param_dict.get("child_checking_endpoint"))  # param5
                     # step5:make sure the get method for dependent suppliers contains the new one
-                    assert param_dict.get(
-                        "child_check_response_payload") in suppliers.json()  # json is param6
+                    suppliers_objects = suppliers.json()
+                    assert all(suppused_supplier_obj in suppliers_objects for suppused_supplier_obj in param_dict.get(
+                        "child_check_response_payload"))  # json is param6
                     if param_dict.get("orders_check"):
                         # step6:make sure the orders are not affected
                         updated_orders = await ac.get("/crud/orders")
                         assert orders.json() == updated_orders.json()
+                else:
+                    await ingred_association_commons()
             else:
                 req_url = param_dict["req_url"]
                 req_json = param_dict.get("req_json")

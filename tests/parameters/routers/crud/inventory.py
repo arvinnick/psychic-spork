@@ -465,10 +465,100 @@ test_case_insert_single_supplier_success = {
     "method":"post",
     "response_status_code":200,
     "child_checking_endpoint":"/crud/inventory/1/suppliers",
-    "child_check_response_payload":{
+    "child_check_response_payload":[{
                     "name": "South Trading",
                     "address": "Coastal Blvd, Bandar Abbas",
                     "number": "tel:+98-76-1234-5678",
                     "email": None,
-                }
+                }]
+}
+
+
+test_case_insert_multiple_supplier_success = {
+    "supplier_ingredient_relation":True,
+    "success":True,
+    "orders_check":True,
+    "request_endpoint":"/crud/inventory/1?supplier_id=2&supplier_id=3",
+    "method":"post",
+    "response_status_code":200,
+    "child_checking_endpoint":"/crud/inventory/1/suppliers",
+    "child_check_response_payload":[
+        {
+            "name": "South Trading",
+            "address": "Coastal Blvd, Bandar Abbas",
+            "number": "tel:+98-76-1234-5678",
+            "email": None
+        },
+        {
+            "name": "Sepehr Machinery",
+            "address": "1st Valiasr St, Mashahad",
+            "number": "tel:+98-21-1234-5678",
+            "email": "info@tehransupply.com"
+        }
+    ]
+}
+
+###fail
+test_case_insert_wrong_datatype_fail_second_case = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventory/1/suppliers/asa",
+    "method":"post",
+    "response_status_code":422,
+    "response_payload":{'detail': [{'input': 'asa',
+             'loc': ['path', 'supplier_id'],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]}
+}
+
+test_case_insert_wrong_datatype_fail = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventory/1?supplier_id=a",
+    "method":"post",
+    "response_status_code":422,
+    "response_payload":{'detail': [{'input': 'a',
+                                    'loc': ['query', 'supplier_id', 'list[int]', 0],
+                                    'msg': 'Input should be a valid integer, unable to parse string '
+                                            'as an integer',
+                                     'type': 'int_parsing'},
+                                    {'input': ['a'],
+                                     'loc': ['query', 'supplier_id', 'int'],
+                                     'msg': 'Input should be a valid integer',
+                                     'type': 'int_type'}]}
+}
+
+
+test_case_insert_non_existing_ingredient_fail = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventory/9/suppliers/2",
+    "method":"post",
+    "response_status_code":406,
+    "response_payload":{'detail': 'ingredient id 9 does not exist'}
+}
+
+
+test_case_insert_non_existing_supplier_fail = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventory/1/suppliers/8",
+    "method":"post",
+    "response_status_code":406,
+    "response_payload":{'detail': 'one or more supplier ids 8 do not exist'}
+}
+
+
+test_case_insert_wrong_endpoint_fail = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventor_y/1/suppliers/8",
+    "method":"post",
+    "response_status_code":404
 }

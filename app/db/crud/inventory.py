@@ -79,10 +79,11 @@ async def database_layer_add_supplier_to_ingredient(engine:AsyncEngine,
                                                     ingredient_id:int,
                                                     values_to_be_added):
     logger.info(f"adding supplier to ingredient: {ingredient_id} at the database layer")
-    values = {}
+    values = []
     for (ingred_id, supp_id) in values_to_be_added:
-        values["inventory_id"] = ingred_id
-        values["supplier_id"] = supp_id
+        values.append({
+            "inventory_id":ingred_id
+            ,"supplier_id":supp_id})
     query = insert(SupplierInventoryAssociation).values(values)
     try:
         async with engine.begin() as conn:

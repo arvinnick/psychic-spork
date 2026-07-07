@@ -246,3 +246,25 @@ async def add_supplier_to_inredient(engine:Annotated[AsyncEngine, Depends(get_en
         logger.error(f"error in adding supplier id: {e}")
         raise HTTPException(status_code=500, detail="there is a problem in server and we know no more")
     return updated_combination
+
+
+@inventory_crud_router.post("/{ingredient_id}",
+                           status_code=200,
+                           summary="adding a supplier to the ingredient")
+async def add_suppliers_to_inredient(engine:Annotated[AsyncEngine, Depends(get_engine)],
+                                    db: Annotated[AsyncSession, Depends(get_db)],
+                                    ingredient_id:int,
+                                    supplier_id:Annotated[List[int]|int, Query()]):
+    logger.info(f"adding supplier id {supplier_id} to the ingredient id {ingredient_id}")
+    try:
+        updated_combination = await service_layer_add_supplier_to_ingredient(db=db,
+                                                                             engine=engine,
+                                                                             ingredient_id=ingredient_id,
+                                                                             supplier_id=supplier_id)
+    except HTTPException as he:
+        logger.error(he)
+        raise he
+    except Exception as e:
+        logger.error(f"error in adding supplier ids: {e}")
+        raise HTTPException(status_code=500, detail="there is a problem in server and we know no more")
+    return updated_combination

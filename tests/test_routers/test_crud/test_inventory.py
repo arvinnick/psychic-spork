@@ -35,13 +35,21 @@ from tests.parameters.routers.crud.inventory import (
     test_put_inventory_item_fail_type,
     test_put_inventory_item_fail_non_existing_entity,
     test_case_insert_single_supplier_success,
+    test_case_insert_multiple_supplier_success,
+    test_case_insert_wrong_datatype_fail,
+    test_case_insert_wrong_endpoint_fail,
+    test_case_insert_non_existing_ingredient_fail,
+    test_case_insert_non_existing_supplier_fail,
+    test_case_insert_wrong_datatype_fail_second_case
+
+
 )
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
-"param_dict",
+    "param_dict",
     [
-        #post
+        # post
         # test_create_inventory_item_successful,
         # test_create_inventory_item_wrong_supplier_fail,
         # test_create_inventory_item_no_supplier_fail,
@@ -50,7 +58,7 @@ from tests.parameters.routers.crud.inventory import (
         # test_create_inventory_item_missing_name_fail,
         # test_duplicate_inventory_name_fail,
         # test_multiple_suppliers_success,
-        #get
+        # get
         # test_get_inventory_filter_quantity_to,
         # test_get_inventory_filter_quantity_to_from,
         # test_get_one_inventory_item_suppliers,
@@ -64,24 +72,28 @@ from tests.parameters.routers.crud.inventory import (
         # test_get_inventory_filter_suppliers,
         # test_get_ont_inventory_item,
         # test_get_inventory_wrong_property,
-        #delete
+        # delete
         # test_successful_delete_list,
         # test_successful_delete,
         # test_non_existing_resource_delete,
         # test_wrong_format_delete,
         # test_dependant_entity_delete_restrict,
-        #put
+        # put
         # test_put_inventory_item_successful_name_and_supplier,
         # test_put_inventory_item_fail_non_existing_attribute,
         # test_put_inventory_item_successful_quantity,
         # test_put_inventory_item_fail_validation,
         # test_put_inventory_item_fail_type,
         # test_put_inventory_item_fail_non_existing_entity,
-        #supplier ingredient relation
-        test_case_insert_single_supplier_success
-
-
-    ]
+        # supplier ingredient relation
+        test_case_insert_single_supplier_success,
+        test_case_insert_multiple_supplier_success,
+        test_case_insert_wrong_datatype_fail,
+        test_case_insert_wrong_endpoint_fail,
+        test_case_insert_non_existing_ingredient_fail,
+        test_case_insert_non_existing_supplier_fail,
+        test_case_insert_wrong_datatype_fail_second_case
+    ],
 )
 async def test_inventory(blueprint_fixture, param_dict):
     await blueprint_fixture(param_dict)

@@ -22,7 +22,15 @@ from tests.parameters.routers.crud.supplier import (test_create_supplier_phone_n
                                                     test_case_update_fail_non_existing_attribute,
                                                     test_case_update_fail_email,
                                                     test_case_update_fail_phone,
-                                                    test_case_update_fail_non_existing_supplier
+                                                    test_case_update_fail_non_existing_supplier,
+                                                    #supplier ingredient relation update
+                                                    test_case_insert_non_existing_supplier_fail,
+                                                    test_case_insert_wrong_endpoint_fail,
+                                                    test_case_insert_single_ingredient_success,
+                                                    test_case_insert_multiple_ingredients_success,
+                                                    test_case_insert_wrong_datatype_fail_second_case,
+                                                    test_case_insert_non_existing_ingredient_fail,
+                                                    test_case_insert_wrong_datatype_fail
                                                     )
 @pytest.mark.anyio
 @pytest.mark.freeze_time(frozen_test_time)
@@ -49,12 +57,20 @@ from tests.parameters.routers.crud.supplier import (test_create_supplier_phone_n
         test_case_successful_delete_list,
         ##put
         test_case_update_success_email,
-        # test_case_update_success_name,
-        # test_case_update_success_phone,
-        # test_case_update_fail_non_existing_attribute,
-        # test_case_update_fail_email,
-        # test_case_update_fail_phone,
-        # test_case_update_fail_non_existing_supplier
+        test_case_update_success_name,
+        test_case_update_success_phone,
+        test_case_update_fail_non_existing_attribute,
+        test_case_update_fail_email,
+        test_case_update_fail_phone,
+        test_case_update_fail_non_existing_supplier,
+        ##supplier ingredient relation update
+        test_case_insert_non_existing_supplier_fail,
+        test_case_insert_wrong_endpoint_fail,
+        test_case_insert_single_ingredient_success,
+        test_case_insert_multiple_ingredients_success,
+        test_case_insert_wrong_datatype_fail_second_case,
+        test_case_insert_non_existing_ingredient_fail,
+        test_case_insert_wrong_datatype_fail
     ]
 )
 async def test_suppliers(blueprint_fixture, param_dict):

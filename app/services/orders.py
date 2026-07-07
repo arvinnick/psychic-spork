@@ -2,6 +2,7 @@ from typing import List
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.util.concurrency import in_greenlet
 
 from app.db.crud.orders import (
     db_layer_delete_order,
@@ -11,6 +12,7 @@ from app.db.models import Orders
 from app.core.logger import logger
 from app.services.commons import check_if_item_exists, update_service_layer
 from app.services.commons import get_orders
+from services.supplier import get_suppliers_for_ingredient
 
 
 async def check_if_order_id_exists(db:AsyncSession,
@@ -57,6 +59,10 @@ async def service_layer_update_order(
         engine=None
 ):
     logger.info(f"updating order: {item_id} at the service layer")
+    logger.info("checking if ingredient is provided by the supplier")
+    if form_data.get("supplier_id") not in await get_suppliers_for_ingredient(db=db,
+                                                                    ingredient_id=form_data.get("ingredient_id")):
+        raise HTTPException(409, detail="supplier doesn't provide the ingredient")
     updated_order = await update_service_layer(
         item_id=item_id,
         db=db,

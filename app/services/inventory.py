@@ -43,7 +43,7 @@ async def get_ingredients(db:AsyncSession,
 
 
 async def check_if_ingredient_id_exists(db:AsyncSession,
-                                        ingredient_id: int|None) -> bool:
+                                        ingredient_id: List[int]|int|None) -> bool:
     logger.info(f"checking if {ingredient_id} exists as an ingredient")
     try:
         existence = await check_if_item_exists(db, ingredient_id, Inventory, get_ingredients)
@@ -144,11 +144,11 @@ async def service_layer_add_supplier_to_ingredient(db:AsyncSession, engine:Async
         if not await check_if_ingredient_id_exists(db=db,
                                                    ingredient_id=ingredient_id):
             logger.error(f"ingredient id {ingredient_id} does not exist")
-            raise HTTPException(status_code=204, detail=f"ingredient id {ingredient_id} does not exist")
+            raise HTTPException(status_code=406, detail=f"ingredient id {ingredient_id} does not exist")
         if not await check_if_supplier_id_exists(db=db,
                                                  supplier_id=supplier_id):
             logger.error(f"one or more supplier ids {supplier_id} do not exist")
-            raise HTTPException(status_code=204, detail=f"one or more supplier ids {supplier_id} do not exist")
+            raise HTTPException(status_code=406, detail=f"one or more supplier ids {supplier_id} do not exist")
         if isinstance(supplier_id, list):
             values_to_be_added = [(ingredient_id, supp_id) for supp_id in supplier_id]
         else:
