@@ -7,7 +7,6 @@ from sqlalchemy import (
     Float,
     Text,
     func,
-    ForeignKeyConstraint,
     PrimaryKeyConstraint,
 )
 from sqlalchemy.ext.asyncio import AsyncAttrs

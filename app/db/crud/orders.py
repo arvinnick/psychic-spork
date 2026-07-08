@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.supplier import get_suppliers_for_ingredient, get_suppliers
+from app.services.supplier import get_suppliers_for_ingredient
 from app.db.injectors import db_item_injector
 from app.db.retrievers import retrieve_inventory, retrieve_suppliers_by_name
 from app.schemas.orders import OrderCreate
@@ -13,9 +13,6 @@ from app.core.logger import logger
 from app.db.deleters import entity_deleter
 from app.db.crud.commons import db_layer_updater
 from app.services.commons import check_if_item_exists
-from app.db.crud.inventory import get_ingredients_db_level
-from app.db.models import Supplier
-from app.schemas.inventory import Inventory
 from app.services.commons import get_orders
 
 

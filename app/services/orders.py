@@ -2,8 +2,6 @@ from typing import List
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.util.concurrency import in_greenlet
-from starlette.responses import JSONResponse
 
 from app.db.crud.orders import (
     db_layer_delete_order,

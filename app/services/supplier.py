@@ -19,7 +19,6 @@ from app.services.commons import (
     check_if_item_exists,
 )
 from core.logger import logger
-from services.inventory import check_if_ingredient_id_exists
 
 
 async def get_suppliers(

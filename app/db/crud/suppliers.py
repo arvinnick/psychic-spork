@@ -1,7 +1,7 @@
 
 from fastapi import HTTPException
 from sqlalchemy import update
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import List
 
 from app.db.models import Supplier, Base

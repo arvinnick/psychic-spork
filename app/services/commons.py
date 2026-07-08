@@ -3,7 +3,7 @@ from typing import Callable, List, Tuple, Any
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Base as BaseDBModel, Supplier
+from app.db.models import Base as BaseDBModel
 from app.core import config
 from app.db.models import Orders
 from app.db.retrievers import retrieve_orders
