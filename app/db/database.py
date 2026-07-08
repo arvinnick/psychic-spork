@@ -12,7 +12,7 @@ from app.core.config import settings
 if settings.PROD:
     engine = create_async_engine(settings.PROD_ENGINE_URI, echo=False)
 else:
-    engine = create_async_engine(settings.DEV_ENGINE_URI, echo=True if settings.DEBUG else False,
+    engine = create_async_engine(settings.DEV_ENGINE_URI, echo=True if settings.ECHO_SQL else False,
                                  )
 
 

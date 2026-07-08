@@ -18,9 +18,9 @@ async def db_layer_updater(
     logger.info(f"updating {model.__tablename__} on db layer")
     try:
         query = (
-            update(model).where(model.id == item_id).returning(model)
+            update(model).where(model.id == item_id).values(**form_data).returning(model)
         )
-        updated_object = await db.execute(query, form_data)
+        updated_object = await db.execute(query)
     except IntegrityError as ie:
         if existence_cache is None:
             if not await db_layer_id_checker(db, form_data.get(item_id)):

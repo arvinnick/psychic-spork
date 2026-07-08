@@ -1,30 +1,31 @@
-from typing import Callable, List
+from typing import Callable, List, Tuple, Any
 
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Base as BaseDBModel
 from app.core import config
-from app.core.logger import logger
 from app.db.models import Orders
 from app.db.retrievers import retrieve_orders
 from app.internals.helpers import datetime_converter
+from app.core.logger import logger
 
 
 async def check_if_item_exists(db:AsyncSession,
-                              item_id: List[int]|int|None,
-                              model:BaseDBModel,
-                              getter_func:Callable) -> bool:
+                               item_id: List[int]|int|None,
+                               model:BaseDBModel,
+                               getter_func:Callable,
+                               first_item=False) -> Tuple[Any, bool]:
     # check if it exists
     try:
         objects = await getter_func(db,
-                                    item_id)
+                                    item_id,
+                                    first_item=first_item)
 
         if not objects:
-            return False
+            return None, False
         else:
-            return True
-
+            return objects, True
     except Exception as e:
         if isinstance(e, HTTPException):
             if e.status_code == 404:
@@ -32,11 +33,9 @@ async def check_if_item_exists(db:AsyncSession,
             else:
                 pass
         logger.error(
-            f"error in deleting {model.name} object, checking for existence: {e}"
+            f"error in deleting {model.__tablename__} object, checking for existence: {e}"
         )
-        raise HTTPException(
-            500, "something went wrong and we don't know what it is:("
-        )
+        raise e
 
 
 async def update_service_layer(item_id:int,
@@ -84,7 +83,8 @@ async def get_orders(db:AsyncSession,
                     date_time_from:str=None,
                     date_time_to:str=None,
                     quantity_lt:float=None,
-                    quantity_gt:float=None,) -> List[Orders]:
+                    quantity_gt:float=None,
+                     first_item=None) -> List[Orders]:
 
     logger.info("Getting order by the specified constraints")
     try:
@@ -114,3 +114,7 @@ async def get_orders(db:AsyncSession,
         else:
             raise HTTPException(status_code=500,
                                 detail=str(e) if config.settings.DEBUG else "we got an error on the server. we know no more:(")
+
+
+
+

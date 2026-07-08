@@ -4,16 +4,17 @@ from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_204_NO_CONTENT
 
-from app.db.models import Inventory
-from app.core.logger import logger
+
 from app.db.crud.inventory import (
     get_ingredients_db_level,
     db_layer_delete_inventory,
-    db_layer_update_inventory,
-    db_layer_update_ingred_supp_relation,
+    db_layer_update_inventory
 )
-from app.services.commons import check_if_item_exists
-
+from app.core.logger import logger
+from app.db.models import Inventory
+from app.services.commons import (
+    check_if_item_exists,
+)
 
 async def get_ingredients(db:AsyncSession,
                           ingredient_id: List[int]|int|None = None,
@@ -38,22 +39,6 @@ async def get_ingredients(db:AsyncSession,
         logger.error(e)
         raise HTTPException(status_code=500,
                             detail="we have gotten an error and we don't know what it is")
-
-
-
-async def check_if_ingredient_id_exists(db:AsyncSession,
-                                        ingredient_id: int|None) -> bool:
-    logger.info(f"checking if {ingredient_id} exists as an ingredient")
-    try:
-        existence = await check_if_item_exists(db, ingredient_id, Inventory, get_ingredients)
-    except HTTPException as he:
-        logger.error(f"error in check_if_ingredient_id_exists: {he}")
-        raise he
-    except Exception as e:
-        logger.error(f"error in check_if_ingredient_id_exists: {e}")
-        raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
-    return existence
-
 
 
 async def service_delete_ingredient(db:AsyncSession,
@@ -97,18 +82,11 @@ async def service_layer_update_ingredient(db:AsyncSession,
         raise e
     if existence:
         try:
-            supplier_ids = form_data.pop("suppliers")
-            await update_supply_ingred_association(engine=engine, ingredient_id=ingredient_id,
-                                                                               supplier_ids=supplier_ids)
-        except Exception as e:
-            logger.error(f"error in assigning suppliers ingredient: {e}")
-            raise e
-        try:
             updated_ingredient = await db_layer_update_inventory(db=db,
                                                                  engine=engine,
                                                                  ingredient_id=ingredient_id,
                                                                  form_data=form_data,
-                                                                 supplier_ids=supplier_ids,
+                                                                 # supplier_ids=supplier_ids,
                                                                  first_item=first_item)
         except HTTPException as he:
             logger.error(f"error in updating ingredient: {he}")
@@ -121,15 +99,21 @@ async def service_layer_update_ingredient(db:AsyncSession,
         return None
 
 
-async def update_supply_ingred_association(engine:AsyncEngine,ingredient_id:int,
-                               supplier_ids:List[int]):
-    logger.info(f"updating ingredient: {ingredient_id} at the service layer")
+
+
+
+async def check_if_ingredient_id_exists(db:AsyncSession,
+                                        ingredient_id: List[int]|int|None) -> bool:
+    logger.info(f"checking if {ingredient_id} exists as an ingredient")
     try:
-        await db_layer_update_ingred_supp_relation(
-            engine=engine,
-            ingredient_id=ingredient_id,
-            supplier_ids=supplier_ids
-        )
+        existence = await check_if_item_exists(db, ingredient_id, Inventory, get_ingredients)
+    except HTTPException as he:
+        logger.error(f"error in check_if_ingredient_id_exists: {he}")
+        raise he
     except Exception as e:
-        logger.error(f"error in updating ingredient supplier relation: {e}")
-        raise e
+        logger.error(f"error in check_if_ingredient_id_exists: {e}")
+        raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
+    return existence
+
+
+

@@ -46,12 +46,12 @@ from tests.parameters.routers.crud.loss import (
 @pytest.mark.parametrize(
 "param_dict",
     [
-        ##########post
+        ########post
         test_quantity_zero_fail,
         test_quantity_negative_fail,
         test_success_created,
         test_ingredient_name_not_in_database_fail,
-        ###########get
+        #########get
         test_filter_quantity_lt,
         test_filter_quantity_gt_wrong_format,
         test_filter_quantity_lt_wrong_format,

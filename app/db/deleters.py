@@ -11,7 +11,7 @@ from app.core.logger import logger
 
 
 
-async def deleter(db: AsyncSession,
+async def entity_deleter(db: AsyncSession,
                    model: Base,
                    id:int|List[int]) -> Base|List[Base]:
     logger.info(f"deleting {id} from {model.__tablename__}")

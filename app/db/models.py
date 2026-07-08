@@ -7,7 +7,7 @@ from sqlalchemy import (
     Float,
     Text,
     func,
-    ForeignKeyConstraint,
+    PrimaryKeyConstraint,
 )
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -34,12 +34,18 @@ class SluggMaker:
 SupplierInventoryAssociation = Table(
     "supplier_inventory_association",
     Base.metadata,
-    Column("supplier_id", ForeignKey("supplier.id",
-                                     ondelete="SET NULL",
-                                     onupdate="CASCADE"), primary_key=True),
-    Column("inventory_id", ForeignKey("inventory.id",
-                                     ondelete="SET NULL",
-                                     onupdate="CASCADE"), primary_key=True)
+    Column("supplier_id",
+           ForeignKey("supplier.id",
+                      ondelete="SET NULL",
+                      onupdate="CASCADE")),
+    Column("inventory_id",
+           ForeignKey("inventory.id",
+                      ondelete="SET NULL",
+                      onupdate="CASCADE")),
+    PrimaryKeyConstraint(
+        "supplier_id",
+        "inventory_id"
+    )
 )
 
 class Inventory(Base, SluggMaker):
@@ -84,8 +90,8 @@ class Orders(Base):
     supplier_id: Mapped[int] = mapped_column(ForeignKey("supplier.id", ondelete="RESTRICT"))
     supplier: Mapped[Supplier] = relationship("Supplier")
     
-    __table_args__ = (ForeignKeyConstraint([ingredient_id, supplier_id],
-                                           [
-                                               SupplierInventoryAssociation.c.inventory_id,
-                                               SupplierInventoryAssociation.c.supplier_id
-                                           ]),)
+    # __table_args__ = (ForeignKeyConstraint([ingredient_id, supplier_id],
+    #                                        [
+    #                                            SupplierInventoryAssociation.c.inventory_id,
+    #                                            SupplierInventoryAssociation.c.supplier_id
+    #                                        ]),)

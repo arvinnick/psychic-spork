@@ -25,10 +25,12 @@ async def get_losses(
     datetime_from: str | None = None,
     quantity_lt: float | None = None,
     quantity_gt: float | None = None,
+        first_item: bool = True,
 ) -> List[Losses]:
+    logger.info("retrieving losses by the specified constraints in the service layer")
     try:
         return await db_layer_get_losses(db, loss_id, ingredient_id, datetime_to, datetime_from, quantity_lt,
-                                         quantity_gt)
+                                         quantity_gt, first_item=first_item)
         
         
     except HTTPException as he:
@@ -67,17 +69,17 @@ async def service_delete_loss(
 
 async def check_if_loss_id_exists(db:AsyncSession,
                                         item_id: List[int]|int) -> bool:
-    logger.info("checking if loss id exists")
+    logger.info(f"checking if loss id {item_id} exists")
     loss_id = item_id
     try:
-        existence = await check_if_item_exists(db, loss_id, Losses, get_losses)
+        _, loss_existence = await check_if_item_exists(db, loss_id, Losses, get_losses)
     except HTTPException as he:
         logger.error(f"error in check_if_loss_id_exists: {he}")
         raise he
     except Exception as e:
         logger.error(f"error in check_if_loss_id_exists: {e}")
         raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
-    return existence
+    return loss_existence
 
 
 async def service_layer_update_loss(db: AsyncSession,
@@ -88,7 +90,7 @@ async def service_layer_update_loss(db: AsyncSession,
     loss_id = item_id
     logger.info(f"updating loss object: {loss_id} at the service layer")
     logger.info(f"checking if the ingredient exists: {form_data.get('ingredient_id')}")
-    ingredient_exists = await check_if_item_exists(db, form_data.get('ingredient_id'), Inventory, get_ingredients)
+    _, ingredient_exists = await check_if_item_exists(db, form_data.get('ingredient_id'), Inventory, get_ingredients)
     if not(ingredient_exists):
         raise HTTPException(status_code=204, detail="ingredient doesn't exist")
     updated_loss = await update_service_layer(item_id=item_id,

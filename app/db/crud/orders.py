@@ -4,18 +4,15 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.supplier import get_suppliers_for_ingredient, get_suppliers
+from app.services.supplier import get_suppliers_for_ingredient
 from app.db.injectors import db_item_injector
 from app.db.retrievers import retrieve_inventory, retrieve_suppliers_by_name
 from app.schemas.orders import OrderCreate
 from app.db.models import Orders
 from app.core.logger import logger
-from app.db.deleters import deleter
+from app.db.deleters import entity_deleter
 from app.db.crud.commons import db_layer_updater
 from app.services.commons import check_if_item_exists
-from app.db.crud.inventory import get_ingredients_db_level
-from app.db.models import Supplier
-from app.schemas.inventory import Inventory
 from app.services.commons import get_orders
 
 
@@ -79,7 +76,7 @@ async def db_layer_delete_order(
 ):
     logger.info(f"deleting order items at db layer: {order_id}")
     try:
-        objs = await deleter(db=db, model=Orders, id=order_id)
+        objs = await entity_deleter(db=db, model=Orders, id=order_id)
     except HTTPException as he:
         if he.status_code == 409:
             raise he
@@ -100,23 +97,6 @@ async def db_layer_update_order(
 
     '''
     logger.info(f"updating order items at db layer: {loss_id}")
-    logger.info(f"checking if ingredient id {form_data.get("ingredient_id")} exists")
-    try:
-        ingredient_exists = await check_if_item_exists(db, form_data.get("ingredient_id"), Inventory, get_ingredients_db_level)
-        if not ingredient_exists:
-            raise HTTPException(status_code=204,detail="ingredient doesn't exist")
-    except Exception as e:
-        logger.error(f"an error in db layer updater: {e}")
-        raise e
-    logger.info(f"checking supplier id {form_data.get("supplier_id")} existence")
-    try:
-        supplier_exists = await check_if_item_exists(db, form_data.get("supplier_id"), Supplier,
-                                               get_suppliers)
-        if not supplier_exists:
-            raise HTTPException(status_code=204,detail="supplier doesn't exist")
-    except Exception as e:
-        logger.error(f"an error in db layer updater: {e}")
-        raise e
     try:
         updated_obj = await db_layer_updater(
             db=db,
