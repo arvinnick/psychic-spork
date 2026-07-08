@@ -100,23 +100,6 @@ async def db_layer_update_order(
 
     '''
     logger.info(f"updating order items at db layer: {loss_id}")
-    logger.info(f"checking if ingredient id {form_data.get("ingredient_id")} exists")
-    try:
-        ingredient_exists = await check_if_item_exists(db, form_data.get("ingredient_id"), Inventory, get_ingredients_db_level)
-        if not ingredient_exists:
-            raise HTTPException(status_code=204,detail="ingredient doesn't exist")
-    except Exception as e:
-        logger.error(f"an error in db layer updater: {e}")
-        raise e
-    logger.info(f"checking supplier id {form_data.get("supplier_id")} existence")
-    try:
-        supplier_exists = await check_if_item_exists(db, form_data.get("supplier_id"), Supplier,
-                                               get_suppliers)
-        if not supplier_exists:
-            raise HTTPException(status_code=204,detail="supplier doesn't exist")
-    except Exception as e:
-        logger.error(f"an error in db layer updater: {e}")
-        raise e
     try:
         updated_obj = await db_layer_updater(
             db=db,

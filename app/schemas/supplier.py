@@ -6,7 +6,7 @@ from pydantic_extra_types.phone_numbers import PhoneNumber
 
 
 class SupplierBase(BaseModel):
-    name: str = ''
+    name: str
     address: str | None = None
     number: PhoneNumber | None = None
     email: EmailStr | None = None

@@ -112,7 +112,8 @@ async def retrieve_orders(
                     date_time_from:datetime|None=None,
                     date_time_to: datetime|None=None,
                     quantity_lt:float=None,
-                    quantity_gt:float=None
+                    quantity_gt:float=None,
+first_item=False
             )  -> List[Orders]:
     logger.info("retrieving orders by the specified constraints")
     query = select(Orders)
@@ -145,7 +146,10 @@ async def retrieve_orders(
     except Exception as e:
         logger.error(f"An error occurred while retrieving orders: {str(e)}")
         raise e
-    orders = orders_cor.scalars().all()
+    if first_item:
+        orders = orders_cor.scalars().first()
+    else:
+        orders = orders_cor.scalars().all()
     return orders
 
 
@@ -157,6 +161,7 @@ async def retrieve_losses(db:AsyncSession,
                           datetime_from: str | None = None,
                           quantity_lt: float | None = None,
                           quantity_gt: float | None = None,
+                          first_item=False
                           ):
     logger.info("retrieving losses by the specified constraints")
     query = select(Losses).options(selectinload(Losses.ingredient))
@@ -188,12 +193,16 @@ async def retrieve_losses(db:AsyncSession,
         logger.error(f"An error occurred while retrieving losses: {str(e)}")
         raise e
     losses = await db.execute(query)
-    losses = losses.scalars().all()
+    if first_item:
+        losses = losses.scalars().first()
+    else:
+        losses = losses.scalars().all()
     return losses
 
 async def retrieve_suppliers_by_id(
         db:AsyncSession,
-        supplier_id:List[int]|int|None = None
+        supplier_id:List[int]|int|None = None,
+first_item=False
                                    ) -> List[Supplier]:
     logger.info("retrieving suppliers by id")
     query = select(Supplier).options(selectinload(Supplier.inventories))
@@ -203,7 +212,10 @@ async def retrieve_suppliers_by_id(
         query = query.where(Supplier.id.in_(supplier_id))
     try:
         suppliers = await db.execute(query)
-        suppliers = suppliers.scalars().all()
+        if first_item:
+            suppliers = suppliers.scalars().first()
+        else:
+            suppliers = suppliers.scalars().all()
     except Exception as e:
         logger.error(f"An error occurred while retrieving suppliers: {str(e)}")
         raise HTTPException(status_code=500, detail="we have gotten an error. We know no more")

@@ -3,6 +3,7 @@ from typing import List
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.util.concurrency import in_greenlet
+from starlette.responses import JSONResponse
 
 from app.db.crud.orders import (
     db_layer_delete_order,
@@ -12,7 +13,10 @@ from app.db.models import Orders
 from app.core.logger import logger
 from app.services.commons import check_if_item_exists, update_service_layer
 from app.services.commons import get_orders
-from services.supplier import get_suppliers_for_ingredient
+from db.crud.inventory import get_ingredients_db_level
+from db.models import Inventory, Supplier
+from services.losses import get_losses
+from services.supplier import get_suppliers_for_ingredient, get_suppliers
 
 
 async def check_if_order_id_exists(db:AsyncSession,
@@ -59,9 +63,35 @@ async def service_layer_update_order(
         engine=None
 ):
     logger.info(f"updating order: {item_id} at the service layer")
+    logger.info(f"checking if ingredient id {form_data.get('ingredient_id')} exists")
+    try:
+        ingredient_cache, ingredient_exists = await check_if_item_exists(
+            db, form_data.get("ingredient_id"), Inventory, get_ingredients_db_level, first_item=first_item
+        )
+        if not ingredient_exists:
+            raise HTTPException(status_code=204, detail="ingredient doesn't exist")
+    except Exception as e:
+        logger.error(f"an error in db layer updater: {e}")
+        raise e
+    logger.info(f"checking supplier id {form_data.get('supplier_id')} existence")
+    try:
+        supplier_cache, supplier_exists = await check_if_item_exists(
+            db, form_data.get("supplier_id"), Supplier, get_suppliers, first_item=first_item
+        )
+        if not supplier_exists:
+            raise HTTPException(status_code=204, detail="supplier doesn't exist")
+    except Exception as e:
+        logger.error(f"an error in db layer updater: {e}")
+        raise e
+    # logger.info("checking if supplier exists")
+    # if not await check_if_item_exists(db=db, item_id=form_data.get('supplier_id'),
+    #                                   model=Supplier, getter_func=g):
     logger.info("checking if ingredient is provided by the supplier")
-    if form_data.get("supplier_id") not in await get_suppliers_for_ingredient(db=db,
-                                                                    ingredient_id=form_data.get("ingredient_id")):
+    suppliers = await get_suppliers_for_ingredient(db=db,
+                                                   ingredient_id=form_data.get("ingredient_id"),
+                                                   ingredient_obj=ingredient_cache)
+    supplier_ids = [supplier.id for supplier in suppliers]
+    if form_data.get("supplier_id") not in supplier_ids:
         raise HTTPException(409, detail="supplier doesn't provide the ingredient")
     updated_order = await update_service_layer(
         item_id=item_id,
@@ -71,3 +101,8 @@ async def service_layer_update_order(
         existence_checker=check_if_order_id_exists,
         first_item=first_item)
     return updated_order
+
+
+async def service_layer_get_loss_ingredient(db:AsyncSession, loss_id:int):
+    loss_objects = await get_losses(db, loss_id)
+    return loss_objects.ingredient

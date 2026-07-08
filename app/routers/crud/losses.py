@@ -23,6 +23,7 @@ from app.services.losses import (
 from app.services.inventory import get_ingredients
 from app.services.losses import check_if_loss_id_exists
 from app.routers.crud.commons import update_item
+from services.orders import service_layer_get_loss_ingredient
 
 losses_crud_router = APIRouter(
     prefix="/losses",
@@ -80,7 +81,7 @@ async def get_single_loss(db:Annotated[AsyncSession, Depends(get_db)],
     """
     logger.info("Getting losses by ID")
     try:
-        loss_objects = await get_losses(db, [loss_id])
+        loss_objects = await get_losses(db, [loss_id], first_item=False)
         return loss_objects
     except Exception as e:
         logger.error(f"error in getting losses endpoint: {e}")
@@ -112,7 +113,8 @@ async def get_losses_path_operation(db:Annotated[AsyncSession, Depends(get_db)],
                                         datetime_to,
                                         datetime_from,
                                         quantity_lt,
-                                        quantity_gt)
+                                        quantity_gt,
+                                        first_item=False)
         return loss_objects
     except HTTPException as he:
         logger.error(f"validation error in getting losses endpoint: {he}")
@@ -121,8 +123,6 @@ async def get_losses_path_operation(db:Annotated[AsyncSession, Depends(get_db)],
         logger.error(f"error in getting losses endpoint: {e}")
         raise HTTPException(500,
                             "something went wrong and we don't know what it is:(")
-
-
 
 
 @losses_crud_router.get('/{loss_id}/ingredient',
@@ -138,13 +138,12 @@ async def get_losses_ingredient(db:Annotated[AsyncSession, Depends(get_db)],
     """
     logger.info("Getting losses by constraints")
     try:
-        loss_objects = await get_losses(db,
-                                        loss_id)
-        return loss_objects[0].ingredient
+        ingredient = await service_layer_get_loss_ingredient(db=db, loss_id=loss_id)
     except Exception as e:
         logger.error(f"error in getting losses endpoint: {e}")
         raise HTTPException(500,
                             "something went wrong and we don't know what it is:(")
+    return ingredient
 
 
 @losses_crud_router.delete('/{loss_id}', status_code=204,

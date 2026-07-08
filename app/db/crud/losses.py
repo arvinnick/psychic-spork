@@ -9,7 +9,7 @@ from app.db.models import Losses
 from app.db.retrievers import retrieve_losses
 from app.db.deleters import entity_deleter
 from app.db.crud.commons import db_layer_updater
-from app.services.inventory import check_if_ingredient_id_exists
+from services.inventory import check_if_ingredient_id_exists
 
 
 async def db_layer_get_losses(
@@ -20,6 +20,7 @@ async def db_layer_get_losses(
     datetime_from: str | None = None,
     quantity_lt: float | None = None,
     quantity_gt: float | None = None,
+    first_item:bool=False
 ) -> List[Losses]:
     try:
         losses = await retrieve_losses(
@@ -30,6 +31,7 @@ async def db_layer_get_losses(
             datetime_from,
             quantity_lt,
             quantity_gt,
+            first_item=first_item
         )
     except HTTPException as he:
         logger.error(f"validation error in getting losses from database: {he}")

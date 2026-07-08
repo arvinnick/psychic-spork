@@ -4,17 +4,17 @@ from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_204_NO_CONTENT
 
-from app.db.models import Inventory
-from app.core.logger import logger
+
 from app.db.crud.inventory import (
     get_ingredients_db_level,
     db_layer_delete_inventory,
     db_layer_update_inventory
 )
-from app.services.commons import check_if_item_exists
-from app.db.crud.inventory import database_layer_add_supplier_to_ingredient
-from app.services.supplier import check_if_supplier_id_exists
-
+from core.logger import logger
+from db.models import Inventory
+from services.commons import (
+    check_if_item_exists,
+)
 
 async def get_ingredients(db:AsyncSession,
                           ingredient_id: List[int]|int|None = None,
@@ -39,22 +39,6 @@ async def get_ingredients(db:AsyncSession,
         logger.error(e)
         raise HTTPException(status_code=500,
                             detail="we have gotten an error and we don't know what it is")
-
-
-
-async def check_if_ingredient_id_exists(db:AsyncSession,
-                                        ingredient_id: List[int]|int|None) -> bool:
-    logger.info(f"checking if {ingredient_id} exists as an ingredient")
-    try:
-        existence = await check_if_item_exists(db, ingredient_id, Inventory, get_ingredients)
-    except HTTPException as he:
-        logger.error(f"error in check_if_ingredient_id_exists: {he}")
-        raise he
-    except Exception as e:
-        logger.error(f"error in check_if_ingredient_id_exists: {e}")
-        raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
-    return existence
-
 
 
 async def service_delete_ingredient(db:AsyncSession,
@@ -97,15 +81,6 @@ async def service_layer_update_ingredient(db:AsyncSession,
         logger.error(f"error in updating ingredient: {e}")
         raise e
     if existence:
-        # if not form_data.get("suppliers"):
-        #     raise HTTPException(status_code=400, detail="No supplier is provided")
-        # try:
-        #     supplier_ids = form_data.pop("suppliers")
-        #     await update_supply_ingred_association(engine=engine, ingredient_id=ingredient_id,
-        #                                                                        supplier_ids=supplier_ids)
-        # except Exception as e:
-        #     logger.error(f"error in assigning suppliers ingredient: {e}")
-        #     raise e
         try:
             updated_ingredient = await db_layer_update_inventory(db=db,
                                                                  engine=engine,
@@ -124,42 +99,21 @@ async def service_layer_update_ingredient(db:AsyncSession,
         return None
 
 
-# async def update_supply_ingred_association(engine:AsyncEngine,
-#                                            ingredient_id:int,
-#                                            supplier_ids:List[int]):
-#     logger.info(f"updating ingredient: {ingredient_id} at the service layer")
-#     try:
-#         await db_layer_update_ingred_supp_relation(
-#             engine=engine,
-#             ingredient_id=ingredient_id,
-#             supplier_ids=supplier_ids
-#         )
-#     except Exception as e:
-#         logger.error(f"error in updating ingredient supplier relation: {e}")
-#         raise e
-async def service_layer_add_supplier_to_ingredient(db:AsyncSession, engine:AsyncEngine,
-                                                   ingredient_id:int, supplier_id:List[int]|int):
-    logger.info(f"adding supplier id {supplier_id} to the ingredient id {ingredient_id} in the service layer")
+
+
+
+async def check_if_ingredient_id_exists(db:AsyncSession,
+                                        ingredient_id: List[int]|int|None) -> bool:
+    logger.info(f"checking if {ingredient_id} exists as an ingredient")
     try:
-        if not await check_if_ingredient_id_exists(db=db,
-                                                   ingredient_id=ingredient_id):
-            logger.error(f"ingredient id {ingredient_id} does not exist")
-            raise HTTPException(status_code=406, detail=f"ingredient id {ingredient_id} does not exist")
-        if not await check_if_supplier_id_exists(db=db,
-                                                 supplier_id=supplier_id):
-            logger.error(f"one or more supplier ids {supplier_id} do not exist")
-            raise HTTPException(status_code=406, detail=f"one or more supplier ids {supplier_id} do not exist")
-        if isinstance(supplier_id, list):
-            values_to_be_added = [(ingredient_id, supp_id) for supp_id in supplier_id]
-        else:
-            values_to_be_added = [(ingredient_id, supplier_id)]
-        updated_combination = await database_layer_add_supplier_to_ingredient(engine=engine,
-                                                                              ingredient_id=ingredient_id,
-                                                                              values_to_be_added=values_to_be_added)
+        existence = await check_if_item_exists(db, ingredient_id, Inventory, get_ingredients)
     except HTTPException as he:
-        logger.error(he)
+        logger.error(f"error in check_if_ingredient_id_exists: {he}")
         raise he
     except Exception as e:
-        logger.error(f"error in adding supplier to the ingredient, service layer: {e}")
-        raise e
-    return updated_combination
+        logger.error(f"error in check_if_ingredient_id_exists: {e}")
+        raise HTTPException(status_code=500,detail="there is an error in the server and we don't know what it is")
+    return existence
+
+
+

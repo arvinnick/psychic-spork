@@ -30,7 +30,7 @@ from app.services.supplier import get_suppliers_for_ingredient
 from app.routers.crud.commons import delete_item
 from app.schemas.inventory import InventoryPutItem
 from app.routers.crud.commons import update_item
-from app.services.inventory import service_layer_add_supplier_to_ingredient
+from app.services.supplier_inventory_relationship import service_layer_add_supplier_to_ingredient
 
 inventory_crud_router = APIRouter(
     prefix="/inventory",

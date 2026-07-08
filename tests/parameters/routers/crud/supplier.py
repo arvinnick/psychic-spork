@@ -219,7 +219,7 @@ test_case_update_fail_non_existing_supplier = {
     "req_json": {
         "name": "MammadCo",
         "email": "info@aram.co",
-        "number": "57034727"},
+        "number": "tel:+98-21-1234-5678"},
     "method": "put",
     "res_status_code": 204,
     "res_json": {"detail":"Supplier doesn't exist"},
@@ -230,21 +230,28 @@ test_case_update_fail_non_existing_attribute = {
     "req_json": {
         "name_": "MammadCo",
         "email": "info@aram.co",
-        "number": "57034727"},
+        "number": "tel:+1-650-253-0000"},
     "method": "put",
-    "res_status_code": 400,
-    "res_json": {"detail":"attribute name_ doesn't exist"},
+    "res_status_code": 422,
+    "res_json": {'detail': [{'input': {'email': 'info@aram.co',
+                       'name_': 'MammadCo',
+                       'number': 'tel:+1-650-253-0000'},
+             'loc': ['body', 'name'],
+             'msg': 'Field required',
+             'type': 'missing'}]},
 }
 
 test_case_update_success_name = {
    "req_url": "/crud/suppliers/1",
     "req_json": {
+"address": "1st Valiasr St, Mashahad",
         "name": "MammadCo",
         "email": "info@aram.co",
         "number": "tel:+1-650-253-0000"},
     "method": "put",
     "res_status_code": 200,
     "res_json": {
+"address": "1st Valiasr St, Mashahad",
         "name": "MammadCo",
         "email": "info@aram.co",
         "number": "tel:+1-650-253-0000"},
@@ -254,11 +261,13 @@ test_case_update_success_email = {
    "req_url": "/crud/suppliers/1",
     "req_json": {
         "name": "MammadCo",
+"address": "1st Valiasr St, Mashahad",
         "email": "info@mammad.co",
         "number": "tel:+1-650-253-0000"},
     "method": "put",
     "res_status_code": 200,
     "res_json": {
+"address": "1st Valiasr St, Mashahad",
         "name": "MammadCo",
         "email": "info@mammad.co",
         "number": "tel:+1-650-253-0000"},
@@ -268,11 +277,13 @@ test_case_update_success_phone = {
    "req_url": "/crud/suppliers/1",
     "req_json": {
         "name": "MammadCo",
+"address": "1st Valiasr St, Mashahad",
         "email": "info@mammad.co",
         "number": "tel:+1-650-253-0000"},
     "method": "put",
     "res_status_code": 200,
     "res_json": {
+"address": "1st Valiasr St, Mashahad",
         "name": "MammadCo",
         "email": "info@mammad.co",
         "number": "tel:+1-650-253-0000"},
@@ -286,10 +297,10 @@ test_case_update_fail_phone = {
         "number": "ds"},
     "method": "put",
     "res_status_code": 422,
-    "res_json": {
-        "name": "MammadCo",
-        "email": "info@mammad.co",
-        "number": "ds"},
+    "res_json": {'detail': [{'input': 'ds',
+             'loc': ['body', 'number'],
+             'msg': 'value is not a valid phone number',
+             'type': 'value_error'}]},
 }
 
 test_case_update_fail_email = {
@@ -300,10 +311,12 @@ test_case_update_fail_email = {
         "number": "tel:+1-650-253-0000"},
     "method": "put",
     "res_status_code": 422,
-    "res_json": {
-        "name": "MammadCo",
-        "email": "info@mammad.co",
-        "number": "tel:+1-650-253-0000"},
+    "res_json": {'detail': [{'ctx': {'reason': 'An email address must have an @-sign.'},
+             'input': '12',
+             'loc': ['body', 'email'],
+             'msg': 'value is not a valid email address: An email address must '
+                    'have an @-sign.',
+             'type': 'value_error'}]},
 }
 
 
@@ -378,7 +391,7 @@ test_case_insert_non_existing_ingredient_fail = {
     "request_endpoint":"/crud/suppliers/9/ingredients/2",
     "method":"post",
     "response_status_code":406,
-    "response_payload":{'detail': 'supplier id 9 does not exist'}
+    "response_payload":{'detail': 'one or more supplier ids 9 do not exist'}
 }
 
 
@@ -389,7 +402,7 @@ test_case_insert_non_existing_supplier_fail = {
     "request_endpoint":"/crud/suppliers/1/ingredients/8",
     "method":"post",
     "response_status_code":406,
-    "response_payload":{'detail': 'one or more ingredient ids (8) do not exist'}
+    "response_payload":{'detail': 'ingredient id 8 does not exist'}
 }
 
 

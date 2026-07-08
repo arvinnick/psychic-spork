@@ -1,13 +1,12 @@
 from typing import Annotated, List
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 import app.core.config as config
 from app.db.database import get_db, get_engine
-from app.db.models import Supplier, SupplierInventoryAssociation
+from app.db.models import Supplier
 from app.core.logger import logger
 from app.schemas.supplier import SupplierCreate
 from app.schemas.supplier import SupplierBase as SupplierSchema
@@ -18,11 +17,11 @@ from app.services.supplier import (
     get_suppliers,
     service_delete_supplier,
     service_layer_update_supplier,
-    check_if_supplier_id_exists,
 )
 from app.db.models import Inventory
-from app.services.inventory import get_ingredients, check_if_ingredient_id_exists
+from app.services.inventory import get_ingredients
 from app.routers.crud.commons import delete_item, update_item
+from app.services.supplier_inventory_relationship import service_layer_add_ingredient_to_supplier
 
 suppliers_crud_router = APIRouter(
     prefix="/suppliers",
@@ -184,53 +183,6 @@ async def add_supplier_to_inredient(engine:Annotated[AsyncEngine, Depends(get_en
     except Exception as e:
         logger.error(f"error in adding ingredient id: {e}")
         raise HTTPException(status_code=500, detail="there is a problem in server and we know no more")
-    return updated_combination
-
-
-async def database_layer_add_ingredient_to_supplier(
-    engine: AsyncEngine, supplier_id: int, values_to_be_added
-):
-    logger.info(
-        f"adding ingredient to supplier: {supplier_id} at the database layer"
-    )
-    values = []
-    for ingred_id, supp_id in values_to_be_added:
-        values.append({"inventory_id": ingred_id, "supplier_id": supp_id})
-    query = insert(SupplierInventoryAssociation).values(values)
-    try:
-        async with engine.begin() as conn:
-            return_value = await conn.execute(query)
-    except Exception as e:
-        logger.error(e)
-        raise e
-    return return_value
-
-
-async def service_layer_add_ingredient_to_supplier(db:AsyncSession, engine:AsyncEngine,
-                                                   ingredient_id:List[int]|int, supplier_id:int):
-    logger.info(f"adding ingredient id {ingredient_id} to the supplier id {supplier_id} in the service layer")
-    try:
-        if not await check_if_ingredient_id_exists(db=db,
-                                                   ingredient_id=ingredient_id):
-            logger.error(f"one or more ingredient ids ({ingredient_id}) do not exist")
-            raise HTTPException(status_code=406, detail=f"one or more ingredient ids ({ingredient_id}) do not exist")
-        if not await check_if_supplier_id_exists(db=db,
-                                                 supplier_id=supplier_id):
-            logger.error(f"supplier id {supplier_id} does not exist")
-            raise HTTPException(status_code=406, detail=f"supplier id {supplier_id} does not exist")
-        if isinstance(ingredient_id, list):
-            values_to_be_added = [(ingred_id, supplier_id) for ingred_id in ingredient_id]
-        else:
-            values_to_be_added = [(ingredient_id, supplier_id)]
-        updated_combination = await database_layer_add_ingredient_to_supplier(engine=engine,
-                                                                              supplier_id=supplier_id,
-                                                                              values_to_be_added=values_to_be_added)
-    except HTTPException as he:
-        logger.error(he)
-        raise he
-    except Exception as e:
-        logger.error(f"error in adding supplier to the ingredient, service layer: {e}")
-        raise e
     return updated_combination
 
 

@@ -58,8 +58,8 @@ async def db_layer_update_inventory(db:AsyncSession,
                                     first_item:bool=True) -> Inventory:
     logger.info(f"updating inventory items at db layer: {ingredient_id}")
     try:
-        query = update(Inventory).where(Inventory.id == ingredient_id).returning(Inventory)
-        updated_ingredient = await db.execute(query, form_data)
+        query = update(Inventory).where(Inventory.id == ingredient_id).values(**form_data).returning(Inventory)
+        updated_ingredient = await db.execute(query)
     except Exception as e:
         logger.error(f"an error in db layer for inventory update: {e}")
         raise e
