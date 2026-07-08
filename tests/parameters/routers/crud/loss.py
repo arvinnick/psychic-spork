@@ -3,20 +3,18 @@ from tests.conftest import frozen_test_time
 
 ##############post
 #test case: ingredient name is wrong
-test_ingredient_name_not_in_database_fail = {"req_url": "/crud/losses/",
+test_ingredient_name_not_in_database_fail = {"req_url": "/crud/losses",
                                                   "req_json": {
                                                                 "quantity": 1.0,
                                                                 "ingredient": "Wheat"
                                                             },
-                                                  "res_status_code": 404,
-                                                  "res_json": {
-                                                      'detail': 'Ingredient not found in the database.'
-                                                  }
+                                                  "res_status_code": 400,
+                                                  "res_json": {'detail': 'ingredient name is not in the database.'}
                                              }
 
 
 #test case: quantity is zero
-test_quantity_zero_fail = {"req_url": "/crud/losses/",
+test_quantity_zero_fail = {"req_url": "/crud/losses",
                                                   "req_json": {
                                                                 "quantity": 0.0,
                                                                 "ingredient": "Wheat Flour"
@@ -31,7 +29,7 @@ test_quantity_zero_fail = {"req_url": "/crud/losses/",
 
 
 #test case: quantity is less than zero
-test_quantity_negative_fail = {"req_url": "/crud/losses/",
+test_quantity_negative_fail = {"req_url": "/crud/losses",
                                                   "req_json": {
                                                                 "quantity": -1.0,
                                                                 "ingredient": "Wheat Flour"
@@ -46,7 +44,7 @@ test_quantity_negative_fail = {"req_url": "/crud/losses/",
 
 
 #test case: successful creation
-test_success_created = {"req_url": "/crud/losses/",
+test_success_created = {"req_url": "/crud/losses",
                                                   "req_json": {
                                                                 "quantity": 1.0,
                                                                 "ingredient": "Wheat Flour"
@@ -104,9 +102,18 @@ test_success_singular = {
 test_fail_string_id = {
     "req_url": "/crud/losses/a",
     "method": "get",
-    "res_status_code": 400,
-    "res_json":
-                {"details":"Invalid ID format. ID should be an integer."}
+    "res_status_code": 422,
+    "res_json": {
+        "detail": [
+            {
+                "input": "a",
+                "loc": ["path", "loss_id"],
+                "msg": "Input should be a valid integer, unable to parse string "
+                "as an integer",
+                "type": "int_parsing",
+            }
+        ]
+    },
 }
 
 test_success_singular_id_non_existent = {
@@ -126,10 +133,8 @@ test_success_singular_ingredient = {
 test_fail_wrong_sub_resources = {
     "req_url": "/crud/losses/1/something_else",
     "method": "get",
-    "res_status_code": 400,
-    "res_json":  {
-        "details": "loss endpoint does not support 'something_else' as a sub-resource."
-    },
+    "res_status_code": 404,
+    "res_json":  {'detail': 'Not Found'},
 }
 
 test_filter_ingredient_id = {
@@ -274,3 +279,195 @@ test_filter_quantity_gt_lt = {
         }
     ]
 }
+
+
+###delete
+test_successful_delete = {
+    "req_url": "/crud/losses/1",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+test_successful_delete_list = {
+    "req_url": "/crud/losses?loss_id=1&loss_id=2",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+test_fail_not_existing_delete_list = {
+    "req_url": "/crud/losses?loss_id=1&loss_id=2&loss_id=34",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":False,
+    "res_json": {'detail': "ID(s) doesn't exist"},
+}
+
+test_wrong_format_delete = {
+    "req_url": "/crud/losses/asa",
+    "method": "delete",
+    "res_status_code": 422,
+    "existing_resource":False,
+    "res_json": {'detail': [{'input': 'asa',
+             'loc': ['path', 'loss_id'],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]},
+}
+
+test_non_existing_resource_delete = {
+    "req_url": "/crud/losses/5",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":False,
+    "res_json": {"detail":"ID doesn't exist"},
+}
+
+
+###put
+test_case_success_non_existing_entity = {
+    "req_url": "/crud/losses/3",
+    "method": "put",
+    "res_status_code": 204,
+    "res_json": {"detail": "ID doesn't exist"},
+    "req_json": {
+                    "date_time": "2023-10-27T10:00:00",
+                    "ingredient_id": 1,
+                    "quantity": 5.0
+                }
+}
+
+test_case_success_update_datetime = {
+    "req_url": "/crud/losses/2",
+    "method": "put",
+    "res_status_code": 200,
+    "res_json": {
+                    "date_time": "2023-10-27T10:00:00",
+                    "ingredient_id": 1,
+                    "quantity": 5.0
+                },
+    "req_json": {
+"ingredient_id": 1,
+                    "quantity": 5.0,
+            "date_time": "2023-10-27T10:00:00",
+        }
+}
+
+
+test_case_success_update_ingredient = {
+    "req_url": "/crud/losses/2",
+    "method": "put",
+    "res_status_code": 200,
+    "res_json": {
+                    "date_time": "2023-10-27T10:00:00",
+                    "ingredient_id": 2,
+                    "quantity": 5.0
+                },
+    "req_json": {
+"date_time": "2023-10-27T10:00:00",
+                    "quantity": 5.0,
+            "ingredient_id": 2,
+        }
+}
+
+
+test_case_success_update_quantity = {
+    "req_url": "/crud/losses/2",
+    "method": "put",
+    "res_status_code": 200,
+    "res_json": {
+                    "date_time": "2023-10-27T10:00:00",
+                    "ingredient_id": 2,
+                    "quantity": 3.0
+                },
+    "req_json": {
+            "date_time": "2023-10-27T10:00:00",
+            "ingredient_id": 2,
+            "quantity": 3.0,
+        }
+}
+
+
+test_case_success_update_quantity_ingredient = {
+    "req_url": "/crud/losses/2",
+    "method": "put",
+    "res_status_code": 200,
+    "res_json": {
+                    "date_time": "2023-10-27T10:00:00",
+                    "ingredient_id": 1,
+                    "quantity": 3.0
+                },
+    "req_json": {
+            "date_time": "2023-10-27T10:00:00",
+            "ingredient_id": 1,
+            "quantity": 3.0,
+        }
+}
+
+
+###failure
+test_case_fail_update_quantity_minus = {
+    "req_url": "/crud/losses/2",
+    "method": "put",
+    "res_status_code": 422,
+    "res_json": {'detail': [{'ctx': {'gt': 0.0},
+                 'input': -1.0,
+                 'loc': ['body', 'quantity'],
+                 'msg': 'Input should be greater than 0',
+                 'type': 'greater_than'}]},
+    "req_json": {
+            "date_time": "2023-10-27T10:00:00",
+            "ingredient_id": 1,
+            "quantity": -1,
+        }
+}
+
+test_case_fail_update_non_existing_ingred_id = {
+    "req_url": "/crud/losses/2",
+    "method": "put",
+    "res_status_code": 204,
+    "res_json": {'detail': "ingredient id doesn't exist"},
+    "req_json": {
+            "date_time": "2023-10-27T10:00:00",
+            "ingredient_id": 8,
+            "quantity": 1,
+        }
+}
+
+test_case_fail_update_zero_quantity = {
+    "req_url": "/crud/losses/2",
+    "method": "put",
+    "res_status_code": 422,
+    "res_json": {'detail': [{'ctx': {'gt': 0.0},
+                 'input': 0,
+                 'loc': ['body', 'quantity'],
+                 'msg': 'Input should be greater than 0',
+                 'type': 'greater_than'}]},
+    "req_json": {
+            "date_time": "2023-10-27T10:00:00",
+            "ingredient_id": 5,
+            "quantity": 0,
+        }
+}
+
+
+test_case_fail_update_wrong_date_time = {
+    "req_url": "/crud/losses/2",
+    "method": "put",
+    "res_status_code": 422,
+    "res_json": {'detail': [{'ctx': {'error': 'input is too short'},
+             'input': 'jdsbkfsd',
+             'loc': ['body', 'date_time'],
+             'msg': 'Input should be a valid datetime or date, input is too '
+                    'short',
+             'type': 'datetime_from_date_parsing'}]},
+    "req_json": {
+            "date_time": "jdsbkfsd",
+            "ingredient_id": 5,
+            "quantity": 1,
+        }
+}
+

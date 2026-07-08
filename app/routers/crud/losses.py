@@ -1,19 +1,29 @@
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.encoders import jsonable_encoder
 from fastapi.params import Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.status import HTTP_204_NO_CONTENT
+from starlette.responses import JSONResponse
 
 import app.core.config as config
 from app.core.logger import logger
 from app.db.database import get_db
 from app.schemas.losses import Loss as LossesSchema, LossGet
-from app.schemas.losses import LossesCreate
+from app.schemas.losses import LossesCreate, LossPutSchema
 from app.schemas.inventory import InventoryBase as InventorySchema
 from app.db.models import Losses, Inventory
 from app.db.injectors import db_item_injector
-from app.db.retrievers import retrieve_inventory
-from app.services.losses import get_losses
+from app.services.losses import (
+    get_losses,
+    service_delete_loss,
+    service_layer_update_loss,
+)
+from app.services.inventory import get_ingredients
+from app.services.losses import check_if_loss_id_exists
+from app.routers.crud.commons import update_item
+from app.services.orders import service_layer_get_loss_ingredient
 
 losses_crud_router = APIRouter(
     prefix="/losses",
@@ -21,7 +31,7 @@ losses_crud_router = APIRouter(
 )
 logger.info("Defined the losses router.")
 
-@losses_crud_router.post('/', response_model=LossesSchema,
+@losses_crud_router.post('', response_model=LossesSchema,
                          summary="creating a loss of ingredients record in the database",
                          status_code=201)
 async def create_loss(loss: LossesCreate,
@@ -32,7 +42,10 @@ async def create_loss(loss: LossesCreate,
     """
     logger.info(f"Creating a loss of ingredient: {loss.ingredient}")
     try:
-        ingredients = await retrieve_inventory(loss.ingredient, db)
+        ingredients = await get_ingredients(db=db,
+                                            ingredient_name=loss.ingredient,
+                                            first_item=True)
+
         if not ingredients:
             raise HTTPException(status_code=400, detail="ingredient name is not in the database.")
         db_item = Losses(
@@ -43,7 +56,7 @@ async def create_loss(loss: LossesCreate,
         await db_item_injector(db_item, db)
         return db_item
     except HTTPException as he:
-        if he.status_code in [400, 404]:
+        if he.status_code == 400:
             raise he
         else:
             raise HTTPException(
@@ -68,7 +81,7 @@ async def get_single_loss(db:Annotated[AsyncSession, Depends(get_db)],
     """
     logger.info("Getting losses by ID")
     try:
-        loss_objects = await get_losses(db, [loss_id])
+        loss_objects = await get_losses(db, [loss_id], first_item=False)
         return loss_objects
     except Exception as e:
         logger.error(f"error in getting losses endpoint: {e}")
@@ -100,7 +113,8 @@ async def get_losses_path_operation(db:Annotated[AsyncSession, Depends(get_db)],
                                         datetime_to,
                                         datetime_from,
                                         quantity_lt,
-                                        quantity_gt)
+                                        quantity_gt,
+                                        first_item=False)
         return loss_objects
     except HTTPException as he:
         logger.error(f"validation error in getting losses endpoint: {he}")
@@ -109,8 +123,6 @@ async def get_losses_path_operation(db:Annotated[AsyncSession, Depends(get_db)],
         logger.error(f"error in getting losses endpoint: {e}")
         raise HTTPException(500,
                             "something went wrong and we don't know what it is:(")
-
-
 
 
 @losses_crud_router.get('/{loss_id}/ingredient',
@@ -126,10 +138,93 @@ async def get_losses_ingredient(db:Annotated[AsyncSession, Depends(get_db)],
     """
     logger.info("Getting losses by constraints")
     try:
-        loss_objects = await get_losses(db,
-                                        loss_id)
-        return loss_objects[0].ingredient
+        ingredient = await service_layer_get_loss_ingredient(db=db, loss_id=loss_id)
     except Exception as e:
         logger.error(f"error in getting losses endpoint: {e}")
         raise HTTPException(500,
                             "something went wrong and we don't know what it is:(")
+    return ingredient
+
+
+@losses_crud_router.delete('/{loss_id}', status_code=204,
+                           summary="deleting a loss object")
+async def delete_loss(db:Annotated[AsyncSession, Depends(get_db)],
+                      loss_id: int):
+    logger.info(f"deleting loss object: {loss_id}")
+
+    try:
+        existence_of_obj = await check_if_loss_id_exists(db, loss_id)
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="there is a problem in the server and we know no more",
+        )
+    if not existence_of_obj:
+        logger.info(f"no losses found for loss id: {loss_id}")
+        return JSONResponse(status_code=HTTP_204_NO_CONTENT,
+                            content={"detail":"ID doesn't exist"})
+    try:
+        deleted_loss = await service_delete_loss(db, loss_id)
+        if not deleted_loss:
+            raise Exception(f"there was a problem in deleting {loss_id}")
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(500,"something went wrong and we don't know what it is:(")
+
+
+
+@losses_crud_router.delete('', status_code=204,
+                           summary="deleting a loss object")
+async def delete_loss_criteria(db:Annotated[AsyncSession, Depends(get_db)],
+                      loss_id: Annotated[List[int]|int|None, Query()]=None):
+    logger.info(f"deleting loss object: {loss_id}")
+    #check if it exists
+    try:
+        existence_of_obj = await check_if_loss_id_exists(db, loss_id)
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
+    if not existence_of_obj:
+        logger.info(f"no losses found for loss id: {loss_id}")
+        return JSONResponse(
+            status_code=HTTP_204_NO_CONTENT, content={"detail": "ID doesn't exist"}
+        )
+    try:
+        deleted_loss = await service_delete_loss(db, loss_id)
+        if deleted_loss:
+            return []
+        else:
+            raise Exception(f"there was a problem in deleting {loss_id}")
+    except Exception as e:
+        logger.error(f"error in deleting loss object: {e}")
+        if isinstance(e, HTTPException):
+            raise e
+        else:
+            raise HTTPException(500,"something went wrong and we don't know what it is:(")
+
+
+
+
+####update
+@losses_crud_router.put(
+    '/{loss_id}',
+    status_code=200,
+    summary="updating a loss object",
+)
+async def update_loss(db:Annotated[AsyncSession, Depends(get_db)],
+                      loss_id:int,
+                      loss_object: LossPutSchema) -> LossPutSchema:
+    logger.info(f"updating loss object: {loss_id}")
+    form_data = jsonable_encoder(loss_object)
+    try:
+        updated_loss = await update_item(db=db,
+                                         item_id=loss_id,
+                                         form_data=form_data,
+                                         service_layer_callable=service_layer_update_loss)
+    except Exception as e:
+        raise e
+    return updated_loss

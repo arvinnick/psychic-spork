@@ -1,3 +1,5 @@
+
+####post
 test_create_inventory_item_successful = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -28,11 +30,10 @@ test_create_inventory_item_wrong_supplier_fail = {"req_url": "/crud/inventory/",
                                                           "Tehran Supply Co.mn"
                                                       ]
                                                   },
-                                                  "res_status_code": 404,
+                                                  "res_status_code": 204,
                                                   "res_json": {
                                                       'detail': 'Supplier not found in the database.'}
                                                   }
-
 test_create_inventory_item_no_supplier_fail = {
     "req_url": "/crud/inventory/",
     "req_json": {
@@ -161,4 +162,403 @@ test_multiple_suppliers_success = {
 
                  ]
                  }
+}
+
+
+####get
+test_get_all_inventory = {
+    "req_url": "/crud/inventory",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+                {"name": "Wheat Flour", "quantity": 500.5},
+                {"name": "White Sugar", "quantity": 200.0},
+                {"name": "Vegetable Oil", "quantity": 150.75},
+                {"name": "Peanut", "quantity": 150.75},
+                {'name': 'Cucumber', 'quantity': 3.75}
+    ]
+}
+test_get_ont_inventory_item = {
+    "req_url": "/crud/inventory/1",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [{"name": "Wheat Flour", "quantity": 500.5}],
+}
+test_get_one_inventory_item_suppliers = {
+    "req_url": "/crud/inventory/1/suppliers",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+            {
+                "address": "1st Valiasr St, Tehran",
+                "email": "info@tehransupply.com",
+                "name": "Tehran Supply Co.",
+                "number": "tel:+98-21-1234-5678",
+            }
+    ],
+}
+test_get_wrong_format_inventory_item_fail = {
+    "req_url": "/crud/inventory/as",
+    "method": "get",
+    "res_status_code": 422,
+    "res_json": {
+                    'detail': [
+                        {'input': 'as',
+                         'loc': [
+                             'path', 'ingredient_id'
+                         ],
+                         'msg': 'Input should be a valid integer, unable to parse string as an integer',
+                         'type': 'int_parsing'
+                         }
+                    ]
+    }
+}
+test_get_inventory_non_existent_id = {
+    "req_url": "/crud/inventory/6",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": []
+}
+test_get_inventory_wrong_property = {
+    "req_url": "/crud/inventory/1/something",
+    "method": "get",
+    "res_status_code": 404,
+    "res_json": {"detail": "Not Found"},
+}
+test_get_inventory_filter_suppliers = {
+    "req_url": "/crud/inventory?supplier_id=1",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+        {"name": "Wheat Flour", "quantity": 500.5},
+        {"name": "White Sugar", "quantity": 200.0}
+    ],
+}
+test_get_inventory_filter_quantity_from = {
+    "req_url": "/crud/inventory?quantity_from=300",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+        {"name": "Wheat Flour", "quantity": 500.5},
+    ]
+}
+test_get_inventory_filter_quantity_to_from = {
+    "req_url": "/crud/inventory?quantity_from=300&quantity_to=500",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": []
+}
+test_get_inventory_filter_quantity_to = {
+    "req_url": "/crud/inventory?quantity_to=175",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+        {"name": "Vegetable Oil", "quantity": 150.75},
+        {"name": "Peanut", "quantity": 150.75},
+        {'name': 'Cucumber', 'quantity': 3.75}
+    ],
+}
+test_get_inventory_filter_quantity_empty = {
+    "req_url": "/crud/inventory?quantity_to=100",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+        {'name': 'Cucumber', 'quantity': 3.75}
+    ],
+}
+test_get_inventory_by_name = {
+    "req_url": "/crud/inventory?name=peanut",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [
+        {"name": "Peanut", "quantity": 150.75}
+    ],
+}
+test_get_inventory_by_name_multiple = {
+    "req_url": "/crud/inventory?name=peanut&name=vegetable-oil",
+    "method": "get",
+    "res_status_code": 200,
+    "res_json": [{'name': 'Vegetable Oil', 'quantity': 150.75},
+                 {'name': 'Peanut', 'quantity': 150.75}],
+}
+
+##delete
+test_successful_delete = {
+    "req_url": "/crud/inventory/4",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+test_successful_delete_list = {
+    "req_url": "/crud/inventory?ingredient_id=4&ingredient_id=5",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":True,
+    "res_json": None,
+}
+
+test_wrong_format_delete = {
+    "req_url": "/crud/inventory/asa",
+    "method": "delete",
+    "res_status_code": 422,
+    "existing_resource":False,
+    "res_json": {'detail': [{'input': 'asa',
+             'loc': ['path', 'ingredient_id'],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]},
+}
+
+test_non_existing_resource_delete = {
+    "req_url": "/crud/inventory/6",
+    "method": "delete",
+    "res_status_code": 204,
+    "existing_resource":False,
+    "res_json": {"detail":"ID doesn't exist"},
+}
+
+
+test_dependant_entity_delete_restrict = {
+    "req_url": "/crud/inventory/1",
+    "method": "delete",
+    "res_status_code": 409,
+    "existing_resource":False,
+    "res_json": {"detail":"the operation is restricted by database constraints"},
+}
+
+
+####put
+#success
+test_put_inventory_item_successful_quantity = {
+    "req_url": "/crud/inventory/3",
+    "existing_resource":True,
+    "method": "put",
+    "req_json": {
+        "name": "Vegetable Oil",
+        "quantity": 200
+    },
+    "res_status_code": 200,
+    'res_json': {
+        "name": "Vegetable Oil",
+        "quantity": 200,
+                 },
+    "dependent_objects": [
+        {
+            "req_url": "/crud/suppliers/2/ingredients",
+            "res_status_code": 200,
+            "method": "get",
+            "res_json": [
+                {"name": "Vegetable Oil", "quantity": 200}
+            ]
+        }
+    ]
+}
+
+
+
+
+test_put_inventory_item_successful_name_and_supplier = {
+    "req_url": "/crud/inventory/3",
+    "method": "put",
+    "existing_resource": True,
+    "req_json": {
+        "name": "Vegetable Oil",
+        "quantity": 120,
+    },
+    "res_status_code": 200,
+    "res_json": {
+        "name": "Vegetable Oil",
+        "quantity": 120,
+    },
+    "dependent_objects": [
+        {
+            "req_url": "/crud/suppliers/2/ingredients",
+            "res_status_code": 200,
+            "method": "get",
+            "res_json": [
+                {"name": "Vegetable Oil", "quantity": 120},
+            ],
+        }
+    ],
+}
+
+
+#fail
+test_put_inventory_item_fail_non_existing_entity = {
+    "req_url": "/crud/inventory/8",
+    "method": "put",
+    "req_json": {
+        "name": "updated_string",
+        "quantity": 2,
+    },
+    "res_status_code": 204,
+    "res_json": {"details": "the inventory item doesn't exist"},
+}
+
+
+
+test_put_inventory_item_fail_non_existing_attribute = {
+    "req_url": "/crud/inventory/1",
+    "method": "put",
+    "req_json": {
+        "namee": "updated_string",
+        "quantity": 2,
+    },
+    "res_status_code": 422,
+    "res_json": {'detail': [{'input': {'namee': 'updated_string',
+                       'quantity': 2},
+             'loc': ['body', 'name'],
+             'msg': 'Field required',
+             'type': 'missing'}]},
+}
+
+test_put_inventory_item_fail_validation = {
+    "req_url": "/crud/inventory/1",
+    "method": "put",
+    "req_json": {
+        "namee": "updated_string",
+        "quantity": -1
+    },
+    "res_status_code": 422,
+    "res_json": {'detail': [{'input': {'namee': 'updated_string',
+                       'quantity': -1},
+             'loc': ['body', 'name'],
+             'msg': 'Field required',
+             'type': 'missing'},
+            {'ctx': {'ge': 0.0},
+             'input': -1,
+             'loc': ['body', 'quantity'],
+             'msg': 'Input should be greater than or equal to 0',
+             'type': 'greater_than_equal'}]},
+}
+
+test_put_inventory_item_fail_type = {
+    "req_url": "/crud/inventory/1",
+    "method": "put",
+    "req_json": {
+        "namee": "updated_string",
+        "quantity": "asa"
+    },
+    "res_status_code": 422,
+    "res_json": {'detail': [{'input': {'namee': 'updated_string',
+                       'quantity': 'asa'},
+             'loc': ['body', 'name'],
+             'msg': 'Field required',
+             'type': 'missing'},
+            {'input': 'asa',
+             'loc': ['body', 'quantity'],
+             'msg': 'Input should be a valid number, unable to parse string as '
+                    'a number',
+             'type': 'float_parsing'}]},
+}
+
+
+
+#######supplier ingredient relationship checker
+test_case_insert_single_supplier_success = {
+    "supplier_ingredient_relation":True,
+    "success":True,
+    "orders_check":True,
+    "request_endpoint":"/crud/inventory/1/suppliers/2",
+    "method":"post",
+    "response_status_code":200,
+    "child_checking_endpoint":"/crud/inventory/1/suppliers",
+    "child_check_response_payload":[{
+                    "name": "South Trading",
+                    "address": "Coastal Blvd, Bandar Abbas",
+                    "number": "tel:+98-76-1234-5678",
+                    "email": None,
+                }]
+}
+
+
+test_case_insert_multiple_supplier_success = {
+    "supplier_ingredient_relation":True,
+    "success":True,
+    "orders_check":True,
+    "request_endpoint":"/crud/inventory/1?supplier_id=2&supplier_id=3",
+    "method":"post",
+    "response_status_code":200,
+    "child_checking_endpoint":"/crud/inventory/1/suppliers",
+    "child_check_response_payload":[
+        {
+            "name": "South Trading",
+            "address": "Coastal Blvd, Bandar Abbas",
+            "number": "tel:+98-76-1234-5678",
+            "email": None
+        },
+        {
+            "name": "Sepehr Machinery",
+            "address": "1st Valiasr St, Mashahad",
+            "number": "tel:+98-21-1234-5678",
+            "email": "info@tehransupply.com"
+        }
+    ]
+}
+
+###fail
+test_case_insert_wrong_datatype_fail_second_case = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventory/1/suppliers/asa",
+    "method":"post",
+    "response_status_code":422,
+    "response_payload":{'detail': [{'input': 'asa',
+             'loc': ['path', 'supplier_id'],
+             'msg': 'Input should be a valid integer, unable to parse string '
+                    'as an integer',
+             'type': 'int_parsing'}]}
+}
+
+test_case_insert_wrong_datatype_fail = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventory/1?supplier_id=a",
+    "method":"post",
+    "response_status_code":422,
+    "response_payload":{'detail': [{'input': 'a',
+                                    'loc': ['query', 'supplier_id', 'list[int]', 0],
+                                    'msg': 'Input should be a valid integer, unable to parse string '
+                                            'as an integer',
+                                     'type': 'int_parsing'},
+                                    {'input': ['a'],
+                                     'loc': ['query', 'supplier_id', 'int'],
+                                     'msg': 'Input should be a valid integer',
+                                     'type': 'int_type'}]}
+}
+
+
+test_case_insert_non_existing_ingredient_fail = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventory/9/suppliers/2",
+    "method":"post",
+    "response_status_code":406,
+    "response_payload":{'detail': 'ingredient id 9 does not exist'}
+}
+
+
+test_case_insert_non_existing_supplier_fail = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventory/1/suppliers/8",
+    "method":"post",
+    "response_status_code":406,
+    "response_payload":{'detail': 'one or more supplier ids 8 do not exist'}
+}
+
+
+test_case_insert_wrong_endpoint_fail = {
+    "supplier_ingredient_relation":True,
+    "success":False,
+    "orders_check":False,
+    "request_endpoint":"/crud/inventor_y/1/suppliers/8",
+    "method":"post",
+    "response_status_code":404
 }

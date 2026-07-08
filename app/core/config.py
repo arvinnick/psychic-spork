@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     DEV_ENGINE_URI : str = f"sqlite+aiosqlite:///{DEV_SQLITE_FILE_NAME}"
     TEST_SQLITE_FILE_NAME: str = f"{BASE_DIR}/testdb.sqlite"
     TEST_ENGINE_URI: str = f"sqlite+aiosqlite:///{TEST_SQLITE_FILE_NAME}"
-    DEBUG : bool = False
-    echo_sql: bool = True
+    DEBUG : bool = True
+    ECHO_SQL: bool = False
     HASH_SALT : str | None = None
     HASH_MIN_LEN: int | None = None
 

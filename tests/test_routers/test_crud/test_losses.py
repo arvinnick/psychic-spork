@@ -1,24 +1,44 @@
 import pytest
 from tests.conftest import frozen_test_time
-from tests.parameters.routers.crud.loss import (test_quantity_zero_fail,
-                                                test_quantity_negative_fail,
-                                                test_success_created,
-                                                test_ingredient_name_not_in_database_fail,
-                                                test_filter_quantity_lt,
-                                                test_filter_quantity_gt_wrong_format,
-                                                test_filter_quantity_lt_wrong_format,
-                                                test_filter_quantity_gt,
-                                                test_filter_datetime_to,
-                                                test_filter_datetime_from,
-                                                test_filter_datetime_from_to,
-                                                test_filter_quantity_gt_lt,
-                                                test_filter_datetime_to_wrong_format,
-                                                test_filter_ingredient_id,
-                                                test_filter_ingredient_id_wrong_format,
-                                                test_success_singular_ingredient,
-                                                test_success_singular,
-                                                test_success_all
-                                                )
+from tests.parameters.routers.crud.loss import (
+    test_quantity_zero_fail,
+    test_quantity_negative_fail,
+    test_success_created,
+    test_ingredient_name_not_in_database_fail,
+    test_filter_quantity_lt,
+    test_filter_quantity_gt_wrong_format,
+    test_filter_quantity_lt_wrong_format,
+    test_filter_quantity_gt,
+    test_filter_datetime_to,
+    test_filter_datetime_from,
+    test_filter_datetime_from_to,
+    test_filter_quantity_gt_lt,
+    test_filter_datetime_to_wrong_format,
+    test_filter_ingredient_id,
+    test_filter_ingredient_id_wrong_format,
+    test_success_singular_ingredient,
+    test_success_singular,
+    test_success_all,
+    test_success_singular_id_non_existent,
+    test_fail_wrong_sub_resources,
+    test_fail_string_id,
+    ###delete
+    test_non_existing_resource_delete,
+    test_wrong_format_delete,
+    test_successful_delete,
+    test_successful_delete_list,
+    test_fail_not_existing_delete_list,
+    ####put
+    test_case_success_update_quantity_ingredient,
+    test_case_fail_update_quantity_minus,
+    test_case_fail_update_zero_quantity,
+    test_case_fail_update_non_existing_ingred_id,
+    test_case_success_update_quantity,
+    test_case_success_update_ingredient,
+    test_case_success_update_datetime,
+    test_case_success_non_existing_entity,
+    test_case_fail_update_wrong_date_time
+)
 
 
 @pytest.mark.anyio
@@ -26,12 +46,12 @@ from tests.parameters.routers.crud.loss import (test_quantity_zero_fail,
 @pytest.mark.parametrize(
 "param_dict",
     [
-        ###########post
+        ########post
         test_quantity_zero_fail,
         test_quantity_negative_fail,
         test_success_created,
         test_ingredient_name_not_in_database_fail,
-        ###########get
+        #########get
         test_filter_quantity_lt,
         test_filter_quantity_gt_wrong_format,
         test_filter_quantity_lt_wrong_format,
@@ -45,8 +65,27 @@ from tests.parameters.routers.crud.loss import (test_quantity_zero_fail,
         test_filter_ingredient_id_wrong_format,
         test_success_singular_ingredient,
         test_success_singular,
-        test_success_all
-    ]
+        test_success_all,
+        test_success_singular_id_non_existent,
+        test_fail_wrong_sub_resources,
+        test_fail_string_id,
+        ############delete
+        test_non_existing_resource_delete,
+        test_wrong_format_delete,
+        test_successful_delete,
+        test_successful_delete_list,
+        test_fail_not_existing_delete_list,
+        ############put
+        test_case_success_update_quantity_ingredient,
+        test_case_fail_update_quantity_minus,
+        test_case_fail_update_zero_quantity,
+        test_case_fail_update_non_existing_ingred_id,
+        test_case_success_update_quantity,
+        test_case_success_update_ingredient,
+        test_case_success_update_datetime,
+        test_case_success_non_existing_entity,
+        test_case_fail_update_wrong_date_time
+        ]
 )
 async def test_losses(blueprint_fixture, param_dict):
     await blueprint_fixture(param_dict)

@@ -1,13 +1,21 @@
 from typing import AsyncGenerator, Any
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import (
+    create_async_engine,
+    async_sessionmaker,
+    AsyncSession,
+    AsyncEngine,
+)
 
 from app.core.config import settings
 
 if settings.PROD:
     engine = create_async_engine(settings.PROD_ENGINE_URI, echo=False)
 else:
-    engine = create_async_engine(settings.DEV_ENGINE_URI, echo=True if settings.DEBUG else False)
+    engine = create_async_engine(settings.DEV_ENGINE_URI, echo=True if settings.ECHO_SQL else False,
+                                 )
+
+
 
 
 
@@ -15,6 +23,7 @@ async_session_maker = async_sessionmaker(
     engine,
     class_=AsyncSession,
     expire_on_commit=False,  # Prevent lazy loading issues after commit
+
 )
 
 
@@ -28,3 +37,6 @@ async def get_db() -> AsyncGenerator[AsyncSession, Any]:
     async with async_session_maker() as session:
         async with session.begin():
             yield session
+
+async def get_engine() -> AsyncGenerator[AsyncEngine, Any]:
+    yield engine

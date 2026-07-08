@@ -1,18 +1,24 @@
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.core.config as config
 from app.db.database import get_db
 from app.core.logger import logger
-from app.schemas.orders import Order as SchemasOrder, OrderGet
+from app.schemas.orders import Order as SchemasOrder, OrderGet, OrderGetItem
 from app.schemas.orders import OrderCreate
 from app.schemas.supplier import SupplierBase as SchemasSupplier
 from app.schemas.inventory import Inventory as SchemasIngredient
 from app.db.models import Orders, Supplier, Inventory
 from app.db.crud.orders import db_layer_create_order
-from app.services.orders import get_orders
+from app.services.orders import (
+    delete_orders_service_layer,
+    service_layer_update_order,
+)
+from app.services.commons import get_orders
+from app.routers.crud.commons import delete_item, update_item
 
 orders_crud_router = APIRouter(
     prefix="/orders",
@@ -36,7 +42,7 @@ async def create_order(order: OrderCreate, db:Annotated[AsyncSession, Depends(ge
         return db_item
     except Exception as e:
         logger.error(f"exception is risen in the order post router: {e}")
-        if isinstance(e, HTTPException) and e.status_code in [400,404]:
+        if isinstance(e, HTTPException) and e.status_code in [400, 204, 409]:
             raise e
         else:
             raise HTTPException(status_code=500,
@@ -105,3 +111,73 @@ async def get_order_ingredient(db:Annotated[AsyncSession, Depends(get_db)],
     order =  await get_orders(db,
                      order_id)
     return order[0].ingredient
+
+
+@orders_crud_router.delete(
+    "/{order_id}",
+    summary="delete an order",
+    status_code=204
+)
+async def delete_order_item(
+        db: Annotated[AsyncSession, Depends(get_db)],
+        order_id: int
+):
+    logger.info(f"deleting order object: {order_id}")
+    try:
+        deleted_item = await delete_item(
+            db=db,
+            item_id=order_id,
+            getter_func=get_orders,
+            model=Orders,
+            service_delete_function=delete_orders_service_layer,
+        )
+    except HTTPException as he:
+        logger.error(he)
+        raise he
+    except Exception as e:
+        logger.error(f"error in deleting inventory object: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="there is a problem in the server and we know no more",
+        )
+    return deleted_item
+
+
+@orders_crud_router.delete("",
+                              status_code=204,
+                              summary="deleting a list of orders")
+async def delete_inventory_list(db: Annotated[AsyncSession, Depends(get_db)],
+                                order_id: Annotated[List[int]|int, Query()]):
+    logger.info(f"deleting inventory object(s): {order_id}")
+    try:
+        deleted_item = await delete_item(db=db, item_id=order_id,
+                                             getter_func=get_orders, model=Orders,
+                                             service_delete_function=delete_orders_service_layer)
+    except HTTPException as he:
+        logger.error(he)
+        raise he
+    except Exception as e:
+        logger.error(f"error in deleting inventory object: {e}")
+        raise HTTPException(status_code=500, detail="there is a problem in the server and we know no more")
+    return deleted_item
+
+
+@orders_crud_router.put("/{order_id}",
+                        status_code=200,
+                        summary="update an order",
+                        response_model=OrderGetItem)
+async def update_order_item(db: Annotated[AsyncSession, Depends(get_db)],
+                            order_id: int,
+                            order: OrderGetItem):
+    logger.info(f"updating order object: {order_id}")
+    form_data = jsonable_encoder(order)
+    try:
+        updated_order = await update_item(
+            db=db,
+            item_id=order_id,
+            form_data=form_data,
+            service_layer_callable=service_layer_update_order,
+        )
+    except Exception as e:
+        raise e
+    return updated_order

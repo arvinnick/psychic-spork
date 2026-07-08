@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 from typing import List
 
 from app.schemas.supplier import SupplierBase
@@ -14,3 +14,13 @@ class Inventory(InventoryBase):
 
 class InventoryCreate(Inventory):
     suppliers: List[str]
+
+class InventoryGet(RootModel[List[InventoryBase]]):
+    pass
+
+
+class InventoryPutItem(InventoryBase):
+    pass
+
+class InventoryPutResponse(InventoryBase):
+    pass
