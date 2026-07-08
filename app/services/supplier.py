@@ -18,7 +18,7 @@ from app.db.retrievers import retrieve_suppliers_for_ingredient as db_layer_supp
 from app.services.commons import (
     check_if_item_exists,
 )
-from core.logger import logger
+from app.core.logger import logger
 
 
 async def get_suppliers(

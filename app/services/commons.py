@@ -8,7 +8,7 @@ from app.core import config
 from app.db.models import Orders
 from app.db.retrievers import retrieve_orders
 from app.internals.helpers import datetime_converter
-from core.logger import logger
+from app.core.logger import logger
 
 
 async def check_if_item_exists(db:AsyncSession,

@@ -3,11 +3,11 @@ from typing import List
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 
-from core.logger import logger
-from db.crud.inventory import database_layer_add_supplier_to_ingredient
-from db.injectors import database_layer_add_ingredient_to_supplier
-from services.inventory import check_if_ingredient_id_exists
-from services.supplier import (
+from app.core.logger import logger
+from app.db.crud.inventory import database_layer_add_supplier_to_ingredient
+from app.db.injectors import database_layer_add_ingredient_to_supplier
+from app.services.inventory import check_if_ingredient_id_exists
+from app.services.supplier import (
     check_if_supplier_id_exists,
 )
 

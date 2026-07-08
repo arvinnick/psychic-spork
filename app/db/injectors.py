@@ -2,8 +2,8 @@ from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 
 from app.db.models import Base
-from core.logger import logger
-from db.models import SupplierInventoryAssociation
+from app.core.logger import logger
+from app.db.models import SupplierInventoryAssociation
 
 
 async def db_item_injector(db_item:Base, db:AsyncSession):

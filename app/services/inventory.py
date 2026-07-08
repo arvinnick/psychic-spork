@@ -10,9 +10,9 @@ from app.db.crud.inventory import (
     db_layer_delete_inventory,
     db_layer_update_inventory
 )
-from core.logger import logger
-from db.models import Inventory
-from services.commons import (
+from app.core.logger import logger
+from app.db.models import Inventory
+from app.services.commons import (
     check_if_item_exists,
 )
 

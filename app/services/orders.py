@@ -11,10 +11,10 @@ from app.db.models import Orders
 from app.core.logger import logger
 from app.services.commons import check_if_item_exists, update_service_layer
 from app.services.commons import get_orders
-from db.crud.inventory import get_ingredients_db_level
-from db.models import Inventory, Supplier
-from services.losses import get_losses
-from services.supplier import get_suppliers_for_ingredient, get_suppliers
+from app.db.crud.inventory import get_ingredients_db_level
+from app.db.models import Inventory, Supplier
+from app.services.losses import get_losses
+from app.services.supplier import get_suppliers_for_ingredient, get_suppliers
 
 
 async def check_if_order_id_exists(db:AsyncSession,
