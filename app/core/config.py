@@ -9,8 +9,6 @@ PARENT_DIR = BASE_DIR.parent
 POSTGRES_USER = environ["POSTGRES_USER"]
 POSTGRES_PASSWORD = environ["POSTGRES_PASSWORD"]
 POSTGRES_DB = environ["POSTGRES_DB"]
-# logger.logger.info(f"Postgres user: {POSTGRES_USER}")
-# logger.logger.info(f"Postgres password: {POSTGRES_PASSWORD}")
 logger.logger.info(f"Postgres database: {POSTGRES_DB}")
 class Settings(BaseSettings):
     PROD : bool = False
