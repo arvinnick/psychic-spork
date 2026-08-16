@@ -13,5 +13,5 @@ aiosqlite #for async access to sqlite databases
 asyncpg #for async access to postgresql databases
 sqlalchemy[asyncio]
 pydantic-settings
-
+asyncpg
 starlette
